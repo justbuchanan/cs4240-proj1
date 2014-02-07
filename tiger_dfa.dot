@@ -1,0 +1,93 @@
+digraph tiger {
+	//	start state
+	S;
+
+	//	syntax error
+	Error [color=red, shape=diamond];
+
+	//	token types
+	node [shape=doublecircle];
+	S -> COMMA [label=","];
+	S -> COLON [label=":"];
+	S -> SEMI [label=";"];
+	S -> LPAREN [label="("];
+	S -> RPAREN [label=")"];
+	S -> LBRACK [label="["];
+	S -> RBRACK [label="]"];
+	S -> LBRACE [label="{"];
+	S -> RBRACE [label="}"];
+	S -> PERIOD [label="."];
+	S -> PLUS [label="+"];
+	S -> MINUS [label="-"];
+	S -> MULT [label="*"];
+	S -> DIV [label="/"];
+	S -> EQ [label="="];
+	
+	S -> NEQ_ [label="!"];
+	NEQ_ [shape="circle"];
+	NEQ_ -> NEQ [label="="];
+
+	S -> LESSER [label="<"];
+	S -> GREATER [label=">"];
+	S -> LESSEREQ [label="<="];
+	S -> GREATEREQ [label=">="];
+	S -> AND [label=""];
+	S -> OR [label=""];
+	S -> ASSIGN [label=""];
+
+	//	keywords
+	ARRAY
+	S -> a [label="a"];
+	a [label="a (identifier)"];
+	a -> ar [label="r"];
+	a -> ID [label="[^r]"];
+	ar [label="ar (identifier)"];
+	ar -> arr [label="r"];
+	ar -> ID [label="[^r]"];
+	arr [label="arr (identifier)"];
+	arr -> arra [label="a"];
+	arr -> ID [label="[^a]"];
+	arra [label="arra (identifier)"];
+	arra -> ARRAY [label="y"];
+	arra -> ID [label="[^y]"];
+
+	//	TODO: tim
+	BREAK
+	BEGIN
+	DO
+	FOR 
+	FUNC
+	VAR
+
+	//	TODO: matt
+	IF
+	IN
+	LET
+	OF
+	THEN
+	TO
+	TYPE
+
+	//	TODO: justin
+	ENDIF
+	ENDDO
+	ELSE
+	END
+	WHILE
+	NIL
+
+	//	data
+	ID;
+	S -> ID [label="[a-zA-Z_]"];
+	ID -> ID [label="[a-zA-Z0-9_]"];
+
+	INTLIT;
+	S -> INTLIT [label="[0-9]"];
+	INTLIT -> INTLIT [label="[0-9]"];
+
+	STRLIT;
+	STRLIT_PART [shape=circle];	//	not an accept state
+	S -> STRLIT_PART [label="\""];
+	STRLIT_PART -> STRLIT_PART [label="[^\"]"];	//	FIXME: is regex ok?
+	STRLIT_PART -> STRLIT [label="\""];
+}
