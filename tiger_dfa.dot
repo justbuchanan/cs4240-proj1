@@ -68,13 +68,69 @@ digraph tiger {
 	TO
 	TYPE
 
+
+	ENDIF;
+	S -> e [label="e"];
+	e [label="e (identifier)"];
+	e -> ID [label="[^nl]"];//
+	e -> en [label="n"];
+	en [label="en (identifier)"];
+	en -> ID [label="[^d]"];
+	en -> END [label="d"];
+	END;//
+	END -> ID [label="[^di]"];//
+	END -> endi [label="i"];
+	endi [label="endi (identifier)"];
+	endi -> ID [label="[^f]"];
+	endi -> ENDIF [label="f"];
+
+
+	ENDDO;
+	END -> endd [label="d"];
+	endd -> ENDDO [label="o"];
+	endd [label="endd (identifier)"];
+	endd -> ID [label="[^o]"];
+
+
+	ELSE;
+	e -> el [label="e"];
+	el [label="el (identifier)"];
+	el -> els [label="s"];
+	el -> ID [label="[^s]"];
+	els [label="els (identifier)"];
+	els -> ELSE [label="e"];
+	els -> ID [label="[^e]"];
+
+
+	END;
+
+
 	//	TODO: justin
-	ENDIF
-	ENDDO
-	ELSE
-	END
-	WHILE
-	NIL
+	WHILE;
+	S -> w [label="w"];
+	w -> wh [label="h"];
+	w -> ID [label="[^h]"];
+	w [label="w (identifier)"];
+	wh -> whi [label="i"];
+	wh -> ID [label="[^i]"];
+	wh [label="wh (identifier)"];
+	whi -> whil [label="l"];
+	whi -> ID [label="[^l]"];
+	whi [label="whi (identifier)"];
+	whil -> WHILE [label="e"];
+	whil -> ID [label="[^e]"];
+	whil [label="whil (identifier)"];
+
+
+	NIL;
+	S -> n;
+	n -> ni [label="i"];
+	n -> ID [label="[^i]"];
+	n [label="n (identifier)"];
+	ni -> NIL [label="l"];
+	ni -> ID [label="[^l]"];
+	ni [label="ni (identifier)"];
+
 
 	//	data
 	ID;
