@@ -53,11 +53,61 @@ digraph tiger {
 
 	//	TODO: tim
 	BREAK
+	S -> b [label="b"];
+	b [label="b (identifier)"];
+	b -> br [label="r"];
+	b -> ID [label="[^r^e]"];
+	br [label="br (identifier)"];
+	br -> bre [label="e"];
+	br -> ID [label="[^e]"];
+	bre [label="bre (identifier)"];
+	bre -> brea [label="a"];
+	bre -> ID [label="[^a]"];
+	brea [label="brea (identifier)"];
+	brea -> BREAK [label="k"];
+	brea -> ID [label="[^k]"];
+
 	BEGIN
+	b -> eBEGIN [label="e"];
+	eBEGIN [label="be (identifier)"];
+	eBEGIN -> g [label="g"];
+	eBEGIN -> ID [label="[^g]"];
+	g [label="beg (identifier)"];
+	g -> i [label="i"];
+	g -> ID [label="[^i]"];
+	i [label="begi (identifier)"];
+	i -> BEGIN[label="n"];
+	i -> ID [label="[^n]"];
+
 	DO
-	FOR 
+	S -> d [label="d"];
+	d [label="d (identifier)"];	
+	d -> ID [label="[^o]"];
+	d -> DO [label="o"];
+	FOR
+	S -> f [label="f"];
+	f [label="f (identifier)"];
+	f -> fo [label="o"];
+	f -> ID [label="[^o^u]"];
+	fo [label="fo (identifier)"];
+	fo -> FOR [label="r"];
+	fo -> ID [label="[^e]"];
 	FUNC
+	f -> fu [label="u"];
+	fu [label="fu (identifier)"];
+	fu -> ID [label="[^n]"];
+	fu -> fun [label="n"];
+	fun -> FUNC [label="c"];
+	fun -> ID [label="[^c]"];
+	fun [label="fun (identifier)"];
 	VAR
+	S -> v [label="v"];
+	v [label="v (identifier)"];
+	v -> va [label="a"];
+	v -> ID [label="[^a]"];
+	va [label="va (identifier)"];
+	va -> VAR [label="r"];
+    va -> ID [label="[^r]"];
 
 	//	TODO: matt
 	IF;
