@@ -196,7 +196,6 @@ digraph tiger {
 	END;
 
 
-	//	TODO: justin
 	WHILE;
 	S -> w [label="w"];
 	w -> wh [label="h"];
@@ -221,6 +220,11 @@ digraph tiger {
 	ni -> NIL [label="l"];
 	ni -> ID [label="[^l]"];
 	ni [label="ni (identifier)"];
+
+
+	//	comments
+	DIV -> COMMENT_BEGIN [label="*"];
+	MULT -> COMMENT_END [label="/"];
 
 
 	//	data
