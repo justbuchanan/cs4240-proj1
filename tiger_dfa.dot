@@ -60,11 +60,32 @@ digraph tiger {
 	VAR
 
 	//	TODO: matt
-	IF
-	IN
-	LET
-	OF
-	THEN
+	IF;
+	S -> i [label="i"];
+	i [label="i (identifier)"];
+	i -> ID [label="[^(fn)]"];
+	i -> IF [label="f"];
+
+
+	IN;
+	i -> IN [label="n"];
+
+	LET;
+	S -> l [label="l"];
+	l [label="l (identifier)"];
+	l -> ID [label="[^e]"];
+	l -> le [label="e"];
+	le [label="le (identifier)"];
+	le -> ID [label="[^t]"];
+	le -> LET [label ="t"];
+
+	OF;
+	S-> o [label="o"];
+	o [label="o (identifier)"];
+	o -> ID [label="[^f]"];
+	o -> OF [label="f"];
+
+	THEN; 
 	TO
 	TYPE
 
