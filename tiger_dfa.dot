@@ -113,7 +113,7 @@ digraph tiger {
 	IF;
 	S -> i [label="i"];
 	i [label="i (identifier)"];
-	i -> ID [label="[^(fn)]"];
+	i -> ID [label="[^(f | n)]"];
 	i -> IF [label="f"];
 
 
@@ -135,9 +135,29 @@ digraph tiger {
 	o -> ID [label="[^f]"];
 	o -> OF [label="f"];
 
-	THEN; 
-	TO
-	TYPE
+	THEN;
+	S -> t [label="t"];
+	t [label="t (identifier)"];
+	t -> ID [label="[^(h | o | y | e)]"];
+	t -> th [label="h"];
+	th [label="th (identifier)"];
+	th -> ID [label="[^e]"];
+	th -> the [label="e"];
+	the [label="the (identifier)"];
+	the -> ID [label="[^n]"];
+	the -> THEN [label="n"];
+
+	TO;
+	t -> TO [label="o"];
+
+	TYPE;
+	t -> ty [label ="y"];
+	ty [label="ty (identifier)"];
+	ty -> ID [label="[^p]"];
+	ty -> typ [label="p"];
+	typ [label="typ (identifier)"];
+	typ -> ID [label="[^e]"];
+	typ -> TYPE [label="e"];
 
 
 	ENDIF;
