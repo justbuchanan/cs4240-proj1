@@ -30,7 +30,10 @@ digraph tiger {
 	GREATER -> GREATEREQ [label="="];
 	S -> AND [label="&"];
 	S -> OR [label="|"];
-	S -> ASSIGN [label=""];
+
+	_ASSIGN [shape=circle];
+	S -> _ASSIGN [label=":"];
+	_ASSIGN -> ASSIGN [label="="];
 
 	//	keywords
 	ARRAY
