@@ -3,7 +3,7 @@ digraph tiger {
 	S;
 
 	//	syntax error
-	Error [color=red, shape=diamond];
+	//Error [color=red, shape=diamond];
 
 	//	token types
 	node [shape=doublecircle];
