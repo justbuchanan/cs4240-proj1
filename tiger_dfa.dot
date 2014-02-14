@@ -38,9 +38,12 @@ digraph tiger {
 	
 
 	//	comments
+	COMMENT_BEGIN, _COMMENT_END [shape=circle];
 	DIV -> COMMENT_BEGIN [label="*"];
-	MULT -> COMMENT_END [label="/"];
-
+	COMMENT_BEGIN -> COMMENT_BEGIN [label="[^*]"]
+	COMMENT_BEGIN -> _COMMENT_END [label="*"];
+	_COMMENT_END -> COMMENT_BEGIN [label="[^/]"];
+	_COMMENT_END -> COMMENT [label="/"];
 
 	//	data
 	ID;
