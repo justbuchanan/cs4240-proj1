@@ -59,4 +59,7 @@ digraph tiger {
 	S -> STRLIT_PART [label="\""];
 	STRLIT_PART -> STRLIT_PART [label="[^\"]"];	//	FIXME: is regex ok?
 	STRLIT_PART -> STRLIT [label="\""];
+	STRLIT_SLASH [shape=circle];
+	STRLIT_PART -> STRLIT_SLASH [label="[\\]"];
+	STRLIT_SLASH -> STRLIT_PART [label="[.]"];
 }
