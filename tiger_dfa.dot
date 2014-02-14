@@ -23,16 +23,13 @@ digraph tiger {
 	S -> DIV [label="/"];
 	S -> EQ [label="="];
 	
-	S -> NEQ_ [label="!"];
-	NEQ_ [shape="circle"];
-	NEQ_ -> NEQ [label="="];
-
 	S -> LESSER [label="<"];
+	LESSER -> NEQ [label=">"];
 	S -> GREATER [label=">"];
-	S -> LESSEREQ [label="<="];
-	S -> GREATEREQ [label=">="];
-	S -> AND [label=""];
-	S -> OR [label=""];
+	LESSER -> LESSEREQ [label="="];
+	GREATER -> GREATEREQ [label="="];
+	S -> AND [label="&"];
+	S -> OR [label="|"];
 	S -> ASSIGN [label=""];
 
 	//	keywords
