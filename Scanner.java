@@ -1,9 +1,12 @@
-
+import java.util.Map;
 
 public class Scanner {
 
 	//	stateTransitionTable[currentState][nextCharacter] = nextState
 	private int[][] _stateTransitionTable;
+
+	//	example: _keywordTable["for"] = FOR
+	private Map<String, State> _keywordTable;
 
 	//	where we're currently at in the string
 	private int _strIndex;
@@ -46,7 +49,7 @@ public class Scanner {
 
 	/**
 	 * Initializes the contents of @_stateTransitionTable so it is
-	 * ready to scan the 'Tiger' language
+	 * ready to scan the 'Tiger' language.  Also sets up @_keywordTable.
 	 */
 	private void setupTransitionTable() {
 		//	initialize all entries to -1 (not a state)
@@ -82,8 +85,6 @@ public class Scanner {
 		_stateTransitionTable[State.LESSER.ordinal()]['='] = State.LESSEREQ.ordinal();
 		_stateTransitionTable[State.GREATER.ordinal()]['='] = State.GREATEREQ.ordinal();
 
-
-		//	TODO: STRLIT, COMMENT
 
 		//	INTLIT
 
@@ -144,6 +145,31 @@ public class Scanner {
 			_stateTransitionTable[State._COMMENT_END.ordinal()][i] = State._COMMENT_END.ordinal();
 		}
 		_stateTransitionTable[State._COMMENT_END.ordinal()]['/'] = State.COMMENT.ordinal();
+
+
+		//	setup the keyword table
+		_keywordTable = new Map<>();
+		_keywordTable["array"] 	= ARRAY;
+		_keywordTable["break"] 	= BREAK;
+		_keywordTable["do"] 	= DO;
+		_keywordTable["else"] 	= ELSE;
+		_keywordTable["end"] 	= END;
+		_keywordTable["for"] 	= FOR;
+		_keywordTable["func"] 	= FUNC;
+		_keywordTable["if"] 	= IF;
+		_keywordTable["in"] 	= IN;
+		_keywordTable["let"] 	= LET;
+		_keywordTable["nil"] 	= NIL;
+		_keywordTable["of"] 	= OF;
+		_keywordTable["then"] 	= THEN;
+		_keywordTable["to"] 	= TO;
+		_keywordTable["type"] 	= TYPE;
+		_keywordTable["var"] 	= VAR;
+		_keywordTable["while"] 	= WHILE;
+		_keywordTable["endif"] 	= ENDIF;
+		_keywordTable["begin"] 	= BEGIN;
+		_keywordTable["end"] 	= END;
+		_keywordTable["enddo"] 	= ENDDO;
 	}
 
 
@@ -221,9 +247,36 @@ public class Scanner {
 		STRLIT,
 
 
+
+		//	keywords - they're not really states, but they are token types
+		ARRAY,
+		BREAK,
+		DO,
+		ELSE,
+		END,
+		FOR,
+		FUNC,
+		IF,
+		IN,
+		LET,
+		NIL,
+		OF,
+		THEN,
+		TO,
+		TYPE,
+		VAR,
+		WHILE,
+		ENDIF,
+		BEGIN,
+		END,
+		ENDDO,
+
+
+
 		ERROR,
 	}
 
+	//	the number of 'real' states - excludes keywords and ERROR
 	static int NUM_STATES = 35;
 
 	public boolean isAcceptState(int state) {
