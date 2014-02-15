@@ -8,6 +8,14 @@ TEST_CLASS=DoublyLinkedListTests
 SRC=$(wildcard *.java)
 OBJ=$(patsubst %.java, %.class, $(SRC))
 
+# make the graph pngs
+SRC_DOT=$(wildcard *.dot)
+OBJ_DOT=$(patsubst %.dot, %.png, $(SRC_DOT))
+
+%.png: %.dot
+	dot -Tpng $^ -o $@
+
+
 # This list of files is included in the pkg.zip output for uploading to T-Square
 # If you want to upload more than just the .java files, add them here
 PKG_FILES=DoublyLinkedList.java Node.java Driver.java
@@ -34,9 +42,3 @@ clean:
 	rm $(OBJ) *.png
 
 
-# make the graph pngs
-SRC_DOT=$(wildcard *.dot)
-OBJ_DOT=$(patsubst %.dot, %.png, $(SRC))
-
-%.png: %.dot
-	dot -Tpng $^ -o $@
