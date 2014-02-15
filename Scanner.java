@@ -45,8 +45,7 @@ public class Scanner {
 	 * ready to scan the 'Tiger' language
 	 */
 	private void setupTransitionTable() {
-		//	TODO
-
+		//	initialize all entries to -1 (not a state)
 		_stateTransitionTable = new int[NUM_STATES][256];
 		for (int i = 0; i < NUM_STATES; i++) {
 			for (int j = 0; j < 256; j++) {
@@ -54,6 +53,40 @@ public class Scanner {
 				_stateTransitionTable[i][j] = -1;
 			}
 		}
+
+		_stateTransitionTable[State.START.ordinal()][','] = State.COMMA.ordinal();
+		_stateTransitionTable[State.START.ordinal()][':'] = State.COLON.ordinal();
+		_stateTransitionTable[State.START.ordinal()][';'] = State.SEMI.ordinal();
+		_stateTransitionTable[State.START.ordinal()]['('] = State.LPAREN.ordinal();
+		_stateTransitionTable[State.START.ordinal()][')'] = State.RPAREN.ordinal();
+		_stateTransitionTable[State.START.ordinal()]['['] = State.LBRACK.ordinal();
+		_stateTransitionTable[State.START.ordinal()][']'] = State.RBRACK.ordinal();
+		_stateTransitionTable[State.START.ordinal()]['{'] = State.LBRACE.ordinal();
+		_stateTransitionTable[State.START.ordinal()]['}'] = State.RBRACE.ordinal();
+		_stateTransitionTable[State.START.ordinal()]['.'] = State.PERIOD.ordinal();
+		_stateTransitionTable[State.START.ordinal()]['-'] = State.MINUS.ordinal();
+		_stateTransitionTable[State.START.ordinal()]['*'] = State.MULT.ordinal();
+		_stateTransitionTable[State.START.ordinal()]['/'] = State.DIV.ordinal();
+		_stateTransitionTable[State.START.ordinal()]['='] = State.EQ.ordinal();
+		_stateTransitionTable[State.START.ordinal()]['<'] = State.LESSER.ordinal();
+		_stateTransitionTable[State.START.ordinal()]['>'] = State.GREATER.ordinal();
+		_stateTransitionTable[State.START.ordinal()]['&'] = State.AND.ordinal();
+		_stateTransitionTable[State.START.ordinal()]['|'] = State.OR.ordinal();
+		
+		_stateTransitionTable[State.COLON.ordinal()]['='] = State.ASSIGN.ordinal();
+		_stateTransitionTable[State.LESSER.ordinal()]['>'] = State.NEQ.ordinal();
+		_stateTransitionTable[State.LESSER.ordinal()]['='] = State.LESSEREQ.ordinal();
+		_stateTransitionTable[State.GREATER.ordinal()]['='] = State.GREATEREQ.ordinal();
+
+
+		//	TODO: STRLIT, ID, COMMENT
+
+		//	INTLIT
+		for (int c = '0'; c <= '9'; c++) {
+			_stateTransitionTable[State.START.ordinal()][c] = State.INTLIT.ordinal();
+			_stateTransitionTable[State.INTLIT.ordinal()][c] = State.INTLIT.ordinal();
+		}
+
 	}
 
 
@@ -86,7 +119,6 @@ public class Scanner {
 	public enum State {
 		START,
 
-		_ASSIGN,
 		_COMMENT_END,
 		STRLIT_PART,
 		COMMENT_BEGIN,
@@ -94,7 +126,6 @@ public class Scanner {
 		STRLIT_SLASH_CONTROL,
 		STRLIT_SLASH_DECIMAL1,
 		STRLIT_SLASH_DECIMAL2,
-
 
 		COMMA,
 		COLON,
