@@ -53,7 +53,7 @@ digraph tiger {
 	STRLIT;
 	STRLIT_PART [shape=circle];	//	not an accept state
 	S -> STRLIT_PART [label="\""];
-	STRLIT_PART -> STRLIT_PART [label="[^\"]"];	//	FIXME: is regex ok?
+	STRLIT_PART -> STRLIT_PART [label="[^\"\\]"];
 	STRLIT_PART -> STRLIT [label="\""];
 	STRLIT_SLASH [shape=circle];
 	STRLIT_PART -> STRLIT_SLASH [label="[\\]"];
@@ -64,6 +64,6 @@ digraph tiger {
 	STRLIT_SLASH_DECIMAL1 -> STRLIT_SLASH_DECIMAL2 [label="[0-9]"];
 	STRLIT_SLASH_DECIMAL2 -> STRLIT_PART [label="[0-9]"];
 	STRLIT_SLASH_CONTROL [shape=circle];
-	STRLIT_SLASH -> STRLIT_SLASH_CONTROL [label="[^]"];
+	STRLIT_SLASH -> STRLIT_SLASH_CONTROL [label="[\\^]"];
 	STRLIT_SLASH_CONTROL -> STRLIT_PART [label="[\\@A-Z\\[\\]^_.]"];
 }
