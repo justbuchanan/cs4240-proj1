@@ -61,5 +61,13 @@ digraph tiger {
 	STRLIT_PART -> STRLIT [label="\""];
 	STRLIT_SLASH [shape=circle];
 	STRLIT_PART -> STRLIT_SLASH [label="[\\]"];
-	STRLIT_SLASH -> STRLIT_PART [label="[.]"];
+	STRLIT_SLASH -> STRLIT_PART [label="[\\nt\"]"];
+	STRLIT_SLASH_DECIMAL1 [shape=circle];
+	STRLIT_SLASH -> STRLIT_SLASH_DECIMAL1 [label="[0-9]"];
+	STRLIT_SLASH_DECIMAL2 [shape=circle];
+	STRLIT_SLASH_DECIMAL1 -> STRLIT_SLASH_DECIMAL2 [label="[0-9]"];
+	STRLIT_SLASH_DECIMAL2 -> STRLIT_PART [label="[0-9]"];
+	STRLIT_SLASH_CONTROL [shape=circle];
+	STRLIT_SLASH -> STRLIT_SLASH_CONTROL [label="[^]"];
+	STRLIT_SLASH_CONTROL -> STRLIT_PART [label="[\\@A-Z\\[\\]^_.]"];
 }
