@@ -83,7 +83,7 @@ public class Scanner {
 		_stateTransitionTable[State.GREATER.ordinal()]['='] = State.GREATEREQ.ordinal();
 
 
-		//	TODO: STRLIT, ID, COMMENT
+		//	TODO: STRLIT, COMMENT
 
 		//	INTLIT
 		for (int c = '0'; c <= '9'; c++) {
@@ -91,6 +91,46 @@ public class Scanner {
 			_stateTransitionTable[State.INTLIT.ordinal()][c] = State.INTLIT.ordinal();
 		}
 
+
+		//	ID
+		for (int c = 'a'; c <= 'z'; c++) {
+			_stateTransitionTable[State.START.ordinal()][c] = State.ID.ordinal();
+			_stateTransitionTable[State.ID.ordinal()][c] = State.ID.ordinal();
+		}
+		for (int c = 'Z'; c <= 'Z'; c++) {
+			_stateTransitionTable[State.START.ordinal()][c] = State.ID.ordinal();
+			_stateTransitionTable[State.ID.ordinal()][c] = State.ID.ordinal();
+		}
+		for (int c = '0'; c <= '9'; c++) {
+			_stateTransitionTable[State.ID.ordinal()][c] = State.ID.ordinal();
+		}
+		_stateTransitionTable[State.ID.ordinal()]['_'] = State.ID.ordinal();
+
+
+		//	STRLIT
+		_stateTransitionTable[State.START.ordinal()]['"'] = State.STRLIT_PART.ordinal();
+
+		for (int c = 0; c < 256; c++) {
+			_stateTransitionTable[State.STRLIT_PART.ordinal()][c] = State.STRLIT_PART.ordinal();
+		}
+		_stateTransitionTable[State.STRLIT_PART.ordinal()]['\\'] = State.STRLIT_SLASH.ordinal();
+		_stateTransitionTable[State.STRLIT_PART.ordinal()]['"'] = State.STRLIT.ordinal();
+
+		_stateTransitionTable[State.STRLIT_SLASH.ordinal()]['^'] = State.STRLIT_SLASH_CONTROL.ordinal();
+
+		_stateTransitionTable[State.STRLIT_SLASH.ordinal()]['\\'] = State.STRLIT_PART.ordinal();
+		_stateTransitionTable[State.STRLIT_SLASH.ordinal()]['n'] = State.STRLIT_PART.ordinal();
+		_stateTransitionTable[State.STRLIT_SLASH.ordinal()]['t'] = State.STRLIT_PART.ordinal();
+
+		for (int c = '0'; c <= '9'; c++) {
+			_stateTransitionTable[State.STRLIT_SLASH.ordinal()][c] = State.STRLIT_SLASH_DECIMAL1.ordinal();
+		}
+		for (int c = '0'; c <= '9'; c++) {
+			_stateTransitionTable[State.STRLIT_SLASH_DECIMAL1.ordinal()][c] = State.STRLIT_SLASH_DECIMAL2.ordinal();
+		}
+		for (int c = '0'; c <= '9'; c++) {
+			_stateTransitionTable[State.STRLIT_SLASH_DECIMAL2.ordinal()][c] = State.STRLIT_PART.ordinal();
+		}
 	}
 
 
