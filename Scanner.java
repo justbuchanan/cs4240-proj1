@@ -86,11 +86,21 @@ public class Scanner {
 		//	TODO: STRLIT, ID, COMMENT
 
 		//	INTLIT
+
 		for (int c = '0'; c <= '9'; c++) {
 			_stateTransitionTable[State.START.ordinal()][c] = State.INTLIT.ordinal();
 			_stateTransitionTable[State.INTLIT.ordinal()][c] = State.INTLIT.ordinal();
 		}
-
+		
+		_stateTransitionTable[State.DIV.ordinal()]['*'] = State.COMMENT_BEGIN.ordinal();
+		for (int i = 0; i <= 255; i++) {
+			_stateTransitionTable[State.COMMENT_BEGIN.ordinal()][i] = State.COMMENT_BEGIN.ordinal();
+		}
+		_stateTransitionTable[State.COMMENT_BEGIN.ordinal()]['*'] = State._COMMENT_END.ordinal();
+		for (int i = 0; i <= 255; i++) {
+			_stateTransitionTable[State._COMMENT_END.ordinal()][i] = State._COMMENT_END.ordinal();
+		}
+		_stateTransitionTable[State._COMMENT_END.ordinal()]['/'] = State.COMMENT.ordinal();
 	}
 
 
@@ -103,19 +113,21 @@ public class Scanner {
 		int c;
 		while (true) {
 			c = popChar();
-			int nextState = (c == -1) ? -1 : _stateTransitionTable[state][c];
-			if (nextState == -1) {
-				if (str.length() > 0 && isAcceptState(state)) {
-					if (c != -1) pushChar(c);
+			if(!((c == '\n' || c == ' ' || c == '\t') && state == State.START.ordinal())) {
+				int nextState = (c == -1) ? -1 : _stateTransitionTable[state][c];
+				if (nextState == -1) {
+					if (str.length() > 0 && isAcceptState(state)) {
+						if (c != -1) pushChar(c);
 
-					return new Token(state, str);
+						return new Token(state, str);
+					} else {
+						return new Token(State.ERROR.ordinal(), null);
+					}
 				} else {
-					return new Token(State.ERROR.ordinal(), null);
+					str += (char)c;
+					state = nextState;
 				}
-			} else {
-				str += (char)c;
-				state = nextState;
-			}
+		    }
 		}
 	}
 
