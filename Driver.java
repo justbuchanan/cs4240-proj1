@@ -34,7 +34,7 @@ public class Driver {
 		//	print out all tokens
 		while (true) {
 			Token token = scanner.nextToken();
-			if (token != null) break;
+			if (token == null) break;
 			System.out.println(">> " + token.value);
 		}
 	}

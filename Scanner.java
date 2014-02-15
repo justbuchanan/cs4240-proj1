@@ -32,6 +32,10 @@ public class Scanner {
 		return c;
 	}
 
+	public boolean hasChar() {
+		return _strIndex < _string.length();
+	}
+
 	/**
 	 * Undoes popChar()
 	 */
@@ -91,15 +95,18 @@ public class Scanner {
 
 
 	public Token nextToken() {
+		if (!hasChar()) return null;
+
 		int state = State.START.ordinal();
 		String str = "";
 
-		int c = popChar();
+		int c;
 		while (true) {
-			int nextState = _stateTransitionTable[state][c];
+			c = popChar();
+			int nextState = (c == -1) ? -1 : _stateTransitionTable[state][c];
 			if (nextState == -1) {
 				if (str.length() > 0 && isAcceptState(state)) {
-					pushChar(c);
+					if (c != -1) pushChar(c);
 
 					return new Token(state, str);
 				} else {
