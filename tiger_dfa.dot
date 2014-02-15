@@ -31,11 +31,7 @@ digraph tiger {
 	S -> AND [label="&"];
 	S -> OR [label="|"];
 
-	_ASSIGN [shape=circle];
-	S -> _ASSIGN [label=":"];
-	_ASSIGN -> ASSIGN [label="="];
-
-	
+	COLON -> ASSIGN [label="="];
 
 	//	comments
 	COMMENT_BEGIN, _COMMENT_END [shape=circle];
