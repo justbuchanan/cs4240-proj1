@@ -1,3 +1,4 @@
+import java.util.HashMap;
 import java.util.Map;
 
 public class Scanner {
@@ -148,28 +149,28 @@ public class Scanner {
 
 
 		//	setup the keyword table
-		_keywordTable = new Map<>();
-		_keywordTable["array"] 	= ARRAY;
-		_keywordTable["break"] 	= BREAK;
-		_keywordTable["do"] 	= DO;
-		_keywordTable["else"] 	= ELSE;
-		_keywordTable["end"] 	= END;
-		_keywordTable["for"] 	= FOR;
-		_keywordTable["func"] 	= FUNC;
-		_keywordTable["if"] 	= IF;
-		_keywordTable["in"] 	= IN;
-		_keywordTable["let"] 	= LET;
-		_keywordTable["nil"] 	= NIL;
-		_keywordTable["of"] 	= OF;
-		_keywordTable["then"] 	= THEN;
-		_keywordTable["to"] 	= TO;
-		_keywordTable["type"] 	= TYPE;
-		_keywordTable["var"] 	= VAR;
-		_keywordTable["while"] 	= WHILE;
-		_keywordTable["endif"] 	= ENDIF;
-		_keywordTable["begin"] 	= BEGIN;
-		_keywordTable["end"] 	= END;
-		_keywordTable["enddo"] 	= ENDDO;
+		_keywordTable = new HashMap<>();
+		_keywordTable.put("array", State.ARRAY);
+		_keywordTable.put("break", State.BREAK);
+		_keywordTable.put("do", State.DO);
+		_keywordTable.put("else", State.ELSE);
+		_keywordTable.put("end", State.END);
+		_keywordTable.put("for", State.FOR);
+		_keywordTable.put("func", State.FUNC);
+		_keywordTable.put("if", State.IF);
+		_keywordTable.put("in", State.IN);
+		_keywordTable.put("let", State.LET);
+		_keywordTable.put("nil", State.NIL);
+		_keywordTable.put("of", State.OF);
+		_keywordTable.put("then", State.THEN);
+		_keywordTable.put("to", State.TO);
+		_keywordTable.put("type", State.TYPE);
+		_keywordTable.put("var", State.VAR);
+		_keywordTable.put("while", State.WHILE);
+		_keywordTable.put("endif", State.ENDIF);
+		_keywordTable.put("begin", State.BEGIN);
+		_keywordTable.put("end", State.END);
+		_keywordTable.put("enddo", State.ENDDO);
 	}
 
 
@@ -188,7 +189,11 @@ public class Scanner {
 					if (str.length() > 0 && isAcceptState(state)) {
 						if (c != -1) pushChar(c);
 
-						return new Token(state, str);
+						if (state == State.ID.ordinal() && _keywordTable.get(str) !=  null) {
+							return new Token(_keywordTable.get(str).ordinal(), str);
+						} else {
+							return new Token(state, str);
+						}
 					} else {
 						return new Token(State.ERROR.ordinal(), null);
 					}
@@ -268,7 +273,6 @@ public class Scanner {
 		WHILE,
 		ENDIF,
 		BEGIN,
-		END,
 		ENDDO,
 
 
