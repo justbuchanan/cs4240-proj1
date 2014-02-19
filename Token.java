@@ -1,11 +1,11 @@
 
 public class Token {
 		
-	public int type;
+	public State type;
 	public String value;
 
 	Token(int type, String value) {
-		this.type = type;
+		this.type = State.values()[type];
 		this.value = value;
 	}
 }
