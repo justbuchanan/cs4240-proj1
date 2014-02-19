@@ -1,0 +1,217 @@
+/* Credit: Captain DeadBones */
+let
+        type board_array_t = array [9] of int;
+        type win_array_t = array [24] of int;
+
+        var turn_number : string;
+        var msg : string;
+        var tmp_str : string := ""; /* temporary strings */
+        var turn : string; /* X or O */
+        var location_char : string; /* tmp var for user location input */
+
+        var i, j, win, move : int;
+        var ASCII_NUMERIC_OFFSET : int := 48; 
+        var tmp_int : int := 0; /* temporary calculations */
+        var location : int;  /* user-provided board location */
+        var winner : int;
+
+        var board : board_array_t := 0;
+        var board_tmpl : board_array_t; /* holds [2, 3, 4, 5, 6, 7, 8, 9, 10] */
+        var win_cond : win_array_t;
+
+        /* print current board to stdout */
+        function print_board(board: board_array_t) begin
+
+                print("The board looks like this:\n");
+
+                for i := 0 to 3 do
+                        print(" ");
+                        for j := 0 to 3 do
+                                if board[i*3+j] = 1 then
+                                        print("X");
+                                else
+                                        if board[i*3+j] = 0 then
+                                                print("O");
+                                        else
+                                                if board[i*3+j] <> -1 then
+                                                        printi(i * 3 + j - 1);
+                                                else
+                                                        print(" ");
+                                                endif;
+                                        endif;
+                                endif;
+
+                                if j <> 2 then
+                                        print(" | ");
+                                endif;
+                        enddo;        
+
+                        if i <> 2 then
+                                print("-----------------");
+                        else
+                                print("\n");
+                        endif;
+
+
+                enddo;
+        end;
+
+        
+
+        function print_instruction() begin
+                print("Please use the following cell numbers to make your move:\n");
+                print_board(board_tmpl);
+        end;
+
+
+
+        function get_input(turn : string) begin
+
+                /* print to stdout: "Where would you like to place X/O (1-9)? " */
+                tmp_str := concat("Where would you like to place ", turn);
+                tmp_str := concat(tmp_str, " (1-9)?\n");
+                print(tmp_str);
+
+                while 1 do
+
+                        location_char := get_char();
+                        location := ord(location_char);
+                        location := location - ASCII_NUMERIC_OFFSET;
+                        
+                        if location >= 1 & location <= 9 then
+                                return location - 1;
+                        else
+                                print("That is not a valid move! Please try again.\n");
+                                print_instruction();
+                        endif;
+                enddo;
+        end;
+
+
+        function init_board_tmpl() begin
+                for i := 2 to 11 do
+                        board_tmpl[i-2] := i;
+                enddo;
+        end;
+
+        function init_win_cond() begin
+                win_cond[0] := 1;
+                win_cond[1] := 2;
+                win_cond[2] := 3;
+
+                win_cond[3] := 4;
+                win_cond[4] := 5;
+                win_cond[5] := 6;
+
+                win_cond[6] := 7;
+                win_cond[7] := 8;
+                win_cond[8] := 9;
+
+                win_cond[9]  := 1;
+                win_cond[10] := 4;
+                win_cond[11] := 7;
+                
+                win_cond[12] := 2;
+                win_cond[13] := 5;
+                win_cond[14] := 8;
+
+                win_cond[15] := 3;
+                win_cond[16] := 6;
+                win_cond[17] := 9;
+
+                win_cond[18] := 1;
+                win_cond[19] := 5;
+                win_cond[20] := 9;
+
+                win_cond[21] := 3;
+                win_cond[22] := 5;
+                win_cond[23] := 7;
+        end;
+
+
+        function check_win(board : board_array_t) begin
+                for i := 0 to 8 do
+                        if (board[win_cond[i*3]-1] = board[win_cond[i*3+1]-1]) & (board[win_cond[i*3+1]-1] = board[win_cond[i*3+2]-1]) then
+                                return board[win_cond[i*3]-1];
+                        endif;
+                enddo;
+                return -1;
+        end;
+
+
+        function quit_game(board : board_array_t, msg : string) begin
+                print_board(board);
+                print(msg);
+                exit(0);
+        end;
+
+
+        function main() begin
+
+                init_board_tmpl();
+                init_win_cond();
+                print_instruction();
+
+                win := 0;
+                move := 0;
+
+                while win <> 1 do
+
+                        print_board(board);
+
+                        turn_number := "Turn number ";
+                        tmp_int := move + 1;
+                        tmp_str := chr(tmp_int);
+                        turn_number := concat(turn_number, tmp_str);
+                        print(turn_number);
+
+                        /* set turn to X or O */
+                        tmp_int := move / 2 * 2;
+                        if move = tmp_int then /* even */
+                                turn := "X";
+                        else /* odd */
+                                turn := "0";
+                        endif;
+
+                        /* get user input */
+                        location := get_input(turn);
+                        while board[location] <> -1 do
+                                print("Invalid move! Cell already taken. Please try again.\n");
+                                location := get_input(turn);
+                        enddo;
+
+                        /* set board at chosen location with X or O */
+                        if turn = "X" then
+                                board[location] := 1;
+                        else
+                                board[location] := 0;
+                        endif;
+
+                        /* advance move and check for end of game */
+                        move := move + 1;
+                        if move > 4 then
+                                winner := check_win(board);
+                                if winner <> -1 then
+                                        msg := "The winner is ";
+                                        if winner = 1 then
+                                                msg := concat(msg, "X");
+                                        else
+                                                msg := concat(msg, "O");
+                                        endif;
+                                        msg := concat(msg, "\n");
+                                        quit_game(board, msg);
+                                else
+                                        if move = 9 then
+                                                msg := "No winner\n";
+                                                quit_game(board, msg);
+                                        endif;
+                                endif;
+                        endif;
+
+
+                enddo;
+        end;
+
+in
+        main();
+end
