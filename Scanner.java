@@ -37,7 +37,8 @@ public class Scanner {
 	}
 
 	public boolean hasChar() {
-		return _strIndex < _string.length();
+		//	-1 because strings are terminated with null characters
+		return _strIndex < _string.length() - 1;
 	}
 
 	/**
