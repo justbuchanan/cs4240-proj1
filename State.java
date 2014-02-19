@@ -20,9 +20,6 @@ public enum State {
 	RPAREN,
 	LBRACK,
 	RBRACK,
-	LBRACE,
-	RBRACE,
-	PERIOD,
 	MINUS,
 	MULT,
 	DIV,
@@ -67,6 +64,7 @@ public enum State {
 	ENDIF,
 	BEGIN,
 	ENDDO,
+	RETURN,
 
 
 

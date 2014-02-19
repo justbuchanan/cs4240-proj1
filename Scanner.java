@@ -70,9 +70,6 @@ public class Scanner {
 		_stateTransitionTable[State.START.ordinal()][')'] = State.RPAREN.ordinal();
 		_stateTransitionTable[State.START.ordinal()]['['] = State.LBRACK.ordinal();
 		_stateTransitionTable[State.START.ordinal()][']'] = State.RBRACK.ordinal();
-		_stateTransitionTable[State.START.ordinal()]['{'] = State.LBRACE.ordinal();
-		_stateTransitionTable[State.START.ordinal()]['}'] = State.RBRACE.ordinal();
-		_stateTransitionTable[State.START.ordinal()]['.'] = State.PERIOD.ordinal();
 		_stateTransitionTable[State.START.ordinal()]['-'] = State.MINUS.ordinal();
 		_stateTransitionTable[State.START.ordinal()]['*'] = State.MULT.ordinal();
 		_stateTransitionTable[State.START.ordinal()]['/'] = State.DIV.ordinal();
@@ -172,6 +169,7 @@ public class Scanner {
 		_keywordTable.put("begin", State.BEGIN);
 		_keywordTable.put("end", State.END);
 		_keywordTable.put("enddo", State.ENDDO);
+		_keywordTable.put("return", State.RETURN);
 	}
 
 
