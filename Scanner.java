@@ -16,7 +16,10 @@ public class Scanner {
 
 	private String _string;
 
-
+	/**
+	 * Creates a scanner with the given string
+	 * @param str The string to scan
+	 */
 	Scanner(String str) {
 		setupTransitionTable();
 		_strIndex = 0;
@@ -39,6 +42,9 @@ public class Scanner {
 		return c;
 	}
 
+	/**
+	 * See if we're at the end of the string or not
+	 */
 	public boolean hasChar() {
 		//	-1 because strings are terminated with null characters
 		return _strIndex < _string.length() - 1;
@@ -177,6 +183,11 @@ public class Scanner {
 	}
 
 
+	/**
+	 * Gets the next token by scanning the string
+	 *
+	 * @return The next token.  If no token, returns null
+	 */
 	public Token nextToken() {
 		if (!hasChar()) return null;
 
