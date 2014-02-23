@@ -12,12 +12,15 @@ public class Scanner {
 	//	where we're currently at in the string
 	private int _strIndex;
 
+	private int currLine;
+
 	private String _string;
 
 
 	Scanner(String str) {
 		setupTransitionTable();
 		_strIndex = 0;
+		currLine = 1;
 		_string = str;
 	}
 
@@ -190,18 +193,22 @@ public class Scanner {
 						if (c != -1) pushChar(c);
 
 						if (state == State.ID.ordinal() && _keywordTable.get(str) !=  null) {
-							return new Token(_keywordTable.get(str).ordinal(), str);
+							return new Token(_keywordTable.get(str).ordinal(), str, currLine);
 						} else {
-							return new Token(state, str);
+							return new Token(state, str, currLine);
 						}
 					} else {
-						return new Token(State.ERROR.ordinal(), null);
+						return new Token(State.ERROR.ordinal(), null, currLine);
 					}
 				} else {
 					str += (char)c;
 					state = nextState;
 				}
 		    }
+		    // check for new line
+			if(c == '\n'){
+				currLine++;
+			} 
 		}
 	}
 
