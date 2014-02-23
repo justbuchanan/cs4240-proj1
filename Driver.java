@@ -7,7 +7,6 @@ public class Driver {
 	public static void main(String[] args) {
 		String fileName = args[0];
 
-
 		String str = "";
 
 		try {

@@ -98,7 +98,7 @@ public class Scanner {
 			_stateTransitionTable[State.START.ordinal()][c] = State.ID.ordinal();
 			_stateTransitionTable[State.ID.ordinal()][c] = State.ID.ordinal();
 		}
-		for (int c = 'Z'; c <= 'Z'; c++) {
+		for (int c = 'A'; c <= 'Z'; c++) {
 			_stateTransitionTable[State.START.ordinal()][c] = State.ID.ordinal();
 			_stateTransitionTable[State.ID.ordinal()][c] = State.ID.ordinal();
 		}
