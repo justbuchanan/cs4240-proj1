@@ -21,6 +21,7 @@ public enum State {
 	LBRACK,
 	RBRACK,
 	MINUS,
+	PLUS,
 	MULT,
 	DIV,
 	EQ,

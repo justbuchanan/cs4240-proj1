@@ -71,6 +71,7 @@ public class Scanner {
 		_stateTransitionTable[State.START.ordinal()]['['] = State.LBRACK.ordinal();
 		_stateTransitionTable[State.START.ordinal()][']'] = State.RBRACK.ordinal();
 		_stateTransitionTable[State.START.ordinal()]['-'] = State.MINUS.ordinal();
+		_stateTransitionTable[State.START.ordinal()]['+'] = State.PLUS.ordinal();
 		_stateTransitionTable[State.START.ordinal()]['*'] = State.MULT.ordinal();
 		_stateTransitionTable[State.START.ordinal()]['/'] = State.DIV.ordinal();
 		_stateTransitionTable[State.START.ordinal()]['='] = State.EQ.ordinal();
