@@ -1,3 +1,5 @@
 # don't track graphviz output
 *.png
 *.class
+.classpath
+.project
