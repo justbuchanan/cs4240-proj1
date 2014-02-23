@@ -14,9 +14,6 @@ digraph tiger {
 	S -> RPAREN [label=")"];
 	S -> LBRACK [label="["];
 	S -> RBRACK [label="]"];
-	S -> LBRACE [label="{"];
-	S -> RBRACE [label="}"];
-	S -> PERIOD [label="."];
 	S -> PLUS [label="+"];
 	S -> MINUS [label="-"];
 	S -> MULT [label="*"];
