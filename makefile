@@ -18,7 +18,7 @@ OBJ_DOT=$(patsubst %.dot, %.png, $(SRC_DOT))
 
 # This list of files is included in the pkg.zip output for uploading to T-Square
 # If you want to upload more than just the .java files, add them here
-PKG_FILES=DoublyLinkedList.java Node.java Driver.java
+PKG_FILES=Scanner.java State.java Token.java Driver.java tiger_dfa.dot tiger_dfa.png
 
 # class path
 # CLASSPATH="junit-4.11.jar:hamcrest-core-1.3.jar:."
@@ -34,6 +34,9 @@ debug: all
 
 test: all
 	java -cp $(CLASSPATH) org.junit.runner.JUnitCore $(TEST_CLASS)
+
+pkg: $(PKG_FILES)
+	zip pkg.zip $(PKG_FILES)
 
 %.class: %.java
 	javac -cp $(CLASSPATH) $^
