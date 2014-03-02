@@ -16,6 +16,8 @@ public class Scanner {
 
 	private String _string;
 
+	private Token setToken;
+
 	/**
 	 * Creates a scanner with the given string
 	 * @param str The string to scan
@@ -189,6 +191,14 @@ public class Scanner {
 	 * @return The next token.  If no token, returns null
 	 */
 	public Token nextToken() {
+
+		// check if we have already found next token
+		if(setToken != null){
+			Token temp = setToken;
+			setToken == null;
+			return temp;
+		}
+
 		if (!hasChar()) return null;
 
 		int state = State.START.ordinal();
@@ -221,6 +231,18 @@ public class Scanner {
 				currLine++;
 			} 
 		}
+	}
+
+	/**
+	* @return: returns the next token: 
+	*/
+	public Token peekToken(){
+		if(setToken == null){
+			setToken = nextToken();
+		}
+		Token returnToken = setToken;
+		setToken = null;
+		return setToken;
 	}
 
 
