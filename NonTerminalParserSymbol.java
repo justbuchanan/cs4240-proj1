@@ -5,5 +5,9 @@ public class NonTerminalParserSymbol extends ParserSymbol{
 	public NonTerminalParserSymbol(NonTerminals nonTerminal){
 		this.nonTerminal = nonTerminal;
 	}
+	
+	public NonTerminals getNonTerminal(){
+		return this.nonTerminal;
+	}
 
 }

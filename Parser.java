@@ -3,7 +3,7 @@ import java.util.LinkedList;
 public class Parser{
 	
 	private Scanner scanner;
-	private LinkedList<Integer> symbolStack;
+	private LinkedList<ParserSymbol> symbolStack;
 	private ProductionRule[][] parserTable;
 
 	public Parser(Scanner scanner){
@@ -14,6 +14,34 @@ public class Parser{
 	public void parseText(){
 		buildParserTable();
 				//	print out all tokens
+		
+		symbolStack.push(new TerminalParserSymbol(Terminals.$));
+		symbolStack.push(new NonTerminalParserSymbol(NonTerminals.TIGER_PROGRAM));
+		while(!symbolStack.isEmpty()){
+			ParserSymbol next = symbolStack.pop();
+			if(next instanceof TerminalParserSymbol){
+				if(scanner.nextToken().equals(((TerminalParserSymbol)next).getTerminal())){
+					continue;
+				}
+				else{
+					// HANDLE ERROR HERE!
+				}
+			}
+			else{
+				NonTerminalParserSymbol symbol = (NonTerminalParserSymbol)next;
+				ProductionRule nextRule = parserTable[symbol.getNonTerminal().ordinal()][scanner.nextToken().ordinal()];
+				if(nextRule == null){
+					// HANDLE ERROR HERE
+				}
+				else{
+					while(nextRule.hasNext()){
+						symbolStack.push(nextRule.next());
+					}
+				}
+			}
+		}
+		
+		
 		while (true) {
 			Token token = scanner.nextToken();
 			if (token == null) break;

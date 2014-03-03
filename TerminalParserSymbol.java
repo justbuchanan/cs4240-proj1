@@ -5,4 +5,8 @@ public class TerminalParserSymbol extends ParserSymbol{
 	public TerminalParserSymbol(Terminals terminal){
 		this.terminal = terminal;
 	}
+	
+	public Terminals getTerminal(){
+		return this.terminal;
+	}
 }

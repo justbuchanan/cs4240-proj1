@@ -10,4 +10,12 @@ public class Token {
 		this.value = value;
 		this.lineNumber = lineNumber;
 	}
+	
+	public boolean equals(Terminals terminal){
+		return (terminal.ordinal() == (type.ordinal() - 4));
+	}
+	
+	public int ordinal(){
+		return type.ordinal();
+	}
 }

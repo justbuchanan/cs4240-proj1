@@ -57,7 +57,8 @@ public enum Terminals {
 
 
 	ERROR,
-	NULL
+	NULL,
+	$
 }
 
 
