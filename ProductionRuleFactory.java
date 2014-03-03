@@ -13,7 +13,7 @@ public class ProductionRuleFactory{
 			}
 			
 			// DECLARATION_SEGMENT
-			if(ruleName.ordinal() == NonTerminals.DECLARATION_SEGMENT.ordinal()){
+			else if(ruleName.ordinal() == NonTerminals.DECLARATION_SEGMENT.ordinal()){
 				if(next.ordinal() == Terminals.TYPE.ordinal()){ //[DECLARATION_SEGMENT][TYPE]
 					return new ProductionRule(NonTerminals.DECLARATION_SEGMENT, new ParserSymbol[] {new NonTerminalParserSymbol(NonTerminals.TYPE_DECLARATION_LIST), 
 							new NonTerminalParserSymbol(NonTerminals.VAR_DECLARATION_LIST), new NonTerminalParserSymbol(NonTerminals.FUNCT_DECLARATION_LIST)});
