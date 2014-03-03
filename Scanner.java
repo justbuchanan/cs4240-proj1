@@ -195,7 +195,7 @@ public class Scanner{
 		// check if we have already found next token
 		if(setToken != null){
 			Token temp = setToken;
-			setToken == null;
+			setToken = null;
 			return temp;
 		}
 

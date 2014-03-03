@@ -30,7 +30,7 @@ public class Driver {
 	    //	create Scanner with string
 		Scanner scanner = new Scanner(str);
 
-		Parser parser = new Parser(str);
+		Parser parser = new Parser(scanner);
 
 		parser.parseText();
 	}

@@ -2,7 +2,7 @@
 /**
  * All non-terminals from the parser grammar
  */
-public enum ParserSymbols {
+public enum NonTerminals {
 	TIGER_PROGRAM,
 
 	DECLARATION_SEGMENT,
