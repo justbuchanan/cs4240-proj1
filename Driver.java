@@ -30,11 +30,8 @@ public class Driver {
 	    //	create Scanner with string
 		Scanner scanner = new Scanner(str);
 
-		//	print out all tokens
-		while (true) {
-			Token token = scanner.nextToken();
-			if (token == null) break;
-			System.out.println(">> " + token.type + " : '" + token.value + "' (" +  token.lineNumber + ")");
-		}
+		Parser parser = new Parser(str);
+
+		parser.parseText();
 	}
 }

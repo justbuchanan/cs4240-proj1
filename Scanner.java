@@ -1,7 +1,7 @@
 import java.util.HashMap;
 import java.util.Map;
 
-public class Scanner {
+public class Scanner{
 
 	//	stateTransitionTable[currentState][nextCharacter] = nextState
 	private int[][] _stateTransitionTable;
