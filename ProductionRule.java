@@ -1,19 +1,19 @@
 import java.util.Iterator;
 
 public class ProductionRule implements Iterable<ParserSymbol>{
-		private NonTerminals left;
+		private NonTerminalParserSymbol left;
 		private ParserSymbol[] right;
 		int curr;
 
 
 		public ProductionRule(NonTerminals left, ParserSymbol[] right){
-			this.left = left;
+			this.left = new NonTerminalParserSymbol(left);
 			this.right = right;
 			curr = right.length - 1;
 		}
 
 
-		NonTerminals left() {
+		NonTerminalParserSymbol left() {
 			return left;
 		}
 
