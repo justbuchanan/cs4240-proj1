@@ -129,4 +129,16 @@ public class Grammar {
 		}
 	}
 
+
+	public String toString() {
+		String desc = new String("Grammar:\n");
+		for (ArrayList<ProductionRule> ruleArray : rules.values()) {
+			for (ProductionRule rule : ruleArray) {
+				desc += "\t" + rule + "\n";
+			}
+		}
+
+		return desc;
+	}
+
 }
