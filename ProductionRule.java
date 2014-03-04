@@ -6,6 +6,18 @@ public class ProductionRule implements Iterable{
 		int curr;
 
 
+		public ProductionRule(NonTerminals left, ParserSymbol[] right){
+			this.left = left;
+			this.right = right;
+			curr = right.length - 1;
+		}
+
+
+		NonTerminals left() {
+			return left;
+		}
+
+
 		private class ProductionRuleIterator implements Iterator {
 			private int curr;
 			private ProductionRule rule;
@@ -39,13 +51,6 @@ public class ProductionRule implements Iterable{
 
 		public Iterator iterator() {
 			return new ProductionRuleIterator(this);
-		}
-
-
-		public ProductionRule(NonTerminals left, ParserSymbol[] right){
-			this.left = left;
-			this.right = right;
-			curr = right.length - 1;
 		}
 
 }
