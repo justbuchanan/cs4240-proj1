@@ -1,5 +1,7 @@
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Set;
+import java.util.HashSet;
 
 
 public class Grammar {
@@ -28,7 +30,7 @@ public class Grammar {
 
 		//	add EOF/$ to follow set for the start symbol
 		if (nonterminal.isEqual(NonTerminals.TIGER_PROGRAM)) {
-			followSet.add(new NonTerminalParserSymbol(NonTerminals.$));
+			followSet.add(new NonTerminalParserSymbol(Terminals.$));
 		}
 
 		//	loop over EVERY rule looking for places where @nonterminal appears on the right side
@@ -40,44 +42,42 @@ public class Grammar {
 				//	that way, subsequent iterations can behave appropriately
 				boolean seenTheNonterminal = false;
 
-				for (int i = 0; i < right.length) {
+				//	if we get to the end and haven't terminated yet, we have to add FOLLOW(@rule.left) to @followSet
+				boolean terminated = false;
+
+				for (int i = 0; i < right.length; i++) {
 					ParserSymbol smbl = right[i];
 
 					if (smbl.isEqual(nonterminal)) {
-
-						//	see if there's another symbol after the current one
-						//	if so, add it's FIRST set except for NULL, to @followSet
-						if (i + 1 < right.length) {
-							Set<TerminalParserSymbol> first = findFirstSet(right[i+1]);
-							first.remove(new TerminalParserSymbol(Terminals.NULL));
-							followSet.add(first);
-						} else {
-							//	@nonterminal is the last symbol in this rule
-							//	add FOLLOW(@rule.left) to @followSet
-							followSet.add( findFollowSet(rule.left) );
-						}
-
+						//	we found it!
 						seenTheNonterminal = true;
 					} else if (seenTheNonterminal) {
-						Set<TerminalParserSymbol> first = findFirstSet(right[i]);
-						TerminalParserSymbol nullSmbl = new TerminalParserSymbol(Terminals.NULL);
-						if (first.contains(nullSmbl) {
-							//	if it contains a null symbol, remove the null, and add it to the follow set
-							first.remove(nullSmbl);
-							followSet.add(first);
-
-							//	if this is the last symbol and it's nullable, add FOLLOW(rule.left) to @followSet
-							if (i + 1 == right.length) {
-								followSet.add( findFollowSet(rule.left) );
-							}
+						//	get first set of @smbl - handle differently depending on whether it's a terminal or not
+						Set<TerminalParserSymbol> first;
+						if (smbl.isTerminal()) {
+							first = new HashSet<>();
+							first.add(smbl);
 						} else {
-							followSet.add(first);
-							break;
+							first = findFirstSet((NonTerminalParserSymbol)smbl);
 						}
 
+						TerminalParserSymbol nullSmbl = new TerminalParserSymbol(Terminals.NULL);
+						if (first.contains(nullSmbl)) {
+							//	if it contains a null symbol, remove the null, and add it to the follow set
+							first.remove(nullSmbl);
+							followSet.addAll(first);
+						} else {
+							followSet.addAll(first);
+							terminated = true;
+							break;
+						}
 					}
-				}
+				}	//	end for loop
 
+				if (seenTheNonterminal && !terminated) {
+					//	@nonterminal is the last symbol in this rule OR all symbols following @nonterminal are nullable
+					followSet.addAll( findFollowSet(rule.left()) );
+				}
 			}
 		}
 	}
