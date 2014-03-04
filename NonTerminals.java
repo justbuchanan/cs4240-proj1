@@ -49,5 +49,3 @@ public enum NonTerminals {
 	OPT_PREFIX,
 	
 }
-
-int NUM_NONTERMINALS = 35;
