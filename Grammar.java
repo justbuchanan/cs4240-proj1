@@ -24,6 +24,11 @@ public class Grammar {
 	public Set<TerminalParserSymbol> findFirstSet(ProductionRule productionRule) {
 		Set<TerminalParserSymbol> set = new HashSet<TerminalParserSymbol>();
 
+		if(productionRule.right()[0].isTerminal() && ((TerminalParserSymbol)productionRule.right()[0]).getTerminal() == Terminals.NULL) {
+			set.add((TerminalParserSymbol) productionRule.right()[0]);
+			return set;
+		}
+
 		for(ParserSymbol parserSymbol : productionRule) {
 			if(parserSymbol.isTerminal() && ((TerminalParserSymbol)parserSymbol).getTerminal() != Terminals.NULL) {
 				set.add((TerminalParserSymbol) parserSymbol);

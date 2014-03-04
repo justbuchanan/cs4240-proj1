@@ -5,6 +5,9 @@ public class Parser{
 	private Scanner scanner;
 	private ProductionRule[][] parserTable;
 	private Grammar grammar;
+	private int NUM_NONTERMINALS = 35;
+	private int NUM_TERMINALS = 49;
+
 
 	public Parser(Scanner scanner, Grammar grammar){
 		this.scanner = scanner;

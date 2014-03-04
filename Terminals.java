@@ -61,5 +61,3 @@ public enum Terminals {
 	$,
 }
 
-int NUM_TERMINALS = 49;
-
