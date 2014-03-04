@@ -1,6 +1,6 @@
 import java.util.Iterator;
 
-public class ProductionRule implements Iterable{
+public class ProductionRule implements Iterable<ParserSymbol>{
 		private NonTerminals left;
 		private ParserSymbol[] right;
 		int curr;
@@ -22,7 +22,7 @@ public class ProductionRule implements Iterable{
 		}
 
 
-		private class ProductionRuleIterator implements Iterator {
+		private class ProductionRuleIterator implements Iterator<ParserSymbol> {
 			private int curr;
 			private ProductionRule rule;
 
@@ -53,7 +53,7 @@ public class ProductionRule implements Iterable{
 			}
 		}
 
-		public Iterator iterator() {
+		public Iterator<ParserSymbol> iterator() {
 			return new ProductionRuleIterator(this);
 		}
 

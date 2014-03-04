@@ -5,10 +5,12 @@ public class Parser{
 	private Scanner scanner;
 	private LinkedList<ParserSymbol> symbolStack;
 	private ProductionRule[][] parserTable;
+	private Grammar grammar;
 
-	public Parser(Scanner scanner){
+	public Parser(Scanner scanner, Grammar grammar){
 		this.scanner = scanner;
 		symbolStack = new LinkedList();
+		this.grammar = grammar;
 	}
 
 	public void parseText(){
