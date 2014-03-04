@@ -1,9 +1,45 @@
 import java.util.Iterator;
 
-public class ProductionRule implements Iterator{
+public class ProductionRule implements Iterable{
 		private NonTerminals left;
 		private ParserSymbol[] right;
 		int curr;
+
+
+		private class ProductionRuleIterator implements Iterator {
+			private int curr;
+			private ProductionRule rule;
+
+			ProductionRuleIterator(ProductionRule rule) {
+				this.rule = rule;
+				curr = 0;
+			}
+
+			@Override
+			public boolean hasNext() {
+				return curr < rule.right.length;
+			}
+
+			@Override
+			public ParserSymbol next() {
+				if (!hasNext()) {
+					throw new IndexOutOfBoundsException();
+				}
+
+				ParserSymbol val = rule.right[curr];
+				curr++;
+				return val;
+			}
+
+			@Override
+			public void remove() {
+				throw new RuntimeException("remove() not supported");
+			}
+		}
+
+		public Iterator iterator() {
+			return new ProductionRuleIterator(this);
+		}
 
 
 		public ProductionRule(NonTerminals left, ParserSymbol[] right){
@@ -11,28 +47,5 @@ public class ProductionRule implements Iterator{
 			this.right = right;
 			curr = right.length - 1;
 		}
-
-
-		@Override
-		public boolean hasNext() {
-			return curr >= 0;
-		}
-
-
-		@Override
-		public ParserSymbol next() {
-			ParserSymbol val = right[curr];
-			curr--;
-			return val;
-		}
-
-
-		@Override
-		public void remove() {
-			curr--;
-			
-		}
-		
-		
 
 }
