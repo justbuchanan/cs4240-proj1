@@ -12,6 +12,14 @@ public class Grammar {
 		rules = new HashMap<>();
 	}
 
+	ArrayList<ProductionRule> allRules() {
+		ArrayList<ProductionRule> allRules = new ArrayList<>();
+		for (ArrayList<ProductionRule> subRules : rules) {
+			allRules.addAll(subRules);
+		}
+		return allRules;
+	}
+
 	public void addRule(ProductionRule rule) {
 		ArrayList<ProductionRule> arr = rules.get(rule.left());
 		if (arr == null) {
