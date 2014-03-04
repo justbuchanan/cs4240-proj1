@@ -57,4 +57,13 @@ public class ProductionRule implements Iterable<ParserSymbol>{
 			return new ProductionRuleIterator(this);
 		}
 
+		public String toString() {
+			String desc = new String("Rule: " + left + " -->");
+			for (ParserSymbol smbl : right) {
+				desc += " " + smbl;
+			}
+
+			return desc;
+		}
+
 }
