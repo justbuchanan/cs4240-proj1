@@ -22,33 +22,31 @@ public class Parser{
 		symbolStack.push(new NonTerminalParserSymbol(NonTerminals.TIGER_PROGRAM));
 
 		while(!symbolStack.isEmpty()){
-			ParserSymbol next = symbolStack.pop();
-			if(next instanceof TerminalParserSymbol){
-				if(scanner.nextToken().equals(((TerminalParserSymbol)next).getTerminal())){
+			TerminalParserSymbol token = scanner.peek();
+			ParserSymbol parserSymbol = symbolStack.pop();
+
+			if(parserSymbol instanceof TerminalParserSymbol) {
+				if(token == parserSymbol) {
+					scanner.nextToken();
+					continue;
+				} else {
+					//ERROR STATE!
 					continue;
 				}
-				else{
-					// HANDLE ERROR HERE!
-				}
-			}
-			else{
-				NonTerminalParserSymbol symbol = (NonTerminalParserSymbol)next;
-				ProductionRule nextRule = parserTable[symbol.getNonTerminal().ordinal()][scanner.nextToken().ordinal()];
-				if(nextRule == null){
-					// HANDLE ERROR HERE
-				}
-				else{
-					while(nextRule.hasNext()){
-						symbolStack.push(nextRule.next());
-					}
+			} else {
+				ProductionRule productionRule = parserTable[parserSymbol.getNonTerminal().ordinal()][token.ordinal()];
+				for(int i = parserSymbol.length - 1; i >= 0; i--) {
+					symbolStack.push(parserSymbol[i]);
 				}
 			}
 		}
 		
-		
+		//If next token is not NULL, then ERROR (if there are any leftover tokens)
 		while (true) {
 			Token token = scanner.nextToken();
-			if (token == null) break;
+			if (token == null) {
+				break;
+			}
 			System.out.println(">> " + token.type + " : '" + token.value + "' (" +  token.lineNumber + ")");
 		}
 	}
