@@ -1,14 +1,22 @@
+import java.util.ArrayList;
+import java.util.HashMap;
+
 
 public class Grammar {
-	private Map<NonTerminalParserSymbol, ArrayList<ParserSymbol> > rules;
+	private HashMap<NonTerminalParserSymbol, ArrayList<ProductionRule> > rules;
 
 
 	Grammar() {
-		rules = new Map<>();
+		rules = new HashMap<>();
 	}
 
 	public void addRule(ProductionRule rule) {
+		ArrayList<ProductionRule> arr = rules.get(rule.left());
+		if (arr == null) {
+			arr = new ArrayList<>();
+		}
 
+		arr.add(rule);
 	}
 
 	public ArrayList<TerminalParserSymbol> findFirstSet(NonTerminalParserSymbol symbol) {
