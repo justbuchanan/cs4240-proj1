@@ -17,6 +17,10 @@ public class ProductionRule implements Iterable{
 			return left;
 		}
 
+		ParserSymbol[] right() {
+			return right;
+		}
+
 
 		private class ProductionRuleIterator implements Iterator {
 			private int curr;
