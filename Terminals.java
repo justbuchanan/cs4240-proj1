@@ -58,8 +58,8 @@ public enum Terminals {
 
 	ERROR,
 	NULL,
-	$
+	$,
 }
 
-
+int NUM_TERMINALS = 49;
 
