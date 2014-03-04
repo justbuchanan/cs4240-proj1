@@ -9,4 +9,8 @@ public class TerminalParserSymbol extends ParserSymbol{
 	public Terminals getTerminal(){
 		return this.terminal;
 	}
+
+	public boolean isTerminal(){
+		return true;
+	}
 }

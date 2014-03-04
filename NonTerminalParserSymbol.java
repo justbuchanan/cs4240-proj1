@@ -10,4 +10,8 @@ public class NonTerminalParserSymbol extends ParserSymbol{
 		return this.nonTerminal;
 	}
 
+	public boolean isTerminal() {
+		return false;
+	}
+
 }
