@@ -15,6 +15,7 @@ public enum NonTerminals {
 	TYPE_ID,
 	VAR_DECLARATION,
 	ID_LIST,
+	ID_LIST_PRIME,
 	OPTIONAL_INIT,
 	FUNCT_DECLARATION,
 	PARAM_LIST,
@@ -23,6 +24,7 @@ public enum NonTerminals {
 	PARAM,
 
 	STAT_SEQ,
+	STAT_SEQ_PRIME,
 	STAT_SEQ_PRIME,
 	STAT,
 	STAT_IF,

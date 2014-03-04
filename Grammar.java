@@ -21,8 +21,42 @@ public class Grammar {
 		arr.add(rule);
 	}
 
-	public ArrayList<TerminalParserSymbol> findFirstSet(NonTerminalParserSymbol symbol) {
+	public Set<TerminalParserSymbol> findFirstSet(ProductionRule productionRule) {
+		Set<TerminalParserSymbol> set = new HashSet<TerminalParserSymbol>();
 
+		for(ParserSymbol parserSymbol : productionRule) {
+			if(parserSymbol.isTerminal() && ((TerminalParserSymbol)parserSymbol).getTerminal() != Terminals.NULL) {
+				set.add((TerminalParserSymbol) parserSymbol);
+				break;
+			} else {
+				TerminalParserSymbol terminalParserSymbol = findFirstSetHelper((NonTerminalParserSymbol) parserSymbol, set);
+				if(terminalParserSymbol != null) {
+					break;
+				}
+			}
+		}
+
+		return set;
+	}
+
+	public TerminalParserSymbol findFirstSetHelper(NonTerminalParserSymbol symbol, Set<TerminalParserSymbol> set) {
+		for(ProductionRule productionRule : rules.get(symbol)) {
+ 			for(ParserSymbol parserSymbol : productionRule) {
+ 				if(parserSymbol.isTerminal() && ((TerminalParserSymbol)parserSymbol).getTerminal() != Terminals.NULL) {
+ 					set.add((TerminalParserSymbol) parserSymbol);
+ 					return (TerminalParserSymbol) parserSymbol;
+ 				} else if(parserSymbol.isTerminal() && ((TerminalParserSymbol)parserSymbol).getTerminal() == Terminals.NULL) {
+ 					continue;
+ 				} else {
+ 					TerminalParserSymbol terminalParserSymbol = findFirstSetHelper((NonTerminalParserSymbol) parserSymbol, set);
+ 					if(terminalParserSymbol != null) {
+ 						return terminalParserSymbol;
+ 					}
+ 				}
+ 			}
+ 		}
+
+		return null;
 	}
 
 	public ArrayList<TerminalParserSymbol> findFollowSet(NonTerminalParserSymbol nonterminal) {
