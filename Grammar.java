@@ -38,17 +38,9 @@ public class Grammar {
 				set.add((Token) parserSymbol);
 				break;
 			} else {
-				//	the first set of @parserSymbol for ALL rules where it is the left-hand-side
-				Set<Token> first = new HashSet<>();
-
-				//	loop through each rule where @parserSymbol is the left-hand-side to build @first
-				for (ProductionRule rule : rules.get((NonTerminalParserSymbol)parserSymbol)) {
-					Set<Token> firstForRule = findFirstSet(rule);
-					first.addAll(firstForRule);
-				}
+				Set<Token> first = findTotalFirstSet((NonTerminalParserSymbol)parserSymbol);
 
 				Token nullSmbl = new Token(State.NULL);
-
 				if (first.contains(nullSmbl)) {
 					//	add @first to @set except for null symbol
 					first.remove(nullSmbl);
@@ -62,6 +54,19 @@ public class Grammar {
 		}
 
 		return set;
+	}
+
+	public Set<Token> findTotalFirstSet(NonTerminalParserSymbol nonterminal) {
+		//	the first set of @nonterminal for ALL rules where it is the left-hand-side
+		Set<Token> first = new HashSet<>();
+
+		//	loop through each rule where @nonterminal is the left-hand-side to build @first
+		for (ProductionRule rule : rules.get(nonterminal)) {
+			Set<Token> firstForRule = findFirstSet(rule);
+			first.addAll(firstForRule);
+		}
+
+		return first;
 	}
 
 	public Set<Token> findFollowSet(NonTerminalParserSymbol nonterminal) {
@@ -97,7 +102,7 @@ public class Grammar {
 							first = new HashSet<>();
 							first.add((Token)smbl);
 						} else {
-							first = findFirstSet(rule);
+							first = findTotalFirstSet((NonTerminalParserSymbol)smbl);
 						}
 
 						Token nullSmbl = new Token(State.NULL);
