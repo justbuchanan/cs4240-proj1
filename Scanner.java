@@ -240,9 +240,7 @@ public class Scanner{
 		if(setToken == null){
 			setToken = nextToken();
 		}
-		Token returnToken = setToken;
-		setToken = null;
-		return returnToken;
+		return setToken;
 	}
 
 
