@@ -39,7 +39,7 @@ pkg: $(PKG_FILES)
 	zip pkg.zip $(PKG_FILES)
 
 %.class: %.java
-	javac -cp $(CLASSPATH) $^
+	javac -g -cp $(CLASSPATH) $^
 
 clean:
 	rm $(OBJ) *.png
