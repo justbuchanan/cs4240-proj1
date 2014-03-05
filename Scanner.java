@@ -247,7 +247,7 @@ public class Scanner{
 
 
 	//	the number of 'real' states - excludes keywords and ERROR
-	static int NUM_STATES = 35;
+	static int NUM_STATES = 58;
 
 	public boolean isAcceptState(int state) {
 		return state < State.START.ordinal();
