@@ -66,10 +66,10 @@ public class Parser{
 
 			if (firstSet.contains(nullSymbol)) {
 				NonTerminalParserSymbol nonterminal = rule.left();
-				Set<Token> followSet = grammar.findFollowSet(rule);
+				Set<Token> followSet = grammar.findFollowSet(nonterminal);
 
 				for (Token terminal : followSet) {
-					parserTable[nonterminal.ordinal()][terminal.ordinal()] = nullSymbol;
+					parserTable[nonterminal.ordinal()][terminal.ordinal()] = new ProductionRule(nonterminal.getNonTerminal(), new ParserSymbol[] {nullSymbol});
 				}
 			}
 		}
