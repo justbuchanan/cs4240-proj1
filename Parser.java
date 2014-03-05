@@ -87,4 +87,36 @@ public class Parser{
 		}
 	}
 
+	public String generateParseTableCSV() {
+		String csv = new String();
+
+		for (int termIdx = 0; termIdx < NUM_TERMINALS; termIdx++) {
+			csv += State.values()[termIdx] + ",";
+		}
+
+		for (int nontermIdx = 0; nontermIdx < NUM_NONTERMINALS; nontermIdx++) {
+			csv += NonTerminals.values()[nontermIdx] + ",";
+
+			for (int termIdx = 0; termIdx < NUM_TERMINALS; termIdx++) {
+				ProductionRule rule = parserTable[nontermIdx][termIdx];
+
+				if (rule != null) {
+					csv += rule.left().getNonTerminal() + " --> ";
+					for (ParserSymbol rightSmbl : rule.right()) {
+						if (rightSmbl.isTerminal()) {
+							csv += ((Token)rightSmbl).type() + " ";
+						} else {
+							csv += ((NonTerminalParserSymbol)rightSmbl).getNonTerminal() + " ";
+						}
+					}
+				}			
+
+				csv += ",";
+			}
+
+			csv += "\n";
+		}
+		
+		return csv;
+	}
 }
