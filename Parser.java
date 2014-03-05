@@ -1,5 +1,6 @@
 import java.util.LinkedList;
 import java.util.Stack;
+import java.util.Set;
 
 public class Parser{
 	
@@ -22,7 +23,7 @@ public class Parser{
 		symbolStack.push(new NonTerminalParserSymbol(NonTerminals.TIGER_PROGRAM));
 
 		while(!symbolStack.isEmpty()){
-			Token token = scanner.peek();
+			Token token = scanner.peekToken();
 			ParserSymbol parserSymbol = symbolStack.pop();
 
 			if(parserSymbol instanceof Token) {
@@ -34,7 +35,7 @@ public class Parser{
 					continue;
 				}
 			} else {
-				ProductionRule productionRule = parserTable[parserSymbol.getNonTerminal().ordinal()][token.ordinal()];
+				ProductionRule productionRule = parserTable[((NonTerminalParserSymbol)parserSymbol).getNonTerminal().ordinal()][token.ordinal()];
 				for(int i = parserSymbol.length - 1; i >= 0; i--) {
 					symbolStack.push(parserSymbol[i]);
 				}
