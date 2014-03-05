@@ -3,6 +3,7 @@ import java.util.HashMap;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.Stack;
+import java.util.Collection;
 
 
 public class Grammar {
@@ -19,6 +20,14 @@ public class Grammar {
 			allRules.addAll(subRules);
 		}
 		return allRules;
+	}
+
+	Collection<ArrayList<ProductionRule>> rulesByNonTerminal() {
+		return rules.values();
+	}
+
+	Set<NonTerminalParserSymbol> allNonTerminalSymbols() {
+		return rules.keySet();
 	}
 
 	public void addRule(ProductionRule rule) {

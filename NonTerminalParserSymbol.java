@@ -19,7 +19,8 @@ public class NonTerminalParserSymbol extends ParserSymbol{
 	}
 
 	public String toString() {
-		return new String("NonTerminal(" + nonTerminal + ")");
+		// return new String("NonTerminal(" + nonTerminal + ")");
+		return nonTerminal.toString();
 	}
 
 	@Override

@@ -1,6 +1,7 @@
 import java.util.LinkedList;
 import java.util.Stack;
 import java.util.Set;
+import java.util.ArrayList;
 
 public class Parser{
 	
@@ -15,9 +16,6 @@ public class Parser{
 		this.scanner = scanner;
 		this.grammar = grammar;
 		buildParserTable();
-
-		// System.out.println(generateParseTableCSV());
-		// System.exit(0);
 	}
 
 	public void parseText() {
@@ -149,5 +147,33 @@ public class Parser{
 		}
 		
 		return csv;
+	}
+
+	public String prettyPrintedFirstSets() {
+		String output = "";
+
+		//	add entries based on first && follow sets
+		for (ArrayList<ProductionRule> rules : grammar.rulesByNonTerminal()) {
+			for (ProductionRule rule : rules) {
+				output += "FIRST(" + rule + ") = " + grammar.findFirstSet(rule) + "\n";
+			}
+			output += "\n";	//	newline between sets of rules
+		}
+
+		return output;
+	}
+
+	public String prettyPrintedFollowSets() {
+		String output = "";
+
+		Token nullSymbol = new Token(State.NULL);
+
+		for (NonTerminalParserSymbol nonterminal : grammar.allNonTerminalSymbols()) {
+			Set<Token> followSet = grammar.findFollowSet(nonterminal);
+
+			output += "FOLLOW(" + nonterminal + ") = " + followSet + "\n";
+		}
+
+		return output;
 	}
 }
