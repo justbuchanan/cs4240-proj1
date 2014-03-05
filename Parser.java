@@ -24,11 +24,17 @@ public class Parser{
 
 		while(!symbolStack.isEmpty()){
 			Token token = scanner.peekToken();
+
+			//	when the scanner returns null, it means we're at the end of the file
+			if (token == null) {
+				token = new Token(State.$);
+			}
+
 			ParserSymbol parserSymbol = symbolStack.pop();
 
 			if(parserSymbol instanceof Token) {
 				if(token == parserSymbol) {
-					scanner.nextToken();
+					scanner.nextToken();	//	eat the token we just peeked
 					continue;
 				} else {
 					//ERROR STATE!
