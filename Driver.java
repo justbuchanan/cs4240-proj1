@@ -38,6 +38,7 @@ public class Driver {
 		Parser parser = new Parser(scanner, grammar);
 
 		//	write debug files
+		writeFile("parser_rules.txt", grammar.prettyPrintedRules());
 		writeFile("parser_table.csv", parser.generateParseTableCSV());
 		writeFile("first_sets.txt", parser.prettyPrintedFirstSets());
 		writeFile("follow_sets.txt", parser.prettyPrintedFollowSets());

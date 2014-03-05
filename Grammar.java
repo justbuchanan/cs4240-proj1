@@ -30,6 +30,17 @@ public class Grammar {
 		return rules.keySet();
 	}
 
+	public String prettyPrintedRules() {
+		String output = "";
+		for (ArrayList<ProductionRule> rules : rulesByNonTerminal()) {
+			for (ProductionRule rule : rules) {
+				output += rule + "\n";
+			}
+			output += "\n";
+		}
+		return output;
+	}
+
 	public void addRule(ProductionRule rule) {
 		ArrayList<ProductionRule> arr = rules.get(rule.left());
 		if (arr == null) {
