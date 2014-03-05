@@ -2,6 +2,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
 import java.util.HashSet;
+import java.util.Stack;
 
 
 public class Grammar {
@@ -69,7 +70,12 @@ public class Grammar {
 		return first;
 	}
 
-	public Set<Token> findFollowSet(NonTerminalParserSymbol nonterminal) {
+
+	private Set<Token> findFollowSet(NonTerminalParserSymbol nonterminal, Stack<NonTerminalParserSymbol> blacklist) {
+		if (blacklist.contains(nonterminal)) return new HashSet<>();
+
+		blacklist.push(nonterminal);
+
 		Set<Token> followSet = new HashSet<>();
 
 		//	add EOF/$ to follow set for the start symbol
@@ -89,7 +95,7 @@ public class Grammar {
 				//	if we get to the end and haven't terminated yet, we have to add FOLLOW(@rule.left) to @followSet
 				boolean terminated = false;
 
-				for (int i = 0; i < right.length; i++) {
+				for (int i = 0; i < right.length && !terminated; i++) {
 					ParserSymbol smbl = right[i];
 
 					if (smbl.equals(nonterminal)) {
@@ -118,14 +124,20 @@ public class Grammar {
 					}
 				}	//	end for loop
 
-				if (seenTheNonterminal && !terminated) {
+				if (seenTheNonterminal && !terminated && !rule.left().equals(nonterminal)) {
 					//	@nonterminal is the last symbol in this rule OR all symbols following @nonterminal are nullable
-					followSet.addAll( findFollowSet(rule.left()) );
+					followSet.addAll( findFollowSet(rule.left(), blacklist) );
 				}
 			}
 		}
 
+		blacklist.pop();
+
 		return followSet;
+	}
+
+	public Set<Token> findFollowSet(NonTerminalParserSymbol nonterminal) {
+		return findFollowSet(nonterminal, new Stack<NonTerminalParserSymbol>());
 	}
 
 
