@@ -33,49 +33,35 @@ public class Grammar {
 	public Set<Token> findFirstSet(ProductionRule productionRule) {
 		Set<Token> set = new HashSet<Token>();
 
-		if(productionRule.right()[0].isTerminal() && ((Token)productionRule.right()[0]).type() == State.NULL) {
-			set.add((Token) productionRule.right()[0]);
-			return set;
-		}
-
 		for(ParserSymbol parserSymbol : productionRule) {
-			if(parserSymbol.isTerminal() && ((Token)parserSymbol).type() != State.NULL) {
+			if(parserSymbol.isTerminal()) {
 				set.add((Token) parserSymbol);
 				break;
 			} else {
-				Token terminalParserSymbol = findFirstSetHelper((NonTerminalParserSymbol) parserSymbol, set);
-				if(terminalParserSymbol != null) {
+				//	the first set of @parserSymbol for ALL rules where it is the left-hand-side
+				Set<Token> first = new HashSet<>();
+
+				//	loop through each rule where @parserSymbol is the left-hand-side to build @first
+				for (ProductionRule rule : rules.get((NonTerminalParserSymbol)parserSymbol)) {
+					Set<Token> firstForRule = findFirstSet(rule);
+					first.addAll(firstForRule);
+				}
+
+				Token nullSmbl = new Token(State.NULL);
+
+				if (first.contains(nullSmbl)) {
+					//	add @first to @set except for null symbol
+					first.remove(nullSmbl);
+					set.addAll(first);
+				} else {
+					//	@parserSymbol is not nullable, so we're done
+					set.addAll(first);
 					break;
 				}
 			}
 		}
 
 		return set;
-	}
-
-	public Token findFirstSetHelper(NonTerminalParserSymbol symbol, Set<Token> set) {
-		ArrayList<ProductionRule> rulesForSymbol = rules.get(symbol);
-		if (rulesForSymbol == null) {
-			throw new RuntimeException("in findFirstHelper(), unable to find production rule for nonterminal: " + symbol);
-		}
-
-		for(ProductionRule productionRule : rulesForSymbol) {
- 			for(ParserSymbol parserSymbol : productionRule) {
- 				if(parserSymbol.isTerminal() && ((Token)parserSymbol).type() != State.NULL) {
- 					set.add((Token) parserSymbol);
- 					return (Token) parserSymbol;
- 				} else if(parserSymbol.isTerminal() && ((Token)parserSymbol).type() == State.NULL) {
- 					continue;
- 				} else {
- 					Token terminalParserSymbol = findFirstSetHelper((NonTerminalParserSymbol) parserSymbol, set);
- 					if(terminalParserSymbol != null) {
- 						return terminalParserSymbol;
- 					}
- 				}
- 			}
- 		}
-
-		return null;
 	}
 
 	public Set<Token> findFollowSet(NonTerminalParserSymbol nonterminal) {
