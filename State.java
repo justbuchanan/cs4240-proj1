@@ -1,5 +1,6 @@
 
 //	accept states are token types
+//	Terminals come first so the indices of the columns for the parser table can start at zero
 public enum State {
 	COMMA,
 	COLON,
@@ -32,6 +33,7 @@ public enum State {
 
 	//	used only by the parser, not the scanner
 	$,
+	NULL,
 
 
 	//	keywords - they're not really states, but they are token types

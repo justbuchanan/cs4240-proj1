@@ -1,6 +1,6 @@
 
 /**
- * Abstract superclass for NonTerminalParserSymbol and TerminalParserSymbol
+ * Abstract superclass for NonTerminalParserSymbol and Token
  */
 public abstract class ParserSymbol {
 	public boolean isTerminal() {

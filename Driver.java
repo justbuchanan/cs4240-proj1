@@ -42,9 +42,9 @@ public class Driver {
 		Grammar grm = new Grammar();
 		// TIGER_PROGRAM
 		grm.addRule(new ProductionRule(NonTerminals.TIGER_PROGRAM, new ParserSymbol[] {
-			new TerminalParserSymbol(Terminals.LET), new NonTerminalParserSymbol(NonTerminals.DECLARATION_SEGMENT),
-			new TerminalParserSymbol(Terminals.IN), new NonTerminalParserSymbol(NonTerminals.STAT_SEQ),
-			new TerminalParserSymbol(Terminals.END)
+			new Token(State.LET), new NonTerminalParserSymbol(NonTerminals.DECLARATION_SEGMENT),
+			new Token(State.IN), new NonTerminalParserSymbol(NonTerminals.STAT_SEQ),
+			new Token(State.END)
 		}));
 		
 		// DECLARATION_SEGMENT
@@ -55,7 +55,7 @@ public class Driver {
 		
 		// TYPE_DECLARATION_LIST
 		grm.addRule(new ProductionRule(NonTerminals.TYPE_DECLARATION_LIST, new ParserSymbol[] {
-			new TerminalParserSymbol(Terminals.NULL)	
+			new Token(State.NULL)	
 		}));
 		
 		grm.addRule(new ProductionRule(NonTerminals.TYPE_DECLARATION_LIST, new ParserSymbol[]{
@@ -64,7 +64,7 @@ public class Driver {
 		
 		// VAR_DECLARATION_LIST
 		grm.addRule(new ProductionRule(NonTerminals.VAR_DECLARATION_LIST, new ParserSymbol[]{
-			new TerminalParserSymbol(Terminals.NULL)
+			new Token(State.NULL)
 		}));
 		
 		grm.addRule(new ProductionRule(NonTerminals.VAR_DECLARATION_LIST, new ParserSymbol[]{
@@ -73,7 +73,7 @@ public class Driver {
 		
 		// FUNCT_DECLARATION_LIST
 		grm.addRule(new ProductionRule(NonTerminals.FUNCT_DECLARATION_LIST, new ParserSymbol[]{
-			new TerminalParserSymbol(Terminals.NULL)	
+			new Token(State.NULL)	
 		}));
 		
 		grm.addRule(new ProductionRule(NonTerminals.FUNCT_DECLARATION_LIST, new ParserSymbol[]{
@@ -82,80 +82,80 @@ public class Driver {
 		
 		// TYPE_DECLARATION
 		grm.addRule(new ProductionRule(NonTerminals.TYPE_DECLARATION, new ParserSymbol[]{
-			new TerminalParserSymbol(Terminals.TYPE), new TerminalParserSymbol(Terminals.ID), 
-			new TerminalParserSymbol(Terminals.EQ), new NonTerminalParserSymbol(NonTerminals.TYPE)
+			new Token(State.TYPE), new Token(State.ID), 
+			new Token(State.EQ), new NonTerminalParserSymbol(NonTerminals.TYPE)
 		}));
 		
 		// TYPE
 		grm.addRule(new ProductionRule(NonTerminals.TYPE, new ParserSymbol[]{
-				new TerminalParserSymbol(Terminals.ARRAY), new TerminalParserSymbol(Terminals.LBRACK), new TerminalParserSymbol(Terminals.INTLIT),
-				new TerminalParserSymbol(Terminals.RBRACK), new NonTerminalParserSymbol(NonTerminals.TYPEDIM)
+				new Token(State.ARRAY), new Token(State.LBRACK), new Token(State.INTLIT),
+				new Token(State.RBRACK), new NonTerminalParserSymbol(NonTerminals.TYPEDIM)
 		}));
 		
 		//TYPEDIM
 		grm.addRule(new ProductionRule(NonTerminals.TYPEDIM, new ParserSymbol[]{
-			new TerminalParserSymbol(Terminals.RBRACK), new TerminalParserSymbol(Terminals.INTLIT), new TerminalParserSymbol(Terminals.LBRACK),
+			new Token(State.RBRACK), new Token(State.INTLIT), new Token(State.LBRACK),
 			new NonTerminalParserSymbol(NonTerminals.TYPEDIM)
 		}));
 		
 		grm.addRule(new ProductionRule(NonTerminals.TYPEDIM, new ParserSymbol[]{
-				new TerminalParserSymbol(Terminals.NULL)
+				new Token(State.NULL)
 		}));
 		
 		// TYPE_ID
 		grm.addRule(new ProductionRule(NonTerminals.TYPE_ID, new ParserSymbol[]{
-				new TerminalParserSymbol(Terminals.INTLIT)
+				new Token(State.INTLIT)
 		}));
 		
 		grm.addRule(new ProductionRule(NonTerminals.TYPE_ID, new ParserSymbol[]{
-			new TerminalParserSymbol(Terminals.STRLIT)	
+			new Token(State.STRLIT)	
 		}));
 		
 		grm.addRule(new ProductionRule(NonTerminals.TYPE_ID, new ParserSymbol[]{
-			new TerminalParserSymbol(Terminals.ID)
+			new Token(State.ID)
 		}));
 		
 		// VAR_DECLARATION
 		grm.addRule(new ProductionRule(NonTerminals.VAR_DECLARATION, new ParserSymbol[]{
-				new TerminalParserSymbol(Terminals.VAR), new NonTerminalParserSymbol(NonTerminals.ID_LIST),
-				new TerminalParserSymbol(Terminals.COLON), new NonTerminalParserSymbol(NonTerminals.TYPE_ID),
-				new NonTerminalParserSymbol(NonTerminals.OPTIONAL_INIT), new TerminalParserSymbol(Terminals.SEMI)
+				new Token(State.VAR), new NonTerminalParserSymbol(NonTerminals.ID_LIST),
+				new Token(State.COLON), new NonTerminalParserSymbol(NonTerminals.TYPE_ID),
+				new NonTerminalParserSymbol(NonTerminals.OPTIONAL_INIT), new Token(State.SEMI)
 		}));
 		
 		// ID_LIST
 		grm.addRule(new ProductionRule(NonTerminals.ID_LIST, new ParserSymbol[]{
-				new TerminalParserSymbol(Terminals.ID), new NonTerminalParserSymbol(NonTerminals.ID_LIST_PRIME)
+				new Token(State.ID), new NonTerminalParserSymbol(NonTerminals.ID_LIST_PRIME)
 		}));
 		
 		// ID_LIST_PRIME
 		grm.addRule(new ProductionRule(NonTerminals.ID_LIST_PRIME, new ParserSymbol[]{
-				new TerminalParserSymbol(Terminals.NULL)
+				new Token(State.NULL)
 		}));
 		
 		grm.addRule(new ProductionRule(NonTerminals.ID_LIST_PRIME, new ParserSymbol[]{
-				new TerminalParserSymbol(Terminals.COMMA), new NonTerminalParserSymbol(NonTerminals.ID_LIST)
+				new Token(State.COMMA), new NonTerminalParserSymbol(NonTerminals.ID_LIST)
 		}));
 		
 		// OPTIONAL_INIT
 		grm.addRule(new ProductionRule(NonTerminals.OPTIONAL_INIT, new ParserSymbol[]{
-				new TerminalParserSymbol(Terminals.NULL)
+				new Token(State.NULL)
 		}));
 		
 		grm.addRule(new ProductionRule(NonTerminals.OPTIONAL_INIT, new ParserSymbol[]{
-				new TerminalParserSymbol(Terminals.ASSIGN), new NonTerminalParserSymbol(NonTerminals.CONST)
+				new Token(State.ASSIGN), new NonTerminalParserSymbol(NonTerminals.CONST)
 		}));
 		
 		// FUNCT_DECLARATION
 		grm.addRule(new ProductionRule(NonTerminals.FUNCT_DECLARATION, new ParserSymbol[]{
-				new TerminalParserSymbol(Terminals.FUNC), new TerminalParserSymbol(Terminals.ID), new TerminalParserSymbol(Terminals.LPAREN),
-				new NonTerminalParserSymbol(NonTerminals.PARAM_LIST), new TerminalParserSymbol(Terminals.RPAREN), 
-				new NonTerminalParserSymbol(NonTerminals.RET_TYPE), new TerminalParserSymbol(Terminals.BEGIN), 
-				new NonTerminalParserSymbol(NonTerminals.STAT_SEQ), new TerminalParserSymbol(Terminals.END), new TerminalParserSymbol(Terminals.SEMI)
+				new Token(State.FUNC), new Token(State.ID), new Token(State.LPAREN),
+				new NonTerminalParserSymbol(NonTerminals.PARAM_LIST), new Token(State.RPAREN), 
+				new NonTerminalParserSymbol(NonTerminals.RET_TYPE), new Token(State.BEGIN), 
+				new NonTerminalParserSymbol(NonTerminals.STAT_SEQ), new Token(State.END), new Token(State.SEMI)
 		}));
 		
 		// PARAM_LIST
 		grm.addRule(new ProductionRule(NonTerminals.PARAM_LIST, new ParserSymbol[]{
-				new TerminalParserSymbol(Terminals.NULL)
+				new Token(State.NULL)
 		}));
 		
 		grm.addRule(new ProductionRule(NonTerminals.PARAM_LIST, new ParserSymbol[]{
@@ -164,26 +164,26 @@ public class Driver {
 		
 		// PARAM_LIST_TAIL
 		grm.addRule(new ProductionRule(NonTerminals.PARAM_LIST_TAIL, new ParserSymbol[]{
-				new TerminalParserSymbol(Terminals.NULL)
+				new Token(State.NULL)
 		}));
 		
 		grm.addRule(new ProductionRule(NonTerminals.PARAM_LIST_TAIL, new ParserSymbol[]{
-				new TerminalParserSymbol(Terminals.COMMA), new NonTerminalParserSymbol(NonTerminals.PARAM),
+				new Token(State.COMMA), new NonTerminalParserSymbol(NonTerminals.PARAM),
 				new NonTerminalParserSymbol(NonTerminals.PARAM_LIST_TAIL)
 		}));
 		
 		// RET_TYPE
 		grm.addRule(new ProductionRule(NonTerminals.RET_TYPE, new ParserSymbol[]{
-				new TerminalParserSymbol(Terminals.NULL)
+				new Token(State.NULL)
 		}));
 		
 		grm.addRule(new ProductionRule(NonTerminals.RET_TYPE, new ParserSymbol[]{
-				new TerminalParserSymbol(Terminals.COLON), new NonTerminalParserSymbol(NonTerminals.TYPE_ID)
+				new Token(State.COLON), new NonTerminalParserSymbol(NonTerminals.TYPE_ID)
 		}));
 		
 		// PARAM
 		grm.addRule(new ProductionRule(NonTerminals.PARAM, new ParserSymbol[]{
-				new TerminalParserSymbol(Terminals.ID), new TerminalParserSymbol(Terminals.COLON),
+				new Token(State.ID), new Token(State.COLON),
 				new NonTerminalParserSymbol(NonTerminals.TYPE_ID)
 		}));
 		
@@ -199,63 +199,63 @@ public class Driver {
 		}));
 		
 		grm.addRule(new ProductionRule(NonTerminals.STAT_SEQ_PRIME, new ParserSymbol[]{
-				new TerminalParserSymbol(Terminals.NULL)
+				new Token(State.NULL)
 		}));
 		
 		// STAT
 		grm.addRule(new ProductionRule(NonTerminals.STAT, new ParserSymbol[]{
-				new NonTerminalParserSymbol(NonTerminals.LVALUE), new TerminalParserSymbol(Terminals.ASSIGN), new NonTerminalParserSymbol(NonTerminals.EXPR),
-				new TerminalParserSymbol(Terminals.SEMI)
+				new NonTerminalParserSymbol(NonTerminals.LVALUE), new Token(State.ASSIGN), new NonTerminalParserSymbol(NonTerminals.EXPR),
+				new Token(State.SEMI)
 		}));
 		
 		grm.addRule(new ProductionRule(NonTerminals.STAT, new ParserSymbol[]{
-				new TerminalParserSymbol(Terminals.WHILE), new NonTerminalParserSymbol(NonTerminals.EXPR), new TerminalParserSymbol(Terminals.DO),
-				new NonTerminalParserSymbol(NonTerminals.STAT_SEQ), new TerminalParserSymbol(Terminals.ENDDO), new TerminalParserSymbol(Terminals.SEMI)
+				new Token(State.WHILE), new NonTerminalParserSymbol(NonTerminals.EXPR), new Token(State.DO),
+				new NonTerminalParserSymbol(NonTerminals.STAT_SEQ), new Token(State.ENDDO), new Token(State.SEMI)
 		}));
 		
 		grm.addRule(new ProductionRule(NonTerminals.STAT, new ParserSymbol[]{
-				new TerminalParserSymbol(Terminals.FOR), new TerminalParserSymbol(Terminals.ID), new TerminalParserSymbol(Terminals.ASSIGN),
-				new NonTerminalParserSymbol(NonTerminals.EXPR), new TerminalParserSymbol(Terminals.TO), new NonTerminalParserSymbol(NonTerminals.EXPR), 
-				new TerminalParserSymbol(Terminals.DO), new NonTerminalParserSymbol(NonTerminals.STAT_SEQ), new TerminalParserSymbol(Terminals.ENDDO), 
-				new TerminalParserSymbol(Terminals.SEMI)
+				new Token(State.FOR), new Token(State.ID), new Token(State.ASSIGN),
+				new NonTerminalParserSymbol(NonTerminals.EXPR), new Token(State.TO), new NonTerminalParserSymbol(NonTerminals.EXPR), 
+				new Token(State.DO), new NonTerminalParserSymbol(NonTerminals.STAT_SEQ), new Token(State.ENDDO), 
+				new Token(State.SEMI)
 		}));
 		
 		grm.addRule(new ProductionRule(NonTerminals.STAT, new ParserSymbol[]{
-			new NonTerminalParserSymbol(NonTerminals.OPT_PREFIX), new TerminalParserSymbol(Terminals.ID), new TerminalParserSymbol(Terminals.LPAREN),
-			new NonTerminalParserSymbol(NonTerminals.EXPR_LIST), new TerminalParserSymbol(Terminals.RPAREN), new TerminalParserSymbol(Terminals.SEMI)
+			new NonTerminalParserSymbol(NonTerminals.OPT_PREFIX), new Token(State.ID), new Token(State.LPAREN),
+			new NonTerminalParserSymbol(NonTerminals.EXPR_LIST), new Token(State.RPAREN), new Token(State.SEMI)
 		}));
 
 		grm.addRule(new ProductionRule(NonTerminals.STAT, new ParserSymbol[]{
-			new TerminalParserSymbol(Terminals.BREAK), new TerminalParserSymbol(Terminals.SEMI)
+			new Token(State.BREAK), new Token(State.SEMI)
 		}));
 		
 		grm.addRule(new ProductionRule(NonTerminals.STAT, new ParserSymbol[]{
-			new TerminalParserSymbol(Terminals.RETURN), new NonTerminalParserSymbol(NonTerminals.EXPR), new TerminalParserSymbol(Terminals.SEMI)
+			new Token(State.RETURN), new NonTerminalParserSymbol(NonTerminals.EXPR), new Token(State.SEMI)
 		}));
 		
 		// STAT_IF
 		grm.addRule(new ProductionRule(NonTerminals.STAT_IF, new ParserSymbol[]{
-			new TerminalParserSymbol(Terminals.IF), new NonTerminalParserSymbol(NonTerminals.EXPR), new TerminalParserSymbol(Terminals.THEN),
+			new Token(State.IF), new NonTerminalParserSymbol(NonTerminals.EXPR), new Token(State.THEN),
 			new NonTerminalParserSymbol(NonTerminals.STAT_SEQ), new NonTerminalParserSymbol(NonTerminals.STAT_IF_CLAUSE_2)
 		}));
 		
 		// STAT_IF_CLAUSE_2
 		grm.addRule(new ProductionRule(NonTerminals.STAT_IF_CLAUSE_2, new ParserSymbol[]{
-			new TerminalParserSymbol(Terminals.ENDIF), new TerminalParserSymbol(Terminals.SEMI)
+			new Token(State.ENDIF), new Token(State.SEMI)
 		}));
 		
 		grm.addRule(new ProductionRule(NonTerminals.STAT_IF_CLAUSE_2, new ParserSymbol[]{
-			new TerminalParserSymbol(Terminals.ELSE), new NonTerminalParserSymbol(NonTerminals.STAT_SEQ), new TerminalParserSymbol(Terminals.ENDIF),
-			new TerminalParserSymbol(Terminals.SEMI)
+			new Token(State.ELSE), new NonTerminalParserSymbol(NonTerminals.STAT_SEQ), new Token(State.ENDIF),
+			new Token(State.SEMI)
 		}));
 		
 		//OPT_PREFIX
 		grm.addRule(new ProductionRule(NonTerminals.OPT_PREFIX, new ParserSymbol[]{
-				new NonTerminalParserSymbol(NonTerminals.LVALUE), new TerminalParserSymbol(Terminals.ASSIGN)
+				new NonTerminalParserSymbol(NonTerminals.LVALUE), new Token(State.ASSIGN)
 		}));
 		
 		grm.addRule(new ProductionRule(NonTerminals.OPT_PREFIX, new ParserSymbol[]{
-			new TerminalParserSymbol(Terminals.NULL)
+			new Token(State.NULL)
 		}));
 		
 		// EXPR
@@ -278,7 +278,7 @@ public class Driver {
 		
 		//NEGATED_EXPR
 		grm.addRule(new ProductionRule(NonTerminals.NEGATED_EXPR, new ParserSymbol[]{
-			new TerminalParserSymbol(Terminals.MINUS), new NonTerminalParserSymbol(NonTerminals.ATOM_EXPR)
+			new Token(State.MINUS), new NonTerminalParserSymbol(NonTerminals.ATOM_EXPR)
 		}));
 		
 		grm.addRule(new ProductionRule(NonTerminals.NEGATED_EXPR, new ParserSymbol[]{
@@ -287,7 +287,7 @@ public class Driver {
 		
 		// MULT_DIV_EXPR
 		grm.addRule(new ProductionRule(NonTerminals.MULT_DIV_EXPR, new ParserSymbol[]{
-				new NonTerminalParserSymbol(NonTerminals.MULT_DIV_EXPR), new TerminalParserSymbol(Terminals.MULT), 
+				new NonTerminalParserSymbol(NonTerminals.MULT_DIV_EXPR), new Token(State.MULT), 
 				new NonTerminalParserSymbol(NonTerminals.NEGATED_EXPR)
 		}));
 		

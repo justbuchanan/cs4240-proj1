@@ -11,21 +11,20 @@ public class Parser{
 
 	public Parser(Scanner scanner, Grammar grammar){
 		this.scanner = scanner;
-		symbolStack = new LinkedList();
 		this.grammar = grammar;
 		buildParserTable();
 	}
 
 	public void parseText(){
 		Stack<ParserSymbol> symbolStack = new Stack<>();
-		symbolStack.push(new TerminalParserSymbol(Terminals.$));
+		symbolStack.push(new Token(State.$));
 		symbolStack.push(new NonTerminalParserSymbol(NonTerminals.TIGER_PROGRAM));
 
 		while(!symbolStack.isEmpty()){
-			TerminalParserSymbol token = scanner.peek();
+			Token token = scanner.peek();
 			ParserSymbol parserSymbol = symbolStack.pop();
 
-			if(parserSymbol instanceof TerminalParserSymbol) {
+			if(parserSymbol instanceof Token) {
 				if(token == parserSymbol) {
 					scanner.nextToken();
 					continue;
@@ -54,20 +53,20 @@ public class Parser{
 	private void buildParserTable(){
 		parserTable = new ProductionRule[NUM_NONTERMINALS][NUM_TERMINALS];
 
-		TerminalParserSymbol nullSymbol = new TerminalParserSymbol(Terminals.NULL);
+		Token nullSymbol = new Token(State.NULL);
 
 		//	add entries based on first && follow sets
 		for (ProductionRule rule : grammar.allRules()) {
-			Set<TerminalParserSymbol> firstSet = grammar.findFirstSet(rule);
-			for (TerminalParserSymbol terminal : firstSet) {
+			Set<Token> firstSet = grammar.findFirstSet(rule);
+			for (Token terminal : firstSet) {
 				parserTable[rule.left().ordinal()][terminal.ordinal()] = rule;
 			}
 
 			if (firstSet.contains(nullSymbol)) {
 				NonTerminalParserSymbol nonterminal = rule.left();
-				Set<TerminalParserSymbol> followSet = grammar.findFollowSet(nonterminal);
+				Set<Token> followSet = grammar.findFollowSet(rule);
 
-				for (TerminalParserSymbol terminal : followSet) {
+				for (Token terminal : followSet) {
 					parserTable[nonterminal.ordinal()][terminal.ordinal()] = nullSymbol;
 				}
 			}

@@ -29,20 +29,20 @@ public class Grammar {
 		arr.add(rule);
 	}
 
-	public Set<TerminalParserSymbol> findFirstSet(ProductionRule productionRule) {
-		Set<TerminalParserSymbol> set = new HashSet<TerminalParserSymbol>();
+	public Set<Token> findFirstSet(ProductionRule productionRule) {
+		Set<Token> set = new HashSet<Token>();
 
-		if(productionRule.right()[0].isTerminal() && ((TerminalParserSymbol)productionRule.right()[0]).getTerminal() == Terminals.NULL) {
-			set.add((TerminalParserSymbol) productionRule.right()[0]);
+		if(productionRule.right()[0].isTerminal() && ((Token)productionRule.right()[0]).type() == State.NULL) {
+			set.add((Token) productionRule.right()[0]);
 			return set;
 		}
 
 		for(ParserSymbol parserSymbol : productionRule) {
-			if(parserSymbol.isTerminal() && ((TerminalParserSymbol)parserSymbol).getTerminal() != Terminals.NULL) {
-				set.add((TerminalParserSymbol) parserSymbol);
+			if(parserSymbol.isTerminal() && ((Token)parserSymbol).type() != State.NULL) {
+				set.add((Token) parserSymbol);
 				break;
 			} else {
-				TerminalParserSymbol terminalParserSymbol = findFirstSetHelper((NonTerminalParserSymbol) parserSymbol, set);
+				Token terminalParserSymbol = findFirstSetHelper((NonTerminalParserSymbol) parserSymbol, set);
 				if(terminalParserSymbol != null) {
 					break;
 				}
@@ -52,16 +52,16 @@ public class Grammar {
 		return set;
 	}
 
-	public TerminalParserSymbol findFirstSetHelper(NonTerminalParserSymbol symbol, Set<TerminalParserSymbol> set) {
+	public Token findFirstSetHelper(NonTerminalParserSymbol symbol, Set<Token> set) {
 		for(ProductionRule productionRule : rules.get(symbol)) {
  			for(ParserSymbol parserSymbol : productionRule) {
- 				if(parserSymbol.isTerminal() && ((TerminalParserSymbol)parserSymbol).getTerminal() != Terminals.NULL) {
- 					set.add((TerminalParserSymbol) parserSymbol);
- 					return (TerminalParserSymbol) parserSymbol;
- 				} else if(parserSymbol.isTerminal() && ((TerminalParserSymbol)parserSymbol).getTerminal() == Terminals.NULL) {
+ 				if(parserSymbol.isTerminal() && ((Token)parserSymbol).type() != State.NULL) {
+ 					set.add((Token) parserSymbol);
+ 					return (Token) parserSymbol;
+ 				} else if(parserSymbol.isTerminal() && ((Token)parserSymbol).type() == State.NULL) {
  					continue;
  				} else {
- 					TerminalParserSymbol terminalParserSymbol = findFirstSetHelper((NonTerminalParserSymbol) parserSymbol, set);
+ 					Token terminalParserSymbol = findFirstSetHelper((NonTerminalParserSymbol) parserSymbol, set);
  					if(terminalParserSymbol != null) {
  						return terminalParserSymbol;
  					}
@@ -72,12 +72,12 @@ public class Grammar {
 		return null;
 	}
 
-	public ArrayList<TerminalParserSymbol> findFollowSet(NonTerminalParserSymbol nonterminal) {
-		Set<TerminalParserSymbol> followSet = new HashSet<>();
+	public Set<Token> findFollowSet(NonTerminalParserSymbol nonterminal) {
+		Set<Token> followSet = new HashSet<>();
 
 		//	add EOF/$ to follow set for the start symbol
 		if (nonterminal.equals(NonTerminals.TIGER_PROGRAM)) {
-			followSet.add(new NonTerminalParserSymbol(Terminals.$));
+			followSet.add(new Token(State.$));
 		}
 
 		//	loop over EVERY rule looking for places where @nonterminal appears on the right side
@@ -100,15 +100,15 @@ public class Grammar {
 						seenTheNonterminal = true;
 					} else if (seenTheNonterminal) {
 						//	get first set of @smbl - handle differently depending on whether it's a terminal or not
-						Set<TerminalParserSymbol> first;
+						Set<Token> first;
 						if (smbl.isTerminal()) {
 							first = new HashSet<>();
-							first.add(smbl);
+							first.add((Token)smbl);
 						} else {
-							first = findFirstSet((NonTerminalParserSymbol)smbl);
+							first = findFirstSet(rule);
 						}
 
-						TerminalParserSymbol nullSmbl = new TerminalParserSymbol(Terminals.NULL);
+						Token nullSmbl = new Token(State.NULL);
 						if (first.contains(nullSmbl)) {
 							//	if it contains a null symbol, remove the null, and add it to the follow set
 							first.remove(nullSmbl);
@@ -127,6 +127,8 @@ public class Grammar {
 				}
 			}
 		}
+
+		return followSet;
 	}
 
 
