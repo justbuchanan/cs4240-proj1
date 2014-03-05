@@ -7,7 +7,7 @@ public class Parser{
 	private Scanner scanner;
 	private ProductionRule[][] parserTable;
 	private Grammar grammar;
-	private int NUM_NONTERMINALS = 42;
+	private int NUM_NONTERMINALS = 43;
 	private int NUM_TERMINALS = 49;
 
 
@@ -15,9 +15,14 @@ public class Parser{
 		this.scanner = scanner;
 		this.grammar = grammar;
 		buildParserTable();
+
+		// System.out.println(generateParseTableCSV());
+		// System.exit(0);
 	}
 
 	public void parseText() {
+		boolean debug = true;
+
 		Stack<ParserSymbol> symbolStack = new Stack<>();
 		symbolStack.push(new Token(State.$));
 		symbolStack.push(new NonTerminalParserSymbol(NonTerminals.TIGER_PROGRAM));
@@ -25,16 +30,28 @@ public class Parser{
 		while(!symbolStack.isEmpty()){
 			Token token = scanner.peekToken();
 
+			//	eat comments
+			if (token.ordinal() == State.COMMENT.ordinal()) {
+				if (debug) System.out.println("Ate a comment");
+				scanner.nextToken();
+				continue;
+			}
+
 			//	when the scanner returns null, it means we're at the end of the file
 			if (token == null) {
 				token = new Token(State.$);
 			}
 
+			if (debug) System.out.println("Peeked token: " + token);
+
 			ParserSymbol parserSymbol = symbolStack.pop();
+
+			if (debug) System.out.println("< Popped parser symbol: " + parserSymbol);
 
 			if(parserSymbol instanceof Token) {
 				if(token.equals(parserSymbol)) {
 					scanner.nextToken();	//	eat the token we just peeked
+					if (debug) System.out.println("Matched the token!");
 					continue;
 				} else {
 					System.out.println("ERROR: Found " + token + ", expecting " + parserSymbol);
@@ -48,9 +65,20 @@ public class Parser{
 					return;
 				}
 
-				for(int i = productionRule.right().length - 1; i >= 0; i--) {
-					symbolStack.push(productionRule.right()[i]);
+
+				ParserSymbol rightSymbol = productionRule.right()[0];
+				if (productionRule.right().length == 1 &&
+					rightSymbol.isTerminal() &&
+					((Token)rightSymbol).ordinal() == State.NULL.ordinal()
+					) {
+
+				} else {
+					for(int i = productionRule.right().length - 1; i >= 0; i--) {
+						System.out.println(">> Parser Push: " + productionRule.right()[i]);
+						symbolStack.push(productionRule.right()[i]);
+					}
 				}
+				
 			}
 		}
 		
@@ -73,7 +101,9 @@ public class Parser{
 		for (ProductionRule rule : grammar.allRules()) {
 			Set<Token> firstSet = grammar.findFirstSet(rule);
 			for (Token terminal : firstSet) {
-				parserTable[rule.left().ordinal()][terminal.ordinal()] = rule;
+				if (terminal.ordinal() != State.NULL.ordinal()) {
+					parserTable[rule.left().ordinal()][terminal.ordinal()] = rule;
+				}
 			}
 
 			if (firstSet.contains(nullSymbol)) {
@@ -90,6 +120,7 @@ public class Parser{
 	public String generateParseTableCSV() {
 		String csv = new String();
 
+		csv += ",";	//	leave upper-left corner blank
 		for (int termIdx = 0; termIdx < NUM_TERMINALS; termIdx++) {
 			csv += State.values()[termIdx] + ",";
 		}
