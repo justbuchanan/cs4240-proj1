@@ -1,18 +1,6 @@
 
 //	accept states are token types
-//	TODO: reorder to group accept states together
-//	COMMA and below are accept states
 public enum State {
-	START,
-
-	_COMMENT_END,
-	STRLIT_PART,
-	COMMENT_BEGIN,
-	STRLIT_SLASH,
-	STRLIT_SLASH_CONTROL,
-	STRLIT_SLASH_DECIMAL1,
-	STRLIT_SLASH_DECIMAL2,
-
 	COMMA,
 	COLON,
 	SEMI,
@@ -43,7 +31,6 @@ public enum State {
 	STRLIT,
 
 
-
 	//	keywords - they're not really states, but they are token types
 	ARRAY,
 	BREAK,
@@ -67,6 +54,16 @@ public enum State {
 	ENDDO,
 	RETURN,
 
+
+	//	the following are NOT accept states
+	START,
+	_COMMENT_END,
+	STRLIT_PART,
+	COMMENT_BEGIN,
+	STRLIT_SLASH,
+	STRLIT_SLASH_CONTROL,
+	STRLIT_SLASH_DECIMAL1,
+	STRLIT_SLASH_DECIMAL2,
 
 
 	ERROR,

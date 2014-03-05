@@ -250,7 +250,7 @@ public class Scanner{
 	static int NUM_STATES = 35;
 
 	public boolean isAcceptState(int state) {
-		return state >= State.COMMA.ordinal();
+		return state < State.START.ordinal();
 	}
 
 }
