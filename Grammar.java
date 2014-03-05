@@ -14,7 +14,7 @@ public class Grammar {
 
 	ArrayList<ProductionRule> allRules() {
 		ArrayList<ProductionRule> allRules = new ArrayList<>();
-		for (ArrayList<ProductionRule> subRules : rules) {
+		for (ArrayList<ProductionRule> subRules : rules.values()) {
 			allRules.addAll(subRules);
 		}
 		return allRules;
@@ -76,7 +76,7 @@ public class Grammar {
 		Set<TerminalParserSymbol> followSet = new HashSet<>();
 
 		//	add EOF/$ to follow set for the start symbol
-		if (nonterminal.isEqual(NonTerminals.TIGER_PROGRAM)) {
+		if (nonterminal.equals(NonTerminals.TIGER_PROGRAM)) {
 			followSet.add(new NonTerminalParserSymbol(Terminals.$));
 		}
 
@@ -95,7 +95,7 @@ public class Grammar {
 				for (int i = 0; i < right.length; i++) {
 					ParserSymbol smbl = right[i];
 
-					if (smbl.isEqual(nonterminal)) {
+					if (smbl.equals(nonterminal)) {
 						//	we found it!
 						seenTheNonterminal = true;
 					} else if (seenTheNonterminal) {

@@ -30,6 +30,9 @@ public enum State {
 	INTLIT,
 	STRLIT,
 
+	//	used only by the parser, not the scanner
+	$,
+
 
 	//	keywords - they're not really states, but they are token types
 	ARRAY,
