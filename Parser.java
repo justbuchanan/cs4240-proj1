@@ -1,4 +1,5 @@
 import java.util.LinkedList;
+import java.util.Stack;
 
 public class Parser{
 	
@@ -11,7 +12,6 @@ public class Parser{
 
 	public Parser(Scanner scanner, Grammar grammar){
 		this.scanner = scanner;
-		symbolStack = new LinkedList();
 		this.grammar = grammar;
 		buildParserTable();
 	}
