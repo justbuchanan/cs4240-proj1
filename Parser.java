@@ -8,7 +8,7 @@ public class Parser{
 	private Scanner scanner;
 	private ProductionRule[][] parserTable;
 	private Grammar grammar;
-	private int NUM_NONTERMINALS = 43;
+	private int NUM_NONTERMINALS = 46;
 	private int NUM_TERMINALS = 49;
 
 
@@ -101,7 +101,7 @@ public class Parser{
 			for (Token terminal : firstSet) {
 				if (terminal.ordinal() != State.NULL.ordinal()) {
 					if (parserTable[rule.left().ordinal()][terminal.ordinal()] != null) {
-						throw new RuntimeException("ERROR: duplicate entries for [" + rule.left() + ", " + terminal + "], grammar is not LL(1)");
+						throw new RuntimeException("ERROR: Rule collision at column " + terminal + ", grammar is not LL(1): " + parserTable[rule.left().ordinal()][terminal.ordinal()] + " ******* " + rule);
 					}
 
 					parserTable[rule.left().ordinal()][terminal.ordinal()] = rule;
@@ -113,10 +113,11 @@ public class Parser{
 				Set<Token> followSet = grammar.findFollowSet(nonterminal);
 
 				for (Token terminal : followSet) {
+					ProductionRule newNullRule = new ProductionRule(nonterminal.getNonTerminal(), new ParserSymbol[] {nullSymbol});
 					if (parserTable[nonterminal.ordinal()][terminal.ordinal()] != null) {
-						throw new RuntimeException("ERROR: duplicate entries for [" + nonterminal + ", " + terminal + "], grammar is not LL(1)");
+						throw new RuntimeException("ERROR: Rule collision at column " + terminal + ", grammar is not LL(1): " + parserTable[nonterminal.ordinal()][terminal.ordinal()] + " ******* " + newNullRule);
 					}
-					parserTable[nonterminal.ordinal()][terminal.ordinal()] = new ProductionRule(nonterminal.getNonTerminal(), new ParserSymbol[] {nullSymbol});
+					parserTable[nonterminal.ordinal()][terminal.ordinal()] = newNullRule;
 				}
 			}
 		}
