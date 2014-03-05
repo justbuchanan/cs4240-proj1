@@ -17,7 +17,7 @@ public class Parser{
 		buildParserTable();
 	}
 
-	public void parseText(){
+	public void parseText() {
 		Stack<ParserSymbol> symbolStack = new Stack<>();
 		symbolStack.push(new Token(State.$));
 		symbolStack.push(new NonTerminalParserSymbol(NonTerminals.TIGER_PROGRAM));
@@ -33,15 +33,21 @@ public class Parser{
 			ParserSymbol parserSymbol = symbolStack.pop();
 
 			if(parserSymbol instanceof Token) {
-				if(token == parserSymbol) {
+				if(token.equals(parserSymbol)) {
 					scanner.nextToken();	//	eat the token we just peeked
 					continue;
 				} else {
-					//ERROR STATE!
-					continue;
+					System.out.println("ERROR: Found " + token + ", expecting " + parserSymbol);
+					return;
 				}
 			} else {
 				ProductionRule productionRule = parserTable[((NonTerminalParserSymbol)parserSymbol).getNonTerminal().ordinal()][token.ordinal()];
+				
+				if (productionRule == null) {
+					System.out.println("ERROR: Trying to match '" + parserSymbol + "', but found: '" + token + "'");
+					return;
+				}
+
 				for(int i = productionRule.right().length - 1; i >= 0; i--) {
 					symbolStack.push(productionRule.right()[i]);
 				}
@@ -54,7 +60,7 @@ public class Parser{
 			if (token == null) {
 				break;
 			}
-			System.out.println(">> " + token.type + " : '" + token.value + "' (" +  token.lineNumber + ")");
+			System.out.println(">> Extra token: " + token.type + " : '" + token.value + "' (" +  token.lineNumber + ")");
 		}
 	}
 
