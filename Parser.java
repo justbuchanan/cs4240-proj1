@@ -30,7 +30,7 @@ public class Parser{
 
 			//	eat comments
 			if (token.ordinal() == State.COMMENT.ordinal()) {
-				if (debug) System.out.println("Ate a comment");
+				if (debug) System.out.println("Ate a comment\n");
 				scanner.nextToken();
 				continue;
 			}
@@ -40,7 +40,7 @@ public class Parser{
 				token = new Token(State.$);
 			}
 
-			if (debug) System.out.println("Peeked token: " + token);
+			if (debug) System.out.println("Peeked token: " + token + ":" + token.value());
 
 			ParserSymbol parserSymbol = symbolStack.pop();
 
@@ -49,7 +49,7 @@ public class Parser{
 			if(parserSymbol instanceof Token) {
 				if(token.equals(parserSymbol)) {
 					scanner.nextToken();	//	eat the token we just peeked
-					if (debug) System.out.println("Matched the token!");
+					if (debug) System.out.println("Matched the token!\n");
 					continue;
 				} else {
 					System.out.println("ERROR: Found " + token + ", expecting " + parserSymbol);
@@ -101,7 +101,7 @@ public class Parser{
 			for (Token terminal : firstSet) {
 				if (terminal.ordinal() != State.NULL.ordinal()) {
 					if (parserTable[rule.left().ordinal()][terminal.ordinal()] != null) {
-						throw new RuntimeException("ERROR: duplicate entries, grammar is not LL(1)");
+						throw new RuntimeException("ERROR: duplicate entries for [" + rule.left() + ", " + terminal + "], grammar is not LL(1)");
 					}
 
 					parserTable[rule.left().ordinal()][terminal.ordinal()] = rule;
@@ -114,7 +114,7 @@ public class Parser{
 
 				for (Token terminal : followSet) {
 					if (parserTable[nonterminal.ordinal()][terminal.ordinal()] != null) {
-						throw new RuntimeException("ERROR: duplicate entries, grammar is not LL(1)");
+						throw new RuntimeException("ERROR: duplicate entries for [" + nonterminal + ", " + terminal + "], grammar is not LL(1)");
 					}
 					parserTable[nonterminal.ordinal()][terminal.ordinal()] = new ProductionRule(nonterminal.getNonTerminal(), new ParserSymbol[] {nullSymbol});
 				}

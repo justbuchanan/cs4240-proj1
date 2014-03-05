@@ -36,6 +36,10 @@ public class Token extends ParserSymbol {
 		return type;
 	}
 
+	public String value() {
+		return value;
+	}
+
 	public boolean isTerminal() {
 		return true;
 	}
