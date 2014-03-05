@@ -14,4 +14,8 @@ public class NonTerminalParserSymbol extends ParserSymbol{
 		return false;
 	}
 
+	public int ordinal() {
+		return nonTerminal.ordinal();
+	}
+
 }

@@ -36,8 +36,8 @@ public class Parser{
 				}
 			} else {
 				ProductionRule productionRule = parserTable[((NonTerminalParserSymbol)parserSymbol).getNonTerminal().ordinal()][token.ordinal()];
-				for(int i = parserSymbol.length - 1; i >= 0; i--) {
-					symbolStack.push(parserSymbol[i]);
+				for(int i = productionRule.right().length - 1; i >= 0; i--) {
+					symbolStack.push(productionRule.right()[i]);
 				}
 			}
 		}
