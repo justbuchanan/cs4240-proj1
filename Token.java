@@ -14,8 +14,18 @@ public class Token extends ParserSymbol {
 		this.lineNumber = lineNumber;
 	}
 	
-	public boolean equals(Token other) {
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) return true;
+		if (obj == null || this.getClass() != obj.getClass()) return false;
+
+		Token other = (Token)obj;
 		return other.type.equals(type);
+	}
+
+	@Override
+	public int hashCode() {
+		return type.hashCode();
 	}
 	
 	public int ordinal(){

@@ -21,4 +21,18 @@ public class NonTerminalParserSymbol extends ParserSymbol{
 	public String toString() {
 		return new String("NonTerminal(" + nonTerminal + ")");
 	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) return true;
+		if (obj == null || this.getClass() != obj.getClass()) return false;
+
+		NonTerminalParserSymbol other = (NonTerminalParserSymbol)obj;
+		return other.nonTerminal.equals(nonTerminal);
+	}
+
+	@Override
+	public int hashCode() {
+		return nonTerminal.hashCode();
+	}
 }

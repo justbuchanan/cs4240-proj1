@@ -54,7 +54,12 @@ public class Grammar {
 	}
 
 	public Token findFirstSetHelper(NonTerminalParserSymbol symbol, Set<Token> set) {
-		for(ProductionRule productionRule : rules.get(symbol)) {
+		ArrayList<ProductionRule> rulesForSymbol = rules.get(symbol);
+		if (rulesForSymbol == null) {
+			throw new RuntimeException("in findFirstHelper(), unable to find production rule for nonterminal: " + symbol);
+		}
+
+		for(ProductionRule productionRule : rulesForSymbol) {
  			for(ParserSymbol parserSymbol : productionRule) {
  				if(parserSymbol.isTerminal() && ((Token)parserSymbol).type() != State.NULL) {
  					set.add((Token) parserSymbol);
