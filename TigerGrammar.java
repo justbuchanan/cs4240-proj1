@@ -183,7 +183,6 @@ public class TigerGrammar extends Grammar {
 		// STAT_SEQ_PRIME
 		addRule(new ProductionRule(NonTerminals.STAT_SEQ_PRIME, new ParserSymbol[]{
 			new NonTerminalParserSymbol(NonTerminals.STAT),
-			new NonTerminalParserSymbol(NonTerminals.STAT),
 			new NonTerminalParserSymbol(NonTerminals.STAT_SEQ_PRIME)
 		}));
 		
@@ -257,7 +256,7 @@ public class TigerGrammar extends Grammar {
 
 		addRule(new ProductionRule(NonTerminals.EXPR_OR_FUNC, new ParserSymbol[]{
 			new NonTerminalParserSymbol(NonTerminals.LVALUE_TAIL),
-			new NonTerminalParserSymbol(NonTerminals.MULT_DIV_EXPR_TAIL)
+			new NonTerminalParserSymbol(NonTerminals.EXPR_ANY_TAIL)
 		}));
 
 		addRule(new ProductionRule(NonTerminals.EXPR_OR_FUNC, new ParserSymbol[]{
@@ -301,7 +300,7 @@ public class TigerGrammar extends Grammar {
 		//	EXPR_NO_LVALUE
 		addRule(new ProductionRule(NonTerminals.EXPR_NO_LVALUE, new ParserSymbol[]{
 			new NonTerminalParserSymbol(NonTerminals.CONST),
-			new NonTerminalParserSymbol(NonTerminals.MULT_DIV_EXPR_TAIL)
+			new NonTerminalParserSymbol(NonTerminals.EXPR_ANY_TAIL)
 		}));
 
 		addRule(new ProductionRule(NonTerminals.EXPR_NO_LVALUE, new ParserSymbol[]{
@@ -313,8 +312,33 @@ public class TigerGrammar extends Grammar {
 			new Token(State.LPAREN),
 			new NonTerminalParserSymbol(NonTerminals.EXPR),
 			new Token(State.RPAREN),
+			new NonTerminalParserSymbol(NonTerminals.EXPR_ANY_TAIL)
+		}));
+
+
+		//	EXPR_ANY_TAIL
+
+		addRule(new ProductionRule(NonTerminals.EXPR_ANY_TAIL, new ParserSymbol[]{
 			new NonTerminalParserSymbol(NonTerminals.MULT_DIV_EXPR_TAIL)
 		}));
+		addRule(new ProductionRule(NonTerminals.EXPR_ANY_TAIL, new ParserSymbol[]{
+			new NonTerminalParserSymbol(NonTerminals.ADD_SUB_EXPR_TAIL)
+		}));
+		addRule(new ProductionRule(NonTerminals.EXPR_ANY_TAIL, new ParserSymbol[]{
+			new NonTerminalParserSymbol(NonTerminals.AND_EXPR_TAIL)
+		}));
+		// addRule(new ProductionRule(NonTerminals.EXPR_ANY_TAIL, new ParserSymbol[]{
+		// 	new NonTerminalParserSymbol(NonTerminals.OR_EXPR_TAIL)
+		// }));
+		addRule(new ProductionRule(NonTerminals.EXPR_ANY_TAIL, new ParserSymbol[]{
+			new NonTerminalParserSymbol(NonTerminals.BOOL_EXPR_TAIL)
+		}));
+		addRule(new ProductionRule(NonTerminals.EXPR_ANY_TAIL, new ParserSymbol[]{
+			new Token(State.NULL)
+		}));
+
+
+		//	FIXME: check OR expressions
 
 		
 		//ATOM_EXPR
@@ -338,14 +362,14 @@ public class TigerGrammar extends Grammar {
 		// MULT_DIV_EXPR
 		addRule(new ProductionRule(NonTerminals.MULT_DIV_EXPR, new ParserSymbol[]{
 				new NonTerminalParserSymbol(NonTerminals.NEGATED_EXPR),
-				new NonTerminalParserSymbol(NonTerminals.MULT_DIV_EXPR),
+				new NonTerminalParserSymbol(NonTerminals.MULT_DIV_EXPR_TAIL),
 		}));
 		
 		// MULT_DIV_EXPR_TAIL
 		addRule(new ProductionRule(NonTerminals.MULT_DIV_EXPR_TAIL, new ParserSymbol[]{
 				new Token(State.MULT),
 				new NonTerminalParserSymbol(NonTerminals.NEGATED_EXPR), 
-				new NonTerminalParserSymbol(NonTerminals.MULT_DIV_EXPR)
+				new NonTerminalParserSymbol(NonTerminals.MULT_DIV_EXPR_TAIL)
 		}));
 		
 		addRule(new ProductionRule(NonTerminals.MULT_DIV_EXPR_TAIL, new ParserSymbol[]{
@@ -355,7 +379,7 @@ public class TigerGrammar extends Grammar {
 		// ADD_SUB_EXPR
 		addRule(new ProductionRule(NonTerminals.ADD_SUB_EXPR, new ParserSymbol[]{
 				new NonTerminalParserSymbol(NonTerminals.MULT_DIV_EXPR),
-				new NonTerminalParserSymbol(NonTerminals.ADD_SUB_EXPR)
+				new NonTerminalParserSymbol(NonTerminals.ADD_SUB_EXPR_TAIL)
 		}));
 		
 		// ADD_SUB_EXPR_TAIL
@@ -388,7 +412,8 @@ public class TigerGrammar extends Grammar {
 		
 		// AND_EXPR
 		addRule(new ProductionRule(NonTerminals.AND_EXPR, new ParserSymbol[]{
-			new NonTerminalParserSymbol(NonTerminals.BOOL_EXPR), new NonTerminalParserSymbol(NonTerminals.AND_EXPR_TAIL)
+			new NonTerminalParserSymbol(NonTerminals.BOOL_EXPR),
+			new NonTerminalParserSymbol(NonTerminals.AND_EXPR_TAIL)
 		}));
 		
 		// AND_EXPR_TAIL

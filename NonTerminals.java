@@ -33,6 +33,7 @@ public enum NonTerminals {
 	EXPR_OR_ID,
 	EXPR_OR_FUNC,
 	EXPR_NO_LVALUE,
+	EXPR_ANY_TAIL,
 
 	EXPR,
 	ATOM_EXPR,

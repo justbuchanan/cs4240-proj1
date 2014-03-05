@@ -44,7 +44,7 @@ public class Driver {
 		writeFile("follow_sets.txt", parser.prettyPrintedFollowSets());
 
 		//	parse!
-		parser.parseText();
+		boolean success = parser.parseText();
 	}
 
 	public static void writeFile(String fileName, String contents) {

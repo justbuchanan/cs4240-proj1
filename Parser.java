@@ -8,7 +8,7 @@ public class Parser{
 	private Scanner scanner;
 	private ProductionRule[][] parserTable;
 	private Grammar grammar;
-	private int NUM_NONTERMINALS = 46;
+	private int NUM_NONTERMINALS = 47;
 	private int NUM_TERMINALS = 49;
 
 
@@ -18,7 +18,7 @@ public class Parser{
 		buildParserTable();
 	}
 
-	public void parseText() {
+	public boolean parseText() {
 		boolean debug = true;
 
 		Stack<ParserSymbol> symbolStack = new Stack<>();
@@ -28,16 +28,16 @@ public class Parser{
 		while(!symbolStack.isEmpty()){
 			Token token = scanner.peekToken();
 
+			//	when the scanner returns null, it means we're at the end of the file
+			if (token == null) {
+				token = new Token(State.$);
+			}
+
 			//	eat comments
 			if (token.ordinal() == State.COMMENT.ordinal()) {
 				if (debug) System.out.println("Ate a comment\n");
 				scanner.nextToken();
 				continue;
-			}
-
-			//	when the scanner returns null, it means we're at the end of the file
-			if (token == null) {
-				token = new Token(State.$);
 			}
 
 			if (debug) System.out.println("Peeked token: " + token + ":" + token.value());
@@ -53,14 +53,14 @@ public class Parser{
 					continue;
 				} else {
 					System.out.println("ERROR: Found " + token + ", expecting " + parserSymbol);
-					return;
+					return false;
 				}
 			} else {
 				ProductionRule productionRule = parserTable[((NonTerminalParserSymbol)parserSymbol).getNonTerminal().ordinal()][token.ordinal()];
 				
 				if (productionRule == null) {
 					System.out.println("ERROR: Trying to match '" + parserSymbol + "', but found: '" + token + "'");
-					return;
+					return false;
 				}
 
 
@@ -80,14 +80,15 @@ public class Parser{
 			}
 		}
 		
-		//If next token is not NULL, then ERROR (if there are any leftover tokens)
-		while (true) {
-			Token token = scanner.nextToken();
-			if (token == null) {
-				break;
-			}
-			System.out.println(">> Extra token: " + token.type + " : '" + token.value + "' (" +  token.lineNumber + ")");
+
+		if (scanner.nextToken() != null) {
+			System.out.println("\nERROR: extra tokens left after parser finished");
+			return false;
 		}
+
+		System.out.println("\nSuccessful parse!!!");
+
+		return true;
 	}
 
 	private void buildParserTable(){
