@@ -242,7 +242,7 @@ public class Scanner{
 		}
 		Token returnToken = setToken;
 		setToken = null;
-		return setToken;
+		return returnToken;
 	}
 
 
