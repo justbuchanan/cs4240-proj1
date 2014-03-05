@@ -24,6 +24,7 @@ public class Grammar {
 		ArrayList<ProductionRule> arr = rules.get(rule.left());
 		if (arr == null) {
 			arr = new ArrayList<>();
+			rules.put(rule.left(), arr);
 		}
 
 		arr.add(rule);
