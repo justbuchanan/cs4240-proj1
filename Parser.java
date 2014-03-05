@@ -100,6 +100,10 @@ public class Parser{
 			Set<Token> firstSet = grammar.findFirstSet(rule);
 			for (Token terminal : firstSet) {
 				if (terminal.ordinal() != State.NULL.ordinal()) {
+					if (parserTable[rule.left().ordinal()][terminal.ordinal()] != null) {
+						throw new RuntimeException("ERROR: duplicate entries, grammar is not LL(1)");
+					}
+
 					parserTable[rule.left().ordinal()][terminal.ordinal()] = rule;
 				}
 			}
@@ -109,6 +113,9 @@ public class Parser{
 				Set<Token> followSet = grammar.findFollowSet(nonterminal);
 
 				for (Token terminal : followSet) {
+					if (parserTable[nonterminal.ordinal()][terminal.ordinal()] != null) {
+						throw new RuntimeException("ERROR: duplicate entries, grammar is not LL(1)");
+					}
 					parserTable[nonterminal.ordinal()][terminal.ordinal()] = new ProductionRule(nonterminal.getNonTerminal(), new ParserSymbol[] {nullSymbol});
 				}
 			}
