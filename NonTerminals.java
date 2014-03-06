@@ -49,6 +49,7 @@ public enum NonTerminals {
 	AND_EXPR,
 	AND_EXPR_TAIL,
 	OR_EXPR,
+	OR_EXPR_TAIL,
 
 	BOOL_OP,
 
