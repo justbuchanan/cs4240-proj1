@@ -6,6 +6,7 @@
 pkg.zip
 .metadata
 .DS_Store
+*.sublime-workspace
 
 # ignore generated files
 first_sets.txt
