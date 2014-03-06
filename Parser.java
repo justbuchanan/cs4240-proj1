@@ -20,6 +20,7 @@ public class Parser{
 
 	public boolean parseText() {
 		boolean debug = true;
+		if (debug) 		System.out.println("-------------------------------STARTING PARSE-------------------------------");
 
 		Stack<ParserSymbol> symbolStack = new Stack<>();
 		symbolStack.push(new Token(State.$));
@@ -27,10 +28,16 @@ public class Parser{
 
 		while(!symbolStack.isEmpty()){
 			Token token = scanner.peekToken();
-
+			
 			//	when the scanner returns null, it means we're at the end of the file
 			if (token == null) {
 				token = new Token(State.$);
+			}
+			// invalid 
+			if(token.ordinal() == State.ERROR.ordinal()){
+				System.out.println("Invalid token on : line " + token.lineNumber);
+				System.out.println("unsuccessful parse");
+				return false;
 			}
 
 			//	eat comments
