@@ -225,6 +225,10 @@ public class TigerGrammar extends Grammar {
 			new Token(State.SEMI)
 		}));
 
+		addRule(new ProductionRule(NonTerminals.STAT, new ParserSymbol[]{
+			new NonTerminalParserSymbol(NonTerminals.STAT_IF)
+		}));
+
 		//	STAT ID
 		addRule(new ProductionRule(NonTerminals.STAT, new ParserSymbol[]{
 			new Token(State.ID),
