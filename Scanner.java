@@ -166,7 +166,7 @@ public class Scanner{
 		_keywordTable.put("else", State.ELSE);
 		_keywordTable.put("end", State.END);
 		_keywordTable.put("for", State.FOR);
-		_keywordTable.put("func", State.FUNC);
+		_keywordTable.put("function", State.FUNC);
 		_keywordTable.put("if", State.IF);
 		_keywordTable.put("in", State.IN);
 		_keywordTable.put("let", State.LET);
