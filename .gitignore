@@ -5,3 +5,11 @@
 .project
 pkg.zip
 .metadata
+.DS_Store
+
+# ignore generated files
+first_sets.txt
+follow_sets.txt
+parser_rules.txt
+parser_table.csv
+
