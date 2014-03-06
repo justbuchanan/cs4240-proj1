@@ -8,7 +8,7 @@ public class Parser{
 	private Scanner scanner;
 	private ProductionRule[][] parserTable;
 	private Grammar grammar;
-	private int NUM_NONTERMINALS = 47;
+	private int NUM_NONTERMINALS = 49;
 	private int NUM_TERMINALS = 49;
 
 
