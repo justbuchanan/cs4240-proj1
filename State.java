@@ -59,6 +59,9 @@ public enum State {
 	ENDDO,
 	RETURN,
 
+	ATOM,
+	NUMBER,
+
 
 	//	the following are NOT accept states
 	START,

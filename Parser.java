@@ -8,8 +8,8 @@ public class Parser{
 	private Scanner scanner;
 	private ProductionRule[][] parserTable;
 	private Grammar grammar;
-	private int NUM_NONTERMINALS = 50;
-	private int NUM_TERMINALS = 49;
+	private int NUM_NONTERMINALS = 5;
+	private int NUM_TERMINALS = 51;
 
 
 	public Parser(Scanner scanner, Grammar grammar){
@@ -19,81 +19,83 @@ public class Parser{
 	}
 
 	public boolean parseText() {
-		boolean debug = true;
-		if (debug) 		System.out.println("-------------------------------STARTING PARSE-------------------------------");
+		// boolean debug = true;
+		// if (debug) 		System.out.println("-------------------------------STARTING PARSE-------------------------------");
 
-		Stack<ParserSymbol> symbolStack = new Stack<>();
-		symbolStack.push(new Token(State.$));
-		symbolStack.push(new NonTerminalParserSymbol(NonTerminals.TIGER_PROGRAM));
+		// Stack<ParserSymbol> symbolStack = new Stack<>();
+		// symbolStack.push(new Token(State.$));
+		// symbolStack.push(new NonTerminalParserSymbol(NonTerminals.TIGER_PROGRAM));
 
-		while(!symbolStack.isEmpty()){
-			Token token = scanner.peekToken();
+		// while(!symbolStack.isEmpty()){
+		// 	Token token = scanner.peekToken();
 			
-			//	when the scanner returns null, it means we're at the end of the file
-			if (token == null) {
-				token = new Token(State.$);
-			}
-			// invalid 
-			if(token.ordinal() == State.ERROR.ordinal()){
-				System.out.println("Invalid token on : line " + token.lineNumber);
-				System.out.println("unsuccessful parse");
-				return false;
-			}
+		// 	//	when the scanner returns null, it means we're at the end of the file
+		// 	if (token == null) {
+		// 		token = new Token(State.$);
+		// 	}
+		// 	// invalid 
+		// 	if(token.ordinal() == State.ERROR.ordinal()){
+		// 		System.out.println("Invalid token on : line " + token.lineNumber);
+		// 		System.out.println("unsuccessful parse");
+		// 		return false;
+		// 	}
 
-			//	eat comments
-			if (token.ordinal() == State.COMMENT.ordinal()) {
-				if (debug) System.out.println("Ate a comment\n");
-				scanner.nextToken();
-				continue;
-			}
+		// 	//	eat comments
+		// 	if (token.ordinal() == State.COMMENT.ordinal()) {
+		// 		if (debug) System.out.println("Ate a comment\n");
+		// 		scanner.nextToken();
+		// 		continue;
+		// 	}
 
-			if (debug) System.out.println("Peeked token: " + token + ":" + token.value());
+		// 	if (debug) System.out.println("Peeked token: " + token + ":" + token.value());
 
-			ParserSymbol parserSymbol = symbolStack.pop();
+		// 	ParserSymbol parserSymbol = symbolStack.pop();
 
-			if (debug) System.out.println("< Popped parser symbol: " + parserSymbol);
+		// 	if (debug) System.out.println("< Popped parser symbol: " + parserSymbol);
 
-			if(parserSymbol instanceof Token) {
-				if(token.equals(parserSymbol)) {
-					scanner.nextToken();	//	eat the token we just peeked
-					if (debug) System.out.println("Matched the token!\n");
-					continue;
-				} else {
-					System.out.println("ERROR: Found " + token + ", expecting " + parserSymbol);
-					return false;
-				}
-			} else {
-				ProductionRule productionRule = parserTable[((NonTerminalParserSymbol)parserSymbol).getNonTerminal().ordinal()][token.ordinal()];
+		// 	if(parserSymbol instanceof Token) {
+		// 		if(token.equals(parserSymbol)) {
+		// 			scanner.nextToken();	//	eat the token we just peeked
+		// 			if (debug) System.out.println("Matched the token!\n");
+		// 			continue;
+		// 		} else {
+		// 			System.out.println("ERROR: Found " + token + ", expecting " + parserSymbol);
+		// 			return false;
+		// 		}
+		// 	} else {
+		// 		ProductionRule productionRule = parserTable[((NonTerminalParserSymbol)parserSymbol).getNonTerminal().ordinal()][token.ordinal()];
 				
-				if (productionRule == null) {
-					System.out.println("ERROR: Trying to match '" + parserSymbol + "', but found: '" + token + "'");
-					return false;
-				}
+		// 		if (productionRule == null) {
+		// 			System.out.println("ERROR: Trying to match '" + parserSymbol + "', but found: '" + token + "'");
+		// 			return false;
+		// 		}
 
 
-				ParserSymbol rightSymbol = productionRule.right()[0];
-				if (productionRule.right().length == 1 &&
-					rightSymbol.isTerminal() &&
-					((Token)rightSymbol).ordinal() == State.NULL.ordinal()
-					) {
+		// 		ParserSymbol rightSymbol = productionRule.right()[0];
+		// 		if (productionRule.right().length == 1 &&
+		// 			rightSymbol.isTerminal() &&
+		// 			((Token)rightSymbol).ordinal() == State.NULL.ordinal()
+		// 			) {
 
-				} else {
-					for(int i = productionRule.right().length - 1; i >= 0; i--) {
-						System.out.println(">> Parser Push: " + productionRule.right()[i]);
-						symbolStack.push(productionRule.right()[i]);
-					}
-				}
+		// 		} else {
+		// 			for(int i = productionRule.right().length - 1; i >= 0; i--) {
+		// 				System.out.println(">> Parser Push: " + productionRule.right()[i]);
+		// 				symbolStack.push(productionRule.right()[i]);
+		// 			}
+		// 		}
 				
-			}
-		}
+		// 	}
+		// }
 		
 
-		if (scanner.nextToken() != null) {
-			System.out.println("\nERROR: extra tokens left after parser finished");
-			return false;
-		}
+		// if (scanner.nextToken() != null) {
+		// 	System.out.println("\nERROR: extra tokens left after parser finished");
+		// 	return false;
+		// }
 
-		System.out.println("\nSuccessful parse!!!");
+		// System.out.println("\nSuccessful parse!!!");
+
+		// return true;
 
 		return true;
 	}

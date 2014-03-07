@@ -6,36 +6,12 @@ import java.io.PrintWriter;
 
 public class Driver {
 	public static void main(String[] args) {
-		String fileName = args[0];
-
-		String str = "";
-
-		try {
-			//	read the full contents of the file into @str
-			BufferedReader br = new BufferedReader(new FileReader(fileName));
-			int c;
-			while ( (c = br.read()) != -1) {
-				str += (char)c;
-			}
-		}
-		catch (FileNotFoundException fnf) {
-			System.out.println("File not found!");
-			return;
-		}
-		catch (IOException ioexc) {
-			System.out.println("IO Error");
-			return;
-		}
-
-
-	    //	create Scanner with string
-		Scanner scanner = new Scanner(str);
-
+		
 		// build grammar
 		Grammar grammar = new TigerGrammar();
 
 		//	create parser
-		Parser parser = new Parser(scanner, grammar);
+		Parser parser = new Parser(null, grammar);
 
 		//	write debug files
 		writeFile("parser_rules.txt", grammar.prettyPrintedRules());

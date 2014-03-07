@@ -98,10 +98,10 @@ public class Grammar {
 
 		Set<Token> followSet = new HashSet<>();
 
-		//	add EOF/$ to follow set for the start symbol
-		if (nonterminal.equals(NonTerminals.TIGER_PROGRAM)) {
-			followSet.add(new Token(State.$));
-		}
+		// //	add EOF/$ to follow set for the start symbol
+		// if (nonterminal.equals(NonTerminals.TIGER_PROGRAM)) {
+		// 	followSet.add(new Token(State.$));
+		// }
 
 		//	loop over EVERY rule looking for places where @nonterminal appears on the right side
 		for (ArrayList<ProductionRule> ruleArray : rules.values()) {
