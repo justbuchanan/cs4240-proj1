@@ -29,6 +29,7 @@ public class TigerGrammar extends Grammar {
 		}));
 
 		addRule(new ProductionRule(NonTerminals.LEXP_SEQ_TAIL, new ParserSymbol[] {
+			new NonTerminalParserSymbol(NonTerminals.LEXP),
 			new Token(State.COMMA),
 			new NonTerminalParserSymbol(NonTerminals.LEXP_SEQ_TAIL)
 		}));

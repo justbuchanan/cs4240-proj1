@@ -8,5 +8,4 @@ public enum NonTerminals {
 	LEXP,
 	LEXP_SEQ,
 	LEXP_SEQ_TAIL,
-	
 }

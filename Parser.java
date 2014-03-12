@@ -9,7 +9,7 @@ public class Parser{
 	private ProductionRule[][] parserTable;
 	private Grammar grammar;
 	private int NUM_NONTERMINALS = 5;
-	private int NUM_TERMINALS = 51;
+	private int NUM_TERMINALS = 7;
 
 
 	public Parser(Scanner scanner, Grammar grammar){
@@ -142,6 +142,8 @@ public class Parser{
 		}
 
 		for (int nontermIdx = 0; nontermIdx < NUM_NONTERMINALS; nontermIdx++) {
+			csv += "\n";
+
 			csv += NonTerminals.values()[nontermIdx] + ",";
 
 			for (int termIdx = 0; termIdx < NUM_TERMINALS; termIdx++) {
@@ -156,12 +158,11 @@ public class Parser{
 							csv += ((NonTerminalParserSymbol)rightSmbl).getNonTerminal() + " ";
 						}
 					}
-				}			
+				}
 
 				csv += ",";
 			}
 
-			csv += "\n";
 		}
 		
 		return csv;
