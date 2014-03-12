@@ -51,7 +51,7 @@ public class Grammar {
 		arr.add(rule);
 	}
 
-	public Set<Token> findFirstSet(ProductionRule productionRule) {
+	public Set<Token> findFirstSet(ProductionRule productionRule, Set<ProductionRule> exclude) {
 		Set<Token> set = new HashSet<Token>();
 
 		boolean allNullable = true;
@@ -62,7 +62,7 @@ public class Grammar {
 				allNullable = false;
 				break;
 			} else {
-				Set<Token> first = findTotalFirstSet((NonTerminalParserSymbol)parserSymbol);
+				Set<Token> first = findTotalFirstSet((NonTerminalParserSymbol)parserSymbol, exclude);
 
 				Token nullSmbl = new Token(State.NULL);
 				if (first.contains(nullSmbl)) {
@@ -85,14 +85,24 @@ public class Grammar {
 		return set;
 	}
 
-	public Set<Token> findTotalFirstSet(NonTerminalParserSymbol nonterminal) {
+	public Set<Token> findFirstSet(ProductionRule productionRule) {
+		Set<ProductionRule> exclude = new HashSet<ProductionRule>();
+		exclude.add(productionRule);
+		return findFirstSet(productionRule, exclude);
+	}
+
+	public Set<Token> findTotalFirstSet(NonTerminalParserSymbol nonterminal, Set<ProductionRule> exclude) {
 		//	the first set of @nonterminal for ALL rules where it is the left-hand-side
 		Set<Token> first = new HashSet<>();
 
 		//	loop through each rule where @nonterminal is the left-hand-side to build @first
 		for (ProductionRule rule : rules.get(nonterminal)) {
-			Set<Token> firstForRule = findFirstSet(rule);
-			first.addAll(firstForRule);
+			if (!exclude.contains(rule)) {
+				exclude.add(rule);
+				System.out.println("Rule: " + rule);
+				Set<Token> firstForRule = findFirstSet(rule, exclude);
+				first.addAll(firstForRule);
+			}
 		}
 
 		return first;
@@ -136,7 +146,7 @@ public class Grammar {
 							first = new HashSet<>();
 							first.add((Token)smbl);
 						} else {
-							first = findTotalFirstSet((NonTerminalParserSymbol)smbl);
+							first = findTotalFirstSet((NonTerminalParserSymbol)smbl, new HashSet<ProductionRule>());
 						}
 
 						Token nullSmbl = new Token(State.NULL);
