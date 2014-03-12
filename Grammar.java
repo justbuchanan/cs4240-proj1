@@ -54,9 +54,12 @@ public class Grammar {
 	public Set<Token> findFirstSet(ProductionRule productionRule) {
 		Set<Token> set = new HashSet<Token>();
 
+		boolean allNullable = true;
+
 		for(ParserSymbol parserSymbol : productionRule) {
 			if(parserSymbol.isTerminal()) {
 				set.add((Token) parserSymbol);
+				allNullable = false;
 				break;
 			} else {
 				Set<Token> first = findTotalFirstSet((NonTerminalParserSymbol)parserSymbol);
@@ -69,9 +72,14 @@ public class Grammar {
 				} else {
 					//	@parserSymbol is not nullable, so we're done
 					set.addAll(first);
+					allNullable = false;
 					break;
 				}
 			}
+		}
+
+		if (allNullable) {
+			set.add(new Token(State.NULL));
 		}
 
 		return set;
