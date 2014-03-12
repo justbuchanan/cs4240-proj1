@@ -6,7 +6,7 @@ public class ProductionRule implements Iterable<ParserSymbol>{
 		int curr;
 
 
-		public ProductionRule(NonTerminals left, ParserSymbol[] right){
+		public ProductionRule(NonTerminals left, ParserSymbol... right){
 			this.left = new NonTerminalParserSymbol(left);
 			this.right = right;
 			curr = right.length - 1;
