@@ -11,24 +11,24 @@ public class TigerGrammar extends Grammar {
 		
 		// TYPE_DECLARATION_LIST
 		addRule(new ProductionRule(NonTerminals.TYPE_DECLARATION_LIST,
-			State.NULL	));
+			State.NULL));
 		
 		addRule(new ProductionRule(NonTerminals.TYPE_DECLARATION_LIST, 
-			NonTerminals.TYPE_DECLARATION, 	NonTerminals.TYPE_DECLARATION_LIST));
+			NonTerminals.TYPE_DECLARATION, NonTerminals.TYPE_DECLARATION_LIST));
 		
 		// VAR_DECLARATION_LIST
 		addRule(new ProductionRule(NonTerminals.VAR_DECLARATION_LIST,
 			State.NULL));
 		
 		addRule(new ProductionRule(NonTerminals.VAR_DECLARATION_LIST, 
-			NonTerminals.VAR_DECLARATION, 	NonTerminals.VAR_DECLARATION_LIST));
+			NonTerminals.VAR_DECLARATION, NonTerminals.VAR_DECLARATION_LIST));
 		
 		// FUNCT_DECLARATION_LIST
 		addRule(new ProductionRule(NonTerminals.FUNCT_DECLARATION_LIST,
-			State.NULL	));
+			State.NULL));
 		
 		addRule(new ProductionRule(NonTerminals.FUNCT_DECLARATION_LIST,
-			NonTerminals.FUNCT_DECLARATION, NonTerminals.FUNCT_DECLARATION_LIST	));
+			NonTerminals.FUNCT_DECLARATION, NonTerminals.FUNCT_DECLARATION_LIST));
 		
 		// TYPE_DECLARATION
 		addRule(new ProductionRule(NonTerminals.TYPE_DECLARATION,
@@ -37,7 +37,7 @@ public class TigerGrammar extends Grammar {
 		
 		// TYPE
 		addRule(new ProductionRule(NonTerminals.TYPE, 
-			State.ARRAY, 	State.LBRACK, 	State.INTLIT, 	State.RBRACK, 	NonTerminals.TYPEDIM, 	State.OF, 	NonTerminals.TYPE_ID, 	State.SEMI));
+			State.ARRAY, State.LBRACK, State.INTLIT, State.RBRACK, NonTerminals.TYPEDIM, State.OF, NonTerminals.TYPE_ID, State.SEMI));
 		
 		//TYPEDIM
 		addRule(new ProductionRule(NonTerminals.TYPEDIM,
@@ -51,14 +51,14 @@ public class TigerGrammar extends Grammar {
 			State.INTLIT));
 		
 		addRule(new ProductionRule(NonTerminals.TYPE_ID,
-			State.STRLIT	));
+			State.STRLIT));
 		
 		addRule(new ProductionRule(NonTerminals.TYPE_ID,
 			State.ID));
 		
 		// VAR_DECLARATION
 		addRule(new ProductionRule(NonTerminals.VAR_DECLARATION, 
-			State.VAR, 	NonTerminals.ID_LIST, 	State.COLON, 	NonTerminals.TYPE_ID, 	NonTerminals.OPTIONAL_INIT, 	State.SEMI));
+			State.VAR, NonTerminals.ID_LIST, State.COLON, NonTerminals.TYPE_ID, NonTerminals.OPTIONAL_INIT, State.SEMI));
 		
 		// ID_LIST
 		addRule(new ProductionRule(NonTerminals.ID_LIST, 
@@ -76,13 +76,13 @@ public class TigerGrammar extends Grammar {
 			State.NULL));
 		
 		addRule(new ProductionRule(NonTerminals.OPTIONAL_INIT, 
-			State.ASSIGN, 	NonTerminals.CONST));
+			State.ASSIGN, NonTerminals.CONST));
 		
 		// FUNCT_DECLARATION
 		addRule(new ProductionRule(NonTerminals.FUNCT_DECLARATION, 
-			State.FUNC, 	State.ID, 	State.LPAREN, 	NonTerminals.PARAM_LIST, 	State.RPAREN, 
-				NonTerminals.RET_TYPE, 	State.BEGIN, 
-				NonTerminals.STAT_SEQ, 	State.END, State.SEMI));
+			State.FUNC, State.ID, State.LPAREN, NonTerminals.PARAM_LIST, State.RPAREN, 
+				NonTerminals.RET_TYPE, State.BEGIN, 
+				NonTerminals.STAT_SEQ, State.END, State.SEMI));
 		
 		// PARAM_LIST
 		addRule(new ProductionRule(NonTerminals.PARAM_LIST, 
@@ -96,22 +96,22 @@ public class TigerGrammar extends Grammar {
 			State.NULL));
 		
 		addRule(new ProductionRule(NonTerminals.PARAM_LIST_TAIL, 
-			State.COMMA, 	NonTerminals.PARAM, 	NonTerminals.PARAM_LIST_TAIL));
+			State.COMMA, NonTerminals.PARAM, NonTerminals.PARAM_LIST_TAIL));
 		
 		// RET_TYPE
 		addRule(new ProductionRule(NonTerminals.RET_TYPE, 
 			State.NULL));
 		
 		addRule(new ProductionRule(NonTerminals.RET_TYPE, 
-			State.COLON, 	NonTerminals.TYPE_ID));
+			State.COLON, NonTerminals.TYPE_ID));
 		
 		// PARAM
 		addRule(new ProductionRule(NonTerminals.PARAM, 
-			State.ID, State.COLON, 	NonTerminals.TYPE_ID));
+			State.ID, State.COLON, NonTerminals.TYPE_ID));
 		
 		// STAT_SEQ
 		addRule(new ProductionRule(NonTerminals.STAT_SEQ, 
-			NonTerminals.STAT, 	NonTerminals.STAT_SEQ_PRIME));
+			NonTerminals.STAT, NonTerminals.STAT_SEQ_PRIME));
 		
 		// STAT_SEQ_PRIME
 		addRule(new ProductionRule(NonTerminals.STAT_SEQ_PRIME,
@@ -224,7 +224,7 @@ public class TigerGrammar extends Grammar {
 		
 		// MULT_DIV_EXPR
 		addRule(new ProductionRule(NonTerminals.MULT_DIV_EXPR, 
-			NonTerminals.NEGATED_EXPR, 	NonTerminals.MULT_DIV_EXPR_TAIL));
+			NonTerminals.NEGATED_EXPR, NonTerminals.MULT_DIV_EXPR_TAIL));
 		
 		// MULT_DIV_EXPR_TAIL
 		addRule(new ProductionRule(NonTerminals.MULT_DIV_EXPR_TAIL,
@@ -242,7 +242,7 @@ public class TigerGrammar extends Grammar {
 		
 		// ADD_SUB_EXPR
 		addRule(new ProductionRule(NonTerminals.ADD_SUB_EXPR, 
-			NonTerminals.MULT_DIV_EXPR, 	NonTerminals.ADD_SUB_EXPR_TAIL));
+			NonTerminals.MULT_DIV_EXPR, NonTerminals.ADD_SUB_EXPR_TAIL));
 		
 		// ADD_SUB_EXPR_TAIL
 		addRule(new ProductionRule(NonTerminals.ADD_SUB_EXPR_TAIL,
