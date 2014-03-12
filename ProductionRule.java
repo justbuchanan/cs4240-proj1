@@ -66,4 +66,17 @@ public class ProductionRule implements Iterable<ParserSymbol>{
 			return desc;
 		}
 
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj) return true;
+			if (obj == null || this.getClass() != obj.getClass()) return false;
+
+			ProductionRule other = (ProductionRule)obj;
+			return other.left.equals(left) && other.right.equals(right);
+		}
+
+		@Override
+		public int hashCode() {
+			return left.hashCode();
+		}
 }
