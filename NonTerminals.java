@@ -26,8 +26,7 @@ public enum NonTerminals {
 	STAT_SEQ,
 	STAT_SEQ_PRIME,
 	STAT,
-	STAT_IF,
-	STAT_IF_CLAUSE_2,
+	STAT_IF_TAIL,
 	
 	STAT_AFTER_ID,
 	EXPR_OR_ID,

@@ -225,9 +225,6 @@ public class TigerGrammar extends Grammar {
 			new Token(State.SEMI)
 		}));
 
-		addRule(new ProductionRule(NonTerminals.STAT, new ParserSymbol[]{
-			new NonTerminalParserSymbol(NonTerminals.STAT_IF)
-		}));
 
 		//	STAT ID
 		addRule(new ProductionRule(NonTerminals.STAT, new ParserSymbol[]{
@@ -271,21 +268,21 @@ public class TigerGrammar extends Grammar {
 
 		
 		// STAT_IF
-		addRule(new ProductionRule(NonTerminals.STAT_IF, new ParserSymbol[]{
+		addRule(new ProductionRule(NonTerminals.STAT, new ParserSymbol[]{
 			new Token(State.IF),
 			new NonTerminalParserSymbol(NonTerminals.EXPR),
 			new Token(State.THEN),
 			new NonTerminalParserSymbol(NonTerminals.STAT_SEQ),
-			new NonTerminalParserSymbol(NonTerminals.STAT_IF_CLAUSE_2)
+			new NonTerminalParserSymbol(NonTerminals.STAT_IF_TAIL)
 		}));
 		
-		// STAT_IF_CLAUSE_2
-		addRule(new ProductionRule(NonTerminals.STAT_IF_CLAUSE_2, new ParserSymbol[]{
+		// STAT_IF_TAIL
+		addRule(new ProductionRule(NonTerminals.STAT_IF_TAIL, new ParserSymbol[]{
 			new Token(State.ENDIF),
 			new Token(State.SEMI)
 		}));
 		
-		addRule(new ProductionRule(NonTerminals.STAT_IF_CLAUSE_2, new ParserSymbol[]{
+		addRule(new ProductionRule(NonTerminals.STAT_IF_TAIL, new ParserSymbol[]{
 			new Token(State.ELSE),
 			new NonTerminalParserSymbol(NonTerminals.STAT_SEQ),
 			new Token(State.ENDIF),
