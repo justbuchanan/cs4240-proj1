@@ -81,7 +81,14 @@ public class ProductionRule implements Iterable<ParserSymbol>{
 			if (obj == null || this.getClass() != obj.getClass()) return false;
 
 			ProductionRule other = (ProductionRule)obj;
-			return other.left.equals(left) && other.right.equals(right);
+
+			if (other.right.length != right.length) return false;
+
+			for (int i = 0; i < right.length; i++) {
+				if (!other.right[i].equals(right[i])) return false;
+			}
+
+			return other.left.equals(left);
 		}
 
 		@Override

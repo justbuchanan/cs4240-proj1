@@ -122,8 +122,10 @@ public class Parser{
 
 				for (Token terminal : followSet) {
 					ProductionRule newNullRule = new ProductionRule(nonterminal.getNonTerminal(), State.NULL);
-					if (parserTable[nonterminal.ordinal()][terminal.ordinal()] != null) {
-						throw new RuntimeException("ERROR: Rule collision at column " + terminal + ", grammar is not LL(1): " + parserTable[nonterminal.ordinal()][terminal.ordinal()] + " ******* " + newNullRule);
+					ProductionRule existingRule = parserTable[nonterminal.ordinal()][terminal.ordinal()];
+					if (existingRule != null && !existingRule.equals(newNullRule)) {
+						System.out.println(existingRule + " != " + newNullRule);
+						throw new RuntimeException("ERROR: Rule collision at column " + terminal + ", grammar is not LL(1): " + existingRule + " ******* " + newNullRule);
 					}
 					parserTable[nonterminal.ordinal()][terminal.ordinal()] = newNullRule;
 				}

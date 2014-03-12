@@ -173,10 +173,7 @@ public class TigerGrammar extends Grammar {
 		
 		// EXPR
 		addRule(new ProductionRule(NonTerminals.EXPR,
-			NonTerminals.LVALUE, NonTerminals.EXPR_ANY_TAIL));
-
-		addRule(new ProductionRule(NonTerminals.EXPR,
-			NonTerminals.EXPR_NO_LVALUE));
+			NonTerminals.OR_EXPR));
 
 		//	EXPR_NO_LVALUE
 		addRule(new ProductionRule(NonTerminals.EXPR_NO_LVALUE,
@@ -190,7 +187,6 @@ public class TigerGrammar extends Grammar {
 
 
 		//	EXPR_ANY_TAIL
-
 		addRule(new ProductionRule(NonTerminals.EXPR_ANY_TAIL,
 			NonTerminals.MULT_DIV_EXPR_TAIL));
 		addRule(new ProductionRule(NonTerminals.EXPR_ANY_TAIL,
@@ -204,9 +200,6 @@ public class TigerGrammar extends Grammar {
 		addRule(new ProductionRule(NonTerminals.EXPR_ANY_TAIL,
 			State.NULL));
 
-
-		//	FIXME: check OR expressions
-
 		
 		//ATOM_EXPR
 		addRule(new ProductionRule(NonTerminals.ATOM_EXPR,
@@ -214,6 +207,9 @@ public class TigerGrammar extends Grammar {
 		
 		addRule(new ProductionRule(NonTerminals.ATOM_EXPR,
 			NonTerminals.LVALUE));
+
+		addRule(new ProductionRule(NonTerminals.ATOM_EXPR,
+			State.LPAREN, NonTerminals.EXPR, State.RPAREN));
 		
 		//NEGATED_EXPR
 		addRule(new ProductionRule(NonTerminals.NEGATED_EXPR,
@@ -228,8 +224,7 @@ public class TigerGrammar extends Grammar {
 		
 		// MULT_DIV_EXPR_TAIL
 		addRule(new ProductionRule(NonTerminals.MULT_DIV_EXPR_TAIL,
-			NonTerminals.MULT_DIV_OP, NonTerminals.NEGATED_EXPR, 
-			NonTerminals.MULT_DIV_EXPR_TAIL));
+			NonTerminals.MULT_DIV_OP, NonTerminals.NEGATED_EXPR, NonTerminals.MULT_DIV_EXPR_TAIL));
 
 		addRule(new ProductionRule(NonTerminals.MULT_DIV_OP,
 			State.MULT));
@@ -263,8 +258,7 @@ public class TigerGrammar extends Grammar {
 		
 		// BOOL_EXPR_TAIL
 		addRule(new ProductionRule(NonTerminals.BOOL_EXPR_TAIL,
-			NonTerminals.BOOL_OP, NonTerminals.ADD_SUB_EXPR, 
-			NonTerminals.BOOL_EXPR_TAIL));
+			NonTerminals.BOOL_OP, NonTerminals.ADD_SUB_EXPR, NonTerminals.BOOL_EXPR_TAIL));
 		
 		addRule(new ProductionRule(NonTerminals.BOOL_EXPR_TAIL,
 			State.NULL));
@@ -275,8 +269,7 @@ public class TigerGrammar extends Grammar {
 		
 		// AND_EXPR_TAIL
 		addRule(new ProductionRule(NonTerminals.AND_EXPR_TAIL,
-			State.AND, NonTerminals.BOOL_EXPR, 
-			NonTerminals.AND_EXPR_TAIL));
+			State.AND, NonTerminals.BOOL_EXPR, NonTerminals.AND_EXPR_TAIL));
 		
 		addRule(new ProductionRule(NonTerminals.AND_EXPR_TAIL,
 			State.NULL));
@@ -287,8 +280,7 @@ public class TigerGrammar extends Grammar {
 
 		// OR_EXPR_TAIL
 		addRule(new ProductionRule(NonTerminals.OR_EXPR_TAIL,
-			State.OR, NonTerminals.BOOL_EXPR, 
-			NonTerminals.OR_EXPR_TAIL));
+			State.OR, NonTerminals.AND_EXPR, NonTerminals.OR_EXPR_TAIL));
 		
 		addRule(new ProductionRule(NonTerminals.OR_EXPR_TAIL,
 			State.NULL));
