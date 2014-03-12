@@ -139,6 +139,8 @@ public class Parser{
 			csv += State.values()[termIdx] + ",";
 		}
 
+		csv += "\n";
+
 		for (int nontermIdx = 0; nontermIdx < NUM_NONTERMINALS; nontermIdx++) {
 			csv += NonTerminals.values()[nontermIdx] + ",";
 
