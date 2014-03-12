@@ -35,7 +35,7 @@ public class Parser{
 			}
 			// invalid 
 			if(token.ordinal() == State.ERROR.ordinal()){
-				System.out.println("Invalid token on : line " + token.lineNumber);
+				System.out.println("Invalid token on line: " + token.lineNumber);
 				System.out.println("unsuccessful parse");
 				return false;
 			}
@@ -66,7 +66,7 @@ public class Parser{
 				ProductionRule productionRule = parserTable[((NonTerminalParserSymbol)parserSymbol).getNonTerminal().ordinal()][token.ordinal()];
 				
 				if (productionRule == null) {
-					System.out.println("ERROR: Trying to match '" + parserSymbol + "', but found: '" + token + "'");
+					System.out.println("ERROR: Trying to match '" + parserSymbol + "', but found: '" + token + "' on line: " + token.lineNumber);
 					return false;
 				}
 
