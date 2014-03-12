@@ -121,7 +121,7 @@ public class Parser{
 				Set<Token> followSet = grammar.findFollowSet(nonterminal);
 
 				for (Token terminal : followSet) {
-					ProductionRule newNullRule = new ProductionRule(nonterminal.getNonTerminal(), new ParserSymbol[] {nullSymbol});
+					ProductionRule newNullRule = new ProductionRule(nonterminal.getNonTerminal(), State.NULL);
 					if (parserTable[nonterminal.ordinal()][terminal.ordinal()] != null) {
 						throw new RuntimeException("ERROR: Rule collision at column " + terminal + ", grammar is not LL(1): " + parserTable[nonterminal.ordinal()][terminal.ordinal()] + " ******* " + newNullRule);
 					}

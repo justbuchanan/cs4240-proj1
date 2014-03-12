@@ -6,9 +6,21 @@ public class ProductionRule implements Iterable<ParserSymbol>{
 		int curr;
 
 
-		public ProductionRule(NonTerminals left, ParserSymbol... right){
+		public ProductionRule(NonTerminals left, Enum... rightEnums){
 			this.left = new NonTerminalParserSymbol(left);
-			this.right = right;
+
+
+			this.right = new ParserSymbol[rightEnums.length];
+
+			int i = 0;
+			for (Enum e : rightEnums) {
+				if (e instanceof State) {
+					right[i++] = new Token((State)e);
+				} else {
+					right[i++] = new NonTerminalParserSymbol((NonTerminals)e);
+				}
+			}
+
 			curr = right.length - 1;
 		}
 

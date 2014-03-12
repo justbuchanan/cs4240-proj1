@@ -3,341 +3,206 @@ public class TigerGrammar extends Grammar {
 	TigerGrammar() {
 		// TIGER_PROGRAM
 		addRule(new ProductionRule(NonTerminals.TIGER_PROGRAM,
-			new Token(State.LET),
-			new NonTerminalParserSymbol(NonTerminals.DECLARATION_SEGMENT),
-			new Token(State.IN),
-			new NonTerminalParserSymbol(NonTerminals.STAT_SEQ),
-			new Token(State.END)
-		));
+			State.LET, NonTerminals.DECLARATION_SEGMENT, State.IN, NonTerminals.STAT_SEQ, State.END));
 		
 		// DECLARATION_SEGMENT
 		addRule(new ProductionRule(NonTerminals.DECLARATION_SEGMENT,
-			new NonTerminalParserSymbol(NonTerminals.TYPE_DECLARATION_LIST), new NonTerminalParserSymbol(NonTerminals.VAR_DECLARATION_LIST),
-			new NonTerminalParserSymbol(NonTerminals.FUNCT_DECLARATION_LIST)
-		));
+			NonTerminals.TYPE_DECLARATION_LIST, NonTerminals.VAR_DECLARATION_LIST, NonTerminals.FUNCT_DECLARATION_LIST));
 		
 		// TYPE_DECLARATION_LIST
 		addRule(new ProductionRule(NonTerminals.TYPE_DECLARATION_LIST,
-			new Token(State.NULL)	
-		));
+			State.NULL	));
 		
-		addRule(new ProductionRule(NonTerminals.TYPE_DECLARATION_LIST,
-				new NonTerminalParserSymbol(NonTerminals.TYPE_DECLARATION),
-				new NonTerminalParserSymbol(NonTerminals.TYPE_DECLARATION_LIST)
-		));
+		addRule(new ProductionRule(NonTerminals.TYPE_DECLARATION_LIST, 
+			NonTerminals.TYPE_DECLARATION, 	NonTerminals.TYPE_DECLARATION_LIST));
 		
 		// VAR_DECLARATION_LIST
 		addRule(new ProductionRule(NonTerminals.VAR_DECLARATION_LIST,
-			new Token(State.NULL)
-		));
+			State.NULL));
 		
-		addRule(new ProductionRule(NonTerminals.VAR_DECLARATION_LIST,
-				new NonTerminalParserSymbol(NonTerminals.VAR_DECLARATION),
-				new NonTerminalParserSymbol(NonTerminals.VAR_DECLARATION_LIST)
-		));
+		addRule(new ProductionRule(NonTerminals.VAR_DECLARATION_LIST, 
+			NonTerminals.VAR_DECLARATION, 	NonTerminals.VAR_DECLARATION_LIST));
 		
 		// FUNCT_DECLARATION_LIST
 		addRule(new ProductionRule(NonTerminals.FUNCT_DECLARATION_LIST,
-			new Token(State.NULL)	
-		));
+			State.NULL	));
 		
 		addRule(new ProductionRule(NonTerminals.FUNCT_DECLARATION_LIST,
-			new NonTerminalParserSymbol(NonTerminals.FUNCT_DECLARATION),
-			new NonTerminalParserSymbol(NonTerminals.FUNCT_DECLARATION_LIST)	
-		));
+			NonTerminals.FUNCT_DECLARATION, NonTerminals.FUNCT_DECLARATION_LIST	));
 		
 		// TYPE_DECLARATION
 		addRule(new ProductionRule(NonTerminals.TYPE_DECLARATION,
-			new Token(State.TYPE),
-			new Token(State.ID), 
-			new Token(State.EQ),
-			new NonTerminalParserSymbol(NonTerminals.TYPE)
-		));
+			State.TYPE, State.ID, 
+			State.EQ, NonTerminals.TYPE));
 		
 		// TYPE
-		addRule(new ProductionRule(NonTerminals.TYPE,
-				new Token(State.ARRAY),
-				new Token(State.LBRACK),
-				new Token(State.INTLIT),
-				new Token(State.RBRACK),
-				new NonTerminalParserSymbol(NonTerminals.TYPEDIM),
-				new Token(State.OF),
-				new NonTerminalParserSymbol(NonTerminals.TYPE_ID),
-				new Token(State.SEMI)
-		));
+		addRule(new ProductionRule(NonTerminals.TYPE, 
+			State.ARRAY, 	State.LBRACK, 	State.INTLIT, 	State.RBRACK, 	NonTerminals.TYPEDIM, 	State.OF, 	NonTerminals.TYPE_ID, 	State.SEMI));
 		
 		//TYPEDIM
 		addRule(new ProductionRule(NonTerminals.TYPEDIM,
-			new Token(State.LBRACK),
-			new Token(State.INTLIT),
-			new Token(State.RBRACK),
-			new NonTerminalParserSymbol(NonTerminals.TYPEDIM)
-		));
+			State.LBRACK, State.INTLIT, State.RBRACK, NonTerminals.TYPEDIM));
 		
-		addRule(new ProductionRule(NonTerminals.TYPEDIM,
-				new Token(State.NULL)
-		));
+		addRule(new ProductionRule(NonTerminals.TYPEDIM, 
+			State.NULL));
 		
 		// TYPE_ID
-		addRule(new ProductionRule(NonTerminals.TYPE_ID,
-				new Token(State.INTLIT)
-		));
+		addRule(new ProductionRule(NonTerminals.TYPE_ID, 
+			State.INTLIT));
 		
 		addRule(new ProductionRule(NonTerminals.TYPE_ID,
-			new Token(State.STRLIT)	
-		));
+			State.STRLIT	));
 		
 		addRule(new ProductionRule(NonTerminals.TYPE_ID,
-			new Token(State.ID)
-		));
+			State.ID));
 		
 		// VAR_DECLARATION
-		addRule(new ProductionRule(NonTerminals.VAR_DECLARATION,
-				new Token(State.VAR),
-				new NonTerminalParserSymbol(NonTerminals.ID_LIST),
-				new Token(State.COLON),
-				new NonTerminalParserSymbol(NonTerminals.TYPE_ID),
-				new NonTerminalParserSymbol(NonTerminals.OPTIONAL_INIT),
-				new Token(State.SEMI)
-		));
+		addRule(new ProductionRule(NonTerminals.VAR_DECLARATION, 
+			State.VAR, 	NonTerminals.ID_LIST, 	State.COLON, 	NonTerminals.TYPE_ID, 	NonTerminals.OPTIONAL_INIT, 	State.SEMI));
 		
 		// ID_LIST
-		addRule(new ProductionRule(NonTerminals.ID_LIST,
-				new Token(State.ID), new NonTerminalParserSymbol(NonTerminals.ID_LIST_PRIME)
-		));
+		addRule(new ProductionRule(NonTerminals.ID_LIST, 
+			State.ID, NonTerminals.ID_LIST_PRIME));
 		
 		// ID_LIST_PRIME
-		addRule(new ProductionRule(NonTerminals.ID_LIST_PRIME,
-				new Token(State.NULL)
-		));
+		addRule(new ProductionRule(NonTerminals.ID_LIST_PRIME, 
+			State.NULL));
 		
-		addRule(new ProductionRule(NonTerminals.ID_LIST_PRIME,
-				new Token(State.COMMA), new NonTerminalParserSymbol(NonTerminals.ID_LIST)
-		));
+		addRule(new ProductionRule(NonTerminals.ID_LIST_PRIME, 
+			State.COMMA, NonTerminals.ID_LIST));
 		
 		// OPTIONAL_INIT
-		addRule(new ProductionRule(NonTerminals.OPTIONAL_INIT,
-				new Token(State.NULL)
-		));
+		addRule(new ProductionRule(NonTerminals.OPTIONAL_INIT, 
+			State.NULL));
 		
-		addRule(new ProductionRule(NonTerminals.OPTIONAL_INIT,
-				new Token(State.ASSIGN),
-				new NonTerminalParserSymbol(NonTerminals.CONST)
-		));
+		addRule(new ProductionRule(NonTerminals.OPTIONAL_INIT, 
+			State.ASSIGN, 	NonTerminals.CONST));
 		
 		// FUNCT_DECLARATION
-		addRule(new ProductionRule(NonTerminals.FUNCT_DECLARATION,
-				new Token(State.FUNC),
-				new Token(State.ID),
-				new Token(State.LPAREN),
-				new NonTerminalParserSymbol(NonTerminals.PARAM_LIST),
-				new Token(State.RPAREN), 
-				new NonTerminalParserSymbol(NonTerminals.RET_TYPE),
-				new Token(State.BEGIN), 
-				new NonTerminalParserSymbol(NonTerminals.STAT_SEQ),
-				new Token(State.END), new Token(State.SEMI)
-		));
+		addRule(new ProductionRule(NonTerminals.FUNCT_DECLARATION, 
+			State.FUNC, 	State.ID, 	State.LPAREN, 	NonTerminals.PARAM_LIST, 	State.RPAREN, 
+				NonTerminals.RET_TYPE, 	State.BEGIN, 
+				NonTerminals.STAT_SEQ, 	State.END, State.SEMI));
 		
 		// PARAM_LIST
-		addRule(new ProductionRule(NonTerminals.PARAM_LIST,
-				new Token(State.NULL)
-		));
+		addRule(new ProductionRule(NonTerminals.PARAM_LIST, 
+			State.NULL));
 		
-		addRule(new ProductionRule(NonTerminals.PARAM_LIST,
-				new NonTerminalParserSymbol(NonTerminals.PARAM), new NonTerminalParserSymbol(NonTerminals.PARAM_LIST_TAIL)
-		));
+		addRule(new ProductionRule(NonTerminals.PARAM_LIST, 
+			NonTerminals.PARAM, NonTerminals.PARAM_LIST_TAIL));
 		
 		// PARAM_LIST_TAIL
-		addRule(new ProductionRule(NonTerminals.PARAM_LIST_TAIL,
-				new Token(State.NULL)
-		));
+		addRule(new ProductionRule(NonTerminals.PARAM_LIST_TAIL, 
+			State.NULL));
 		
-		addRule(new ProductionRule(NonTerminals.PARAM_LIST_TAIL,
-				new Token(State.COMMA),
-				new NonTerminalParserSymbol(NonTerminals.PARAM),
-				new NonTerminalParserSymbol(NonTerminals.PARAM_LIST_TAIL)
-		));
+		addRule(new ProductionRule(NonTerminals.PARAM_LIST_TAIL, 
+			State.COMMA, 	NonTerminals.PARAM, 	NonTerminals.PARAM_LIST_TAIL));
 		
 		// RET_TYPE
-		addRule(new ProductionRule(NonTerminals.RET_TYPE,
-				new Token(State.NULL)
-		));
+		addRule(new ProductionRule(NonTerminals.RET_TYPE, 
+			State.NULL));
 		
-		addRule(new ProductionRule(NonTerminals.RET_TYPE,
-				new Token(State.COLON),
-				new NonTerminalParserSymbol(NonTerminals.TYPE_ID)
-		));
+		addRule(new ProductionRule(NonTerminals.RET_TYPE, 
+			State.COLON, 	NonTerminals.TYPE_ID));
 		
 		// PARAM
-		addRule(new ProductionRule(NonTerminals.PARAM,
-				new Token(State.ID), new Token(State.COLON),
-				new NonTerminalParserSymbol(NonTerminals.TYPE_ID)
-		));
+		addRule(new ProductionRule(NonTerminals.PARAM, 
+			State.ID, State.COLON, 	NonTerminals.TYPE_ID));
 		
 		// STAT_SEQ
-		addRule(new ProductionRule(NonTerminals.STAT_SEQ,
-				new NonTerminalParserSymbol(NonTerminals.STAT),
-				new NonTerminalParserSymbol(NonTerminals.STAT_SEQ_PRIME)
-		));
+		addRule(new ProductionRule(NonTerminals.STAT_SEQ, 
+			NonTerminals.STAT, 	NonTerminals.STAT_SEQ_PRIME));
 		
 		// STAT_SEQ_PRIME
 		addRule(new ProductionRule(NonTerminals.STAT_SEQ_PRIME,
-			new NonTerminalParserSymbol(NonTerminals.STAT),
-			new NonTerminalParserSymbol(NonTerminals.STAT_SEQ_PRIME)
-		));
+			NonTerminals.STAT, NonTerminals.STAT_SEQ_PRIME));
 		
 		addRule(new ProductionRule(NonTerminals.STAT_SEQ_PRIME,
-			new Token(State.NULL)
-		));
+			State.NULL));
 		
 		// STAT
 
 		addRule(new ProductionRule(NonTerminals.STAT,
-			new Token(State.WHILE),
-			new NonTerminalParserSymbol(NonTerminals.EXPR),
-			new Token(State.DO),
-			new NonTerminalParserSymbol(NonTerminals.STAT_SEQ),
-			new Token(State.ENDDO),
-			new Token(State.SEMI)
-		));
+			State.WHILE, NonTerminals.EXPR, State.DO, NonTerminals.STAT_SEQ, State.ENDDO, State.SEMI));
 		
 		addRule(new ProductionRule(NonTerminals.STAT,
-			new Token(State.FOR),
-			new Token(State.ID),
-			new Token(State.ASSIGN),
-			new NonTerminalParserSymbol(NonTerminals.EXPR),
-			new Token(State.TO),
-			new NonTerminalParserSymbol(NonTerminals.EXPR), 
-			new Token(State.DO),
-			new NonTerminalParserSymbol(NonTerminals.STAT_SEQ),
-			new Token(State.ENDDO), 
-			new Token(State.SEMI)
-		));
+			State.FOR, State.ID, State.ASSIGN, NonTerminals.EXPR, State.TO, NonTerminals.EXPR, 
+			State.DO, NonTerminals.STAT_SEQ, State.ENDDO, 
+			State.SEMI));
 
 		addRule(new ProductionRule(NonTerminals.STAT,
-			new Token(State.BREAK),
-			new Token(State.SEMI)
-		));
+			State.BREAK, State.SEMI));
 		
 		addRule(new ProductionRule(NonTerminals.STAT,
-			new Token(State.RETURN),
-			new NonTerminalParserSymbol(NonTerminals.EXPR),
-			new Token(State.SEMI)
-		));
+			State.RETURN, NonTerminals.EXPR, State.SEMI));
 
 
 		//	STAT ID
 		addRule(new ProductionRule(NonTerminals.STAT,
-			new Token(State.ID),
-			new NonTerminalParserSymbol(NonTerminals.STAT_AFTER_ID)
-		));
+			State.ID, NonTerminals.STAT_AFTER_ID));
 
 		addRule(new ProductionRule(NonTerminals.STAT_AFTER_ID,
-			new Token(State.LPAREN),
-			new NonTerminalParserSymbol(NonTerminals.EXPR_LIST),
-			new Token(State.RPAREN),
-			new Token(State.SEMI)
-		));
+			State.LPAREN, NonTerminals.EXPR_LIST, State.RPAREN, State.SEMI));
 
 		addRule(new ProductionRule(NonTerminals.STAT_AFTER_ID,
-			new NonTerminalParserSymbol(NonTerminals.LVALUE_TAIL),
-			new Token(State.ASSIGN),
-			new NonTerminalParserSymbol(NonTerminals.EXPR_OR_ID),
-			new Token(State.SEMI)
-		));
+			NonTerminals.LVALUE_TAIL, State.ASSIGN, NonTerminals.EXPR_OR_ID, State.SEMI));
 
 		addRule(new ProductionRule(NonTerminals.EXPR_OR_ID,
-			new Token(State.ID),
-			new NonTerminalParserSymbol(NonTerminals.EXPR_OR_FUNC)
-		));
+			State.ID, NonTerminals.EXPR_OR_FUNC));
 
 		addRule(new ProductionRule(NonTerminals.EXPR_OR_ID,
-			new NonTerminalParserSymbol(NonTerminals.EXPR_NO_LVALUE)
-		));
+			NonTerminals.EXPR_NO_LVALUE));
 
 		addRule(new ProductionRule(NonTerminals.EXPR_OR_FUNC,
-			new NonTerminalParserSymbol(NonTerminals.LVALUE_TAIL),
-			new NonTerminalParserSymbol(NonTerminals.EXPR_ANY_TAIL)
-		));
+			NonTerminals.LVALUE_TAIL, NonTerminals.EXPR_ANY_TAIL));
 
 		addRule(new ProductionRule(NonTerminals.EXPR_OR_FUNC,
-			new Token(State.LPAREN),
-			new NonTerminalParserSymbol(NonTerminals.EXPR_LIST),
-			new Token(State.RPAREN)
-		));
+			State.LPAREN, NonTerminals.EXPR_LIST, State.RPAREN));
 
 		
 		// STAT_IF
 		addRule(new ProductionRule(NonTerminals.STAT,
-			new Token(State.IF),
-			new NonTerminalParserSymbol(NonTerminals.EXPR),
-			new Token(State.THEN),
-			new NonTerminalParserSymbol(NonTerminals.STAT_SEQ),
-			new NonTerminalParserSymbol(NonTerminals.STAT_IF_TAIL)
-		));
+			State.IF, NonTerminals.EXPR, State.THEN, NonTerminals.STAT_SEQ, NonTerminals.STAT_IF_TAIL));
 		
 		// STAT_IF_TAIL
 		addRule(new ProductionRule(NonTerminals.STAT_IF_TAIL,
-			new Token(State.ENDIF),
-			new Token(State.SEMI)
-		));
+			State.ENDIF, State.SEMI));
 		
 		addRule(new ProductionRule(NonTerminals.STAT_IF_TAIL,
-			new Token(State.ELSE),
-			new NonTerminalParserSymbol(NonTerminals.STAT_SEQ),
-			new Token(State.ENDIF),
-			new Token(State.SEMI)
-		));
+			State.ELSE, NonTerminals.STAT_SEQ, State.ENDIF, State.SEMI));
 		
 		// EXPR
 		addRule(new ProductionRule(NonTerminals.EXPR,
-			new NonTerminalParserSymbol(NonTerminals.LVALUE),
-			new NonTerminalParserSymbol(NonTerminals.EXPR_ANY_TAIL)
-		));
+			NonTerminals.LVALUE, NonTerminals.EXPR_ANY_TAIL));
 
 		addRule(new ProductionRule(NonTerminals.EXPR,
-			new NonTerminalParserSymbol(NonTerminals.EXPR_NO_LVALUE)
-		));
+			NonTerminals.EXPR_NO_LVALUE));
 
 		//	EXPR_NO_LVALUE
 		addRule(new ProductionRule(NonTerminals.EXPR_NO_LVALUE,
-			new NonTerminalParserSymbol(NonTerminals.CONST),
-			new NonTerminalParserSymbol(NonTerminals.EXPR_ANY_TAIL)
-		));
+			NonTerminals.CONST, NonTerminals.EXPR_ANY_TAIL));
 
 		addRule(new ProductionRule(NonTerminals.EXPR_NO_LVALUE,
-			new Token(State.MINUS),
-			new NonTerminalParserSymbol(NonTerminals.ATOM_EXPR)
-		));
+			State.MINUS, NonTerminals.ATOM_EXPR));
 
 		addRule(new ProductionRule(NonTerminals.EXPR_NO_LVALUE,
-			new Token(State.LPAREN),
-			new NonTerminalParserSymbol(NonTerminals.EXPR),
-			new Token(State.RPAREN),
-			new NonTerminalParserSymbol(NonTerminals.EXPR_ANY_TAIL)
-		));
+			State.LPAREN, NonTerminals.EXPR, State.RPAREN, NonTerminals.EXPR_ANY_TAIL));
 
 
 		//	EXPR_ANY_TAIL
 
 		addRule(new ProductionRule(NonTerminals.EXPR_ANY_TAIL,
-			new NonTerminalParserSymbol(NonTerminals.MULT_DIV_EXPR_TAIL)
-		));
+			NonTerminals.MULT_DIV_EXPR_TAIL));
 		addRule(new ProductionRule(NonTerminals.EXPR_ANY_TAIL,
-			new NonTerminalParserSymbol(NonTerminals.ADD_SUB_EXPR_TAIL)
-		));
+			NonTerminals.ADD_SUB_EXPR_TAIL));
 		addRule(new ProductionRule(NonTerminals.EXPR_ANY_TAIL,
-			new NonTerminalParserSymbol(NonTerminals.AND_EXPR_TAIL)
-		));
+			NonTerminals.AND_EXPR_TAIL));
 		addRule(new ProductionRule(NonTerminals.EXPR_ANY_TAIL,
-			new NonTerminalParserSymbol(NonTerminals.OR_EXPR_TAIL)
-		));
+			NonTerminals.OR_EXPR_TAIL));
 		addRule(new ProductionRule(NonTerminals.EXPR_ANY_TAIL,
-			new NonTerminalParserSymbol(NonTerminals.BOOL_EXPR_TAIL)
-		));
+			NonTerminals.BOOL_EXPR_TAIL));
 		addRule(new ProductionRule(NonTerminals.EXPR_ANY_TAIL,
-			new Token(State.NULL)
-		));
+			State.NULL));
 
 
 		//	FIXME: check OR expressions
@@ -345,199 +210,144 @@ public class TigerGrammar extends Grammar {
 		
 		//ATOM_EXPR
 		addRule(new ProductionRule(NonTerminals.ATOM_EXPR,
-			new NonTerminalParserSymbol(NonTerminals.CONST)
-		));
+			NonTerminals.CONST));
 		
 		addRule(new ProductionRule(NonTerminals.ATOM_EXPR,
-			new NonTerminalParserSymbol(NonTerminals.LVALUE)
-		));
+			NonTerminals.LVALUE));
 		
 		//NEGATED_EXPR
 		addRule(new ProductionRule(NonTerminals.NEGATED_EXPR,
-			new Token(State.MINUS), new NonTerminalParserSymbol(NonTerminals.ATOM_EXPR)
-		));
+			State.MINUS, NonTerminals.ATOM_EXPR));
 		
 		addRule(new ProductionRule(NonTerminals.NEGATED_EXPR,
-			new NonTerminalParserSymbol(NonTerminals.ATOM_EXPR)
-		));
+			NonTerminals.ATOM_EXPR));
 		
 		// MULT_DIV_EXPR
-		addRule(new ProductionRule(NonTerminals.MULT_DIV_EXPR,
-				new NonTerminalParserSymbol(NonTerminals.NEGATED_EXPR),
-				new NonTerminalParserSymbol(NonTerminals.MULT_DIV_EXPR_TAIL)
-		));
+		addRule(new ProductionRule(NonTerminals.MULT_DIV_EXPR, 
+			NonTerminals.NEGATED_EXPR, 	NonTerminals.MULT_DIV_EXPR_TAIL));
 		
 		// MULT_DIV_EXPR_TAIL
 		addRule(new ProductionRule(NonTerminals.MULT_DIV_EXPR_TAIL,
-			new NonTerminalParserSymbol(NonTerminals.MULT_DIV_OP),
-			new NonTerminalParserSymbol(NonTerminals.NEGATED_EXPR), 
-			new NonTerminalParserSymbol(NonTerminals.MULT_DIV_EXPR_TAIL)
-		));
+			NonTerminals.MULT_DIV_OP, NonTerminals.NEGATED_EXPR, 
+			NonTerminals.MULT_DIV_EXPR_TAIL));
 
 		addRule(new ProductionRule(NonTerminals.MULT_DIV_OP,
-			new Token(State.MULT)
-		));
+			State.MULT));
 
 		addRule(new ProductionRule(NonTerminals.MULT_DIV_OP,
-			new Token(State.DIV)
-		));
+			State.DIV));
 		
-		addRule(new ProductionRule(NonTerminals.MULT_DIV_EXPR_TAIL,
-				new Token(State.NULL)
-		));
+		addRule(new ProductionRule(NonTerminals.MULT_DIV_EXPR_TAIL, 
+			State.NULL));
 		
 		// ADD_SUB_EXPR
-		addRule(new ProductionRule(NonTerminals.ADD_SUB_EXPR,
-				new NonTerminalParserSymbol(NonTerminals.MULT_DIV_EXPR),
-				new NonTerminalParserSymbol(NonTerminals.ADD_SUB_EXPR_TAIL)
-		));
+		addRule(new ProductionRule(NonTerminals.ADD_SUB_EXPR, 
+			NonTerminals.MULT_DIV_EXPR, 	NonTerminals.ADD_SUB_EXPR_TAIL));
 		
 		// ADD_SUB_EXPR_TAIL
 		addRule(new ProductionRule(NonTerminals.ADD_SUB_EXPR_TAIL,
-			new NonTerminalParserSymbol(NonTerminals.ADD_SUB_OP),
-			new NonTerminalParserSymbol(NonTerminals.MULT_DIV_EXPR),
-			new NonTerminalParserSymbol(NonTerminals.ADD_SUB_EXPR_TAIL)
-		));
+			NonTerminals.ADD_SUB_OP, NonTerminals.MULT_DIV_EXPR, NonTerminals.ADD_SUB_EXPR_TAIL));
 
 		addRule(new ProductionRule(NonTerminals.ADD_SUB_OP,
-			new Token(State.PLUS)
-		));
+			State.PLUS));
 
 		addRule(new ProductionRule(NonTerminals.ADD_SUB_OP,
-			new Token(State.MINUS)
-		));
+			State.MINUS));
 		
 		addRule(new ProductionRule(NonTerminals.ADD_SUB_EXPR_TAIL,
-			new Token(State.NULL)
-		));
+			State.NULL));
 		
 		// BOOL_EXPR{
 		addRule(new ProductionRule(NonTerminals.BOOL_EXPR,
-			new NonTerminalParserSymbol(NonTerminals.ADD_SUB_EXPR),
-			new NonTerminalParserSymbol(NonTerminals.BOOL_EXPR_TAIL)
-		));
+			NonTerminals.ADD_SUB_EXPR, NonTerminals.BOOL_EXPR_TAIL));
 		
 		// BOOL_EXPR_TAIL
 		addRule(new ProductionRule(NonTerminals.BOOL_EXPR_TAIL,
-			new NonTerminalParserSymbol(NonTerminals.BOOL_OP),
-			new NonTerminalParserSymbol(NonTerminals.ADD_SUB_EXPR), 
-			new NonTerminalParserSymbol(NonTerminals.BOOL_EXPR_TAIL)
-		));
+			NonTerminals.BOOL_OP, NonTerminals.ADD_SUB_EXPR, 
+			NonTerminals.BOOL_EXPR_TAIL));
 		
 		addRule(new ProductionRule(NonTerminals.BOOL_EXPR_TAIL,
-			new Token(State.NULL)
-		));
+			State.NULL));
 		
 		// AND_EXPR
 		addRule(new ProductionRule(NonTerminals.AND_EXPR,
-			new NonTerminalParserSymbol(NonTerminals.BOOL_EXPR),
-			new NonTerminalParserSymbol(NonTerminals.AND_EXPR_TAIL)
-		));
+			NonTerminals.BOOL_EXPR, NonTerminals.AND_EXPR_TAIL));
 		
 		// AND_EXPR_TAIL
 		addRule(new ProductionRule(NonTerminals.AND_EXPR_TAIL,
-			new Token(State.AND),
-			new NonTerminalParserSymbol(NonTerminals.BOOL_EXPR), 
-			new NonTerminalParserSymbol(NonTerminals.AND_EXPR_TAIL)
-		));
+			State.AND, NonTerminals.BOOL_EXPR, 
+			NonTerminals.AND_EXPR_TAIL));
 		
 		addRule(new ProductionRule(NonTerminals.AND_EXPR_TAIL,
-			new Token(State.NULL)
-		));
+			State.NULL));
 
 		//	OR_EXPR
 		addRule(new ProductionRule(NonTerminals.OR_EXPR,
-			new NonTerminalParserSymbol(NonTerminals.BOOL_EXPR),
-			new NonTerminalParserSymbol(NonTerminals.OR_EXPR_TAIL)
-		));
+			NonTerminals.BOOL_EXPR, NonTerminals.OR_EXPR_TAIL));
 
 		// OR_EXPR_TAIL
 		addRule(new ProductionRule(NonTerminals.OR_EXPR_TAIL,
-			new Token(State.OR),
-			new NonTerminalParserSymbol(NonTerminals.BOOL_EXPR), 
-			new NonTerminalParserSymbol(NonTerminals.OR_EXPR_TAIL)
-		));
+			State.OR, NonTerminals.BOOL_EXPR, 
+			NonTerminals.OR_EXPR_TAIL));
 		
 		addRule(new ProductionRule(NonTerminals.OR_EXPR_TAIL,
-			new Token(State.NULL)
-		));
+			State.NULL));
 
 		
 		// BOOL_OP
 		addRule(new ProductionRule(NonTerminals.BOOL_OP,
-			new Token(State.EQ)
-		));
+			State.EQ));
 		
 		addRule(new ProductionRule(NonTerminals.BOOL_OP,
-			new Token(State.NEQ)
-		));
+			State.NEQ));
 		
 		addRule(new ProductionRule(NonTerminals.BOOL_OP,
-			new Token(State.GREATER)
-		));
+			State.GREATER));
 		
 		addRule(new ProductionRule(NonTerminals.BOOL_OP,
-			new Token(State.LESSER)
-		));
+			State.LESSER));
 		
 		addRule(new ProductionRule(NonTerminals.BOOL_OP,
-			new Token(State.GREATEREQ)
-		));
+			State.GREATEREQ));
 
 		addRule(new ProductionRule(NonTerminals.BOOL_OP,
-			new Token(State.LESSEREQ) 
-		));
+			State.LESSEREQ ));
 		
 		// CONST
 		addRule(new ProductionRule(NonTerminals.CONST,
-			new Token(State.INTLIT)
-		));
+			State.INTLIT));
 		
 		addRule(new ProductionRule(NonTerminals.CONST,
-			new Token(State.STRLIT)
-		));
+			State.STRLIT));
 
 		addRule(new ProductionRule(NonTerminals.CONST,
-			new Token(State.NIL)
-		));
+			State.NIL));
 		
 		// EXPR_LIST
 		addRule(new ProductionRule(NonTerminals.EXPR_LIST,
-			new Token(State.NULL)
-		));
+			State.NULL));
 		
 		addRule(new ProductionRule(NonTerminals.EXPR_LIST,
-			new NonTerminalParserSymbol(NonTerminals.EXPR),
-			new NonTerminalParserSymbol(NonTerminals.EXPR_LIST_TAIL)
-		));
+			NonTerminals.EXPR, NonTerminals.EXPR_LIST_TAIL));
 		
 		// EXPR_LIST_TAIL
 		addRule(new ProductionRule(NonTerminals.EXPR_LIST_TAIL,
-			new Token(State.COMMA),
-			new NonTerminalParserSymbol(NonTerminals.EXPR), 
-			new NonTerminalParserSymbol(NonTerminals.EXPR_LIST_TAIL)
-		));
+			State.COMMA, NonTerminals.EXPR, 
+			NonTerminals.EXPR_LIST_TAIL));
 		
 		addRule(new ProductionRule(NonTerminals.EXPR_LIST_TAIL,
-			new Token(State.NULL)
-		));
+			State.NULL));
 		
 		// LVALUE{
 		addRule(new ProductionRule(NonTerminals.LVALUE,
-			new Token(State.ID),
-			new NonTerminalParserSymbol(NonTerminals.LVALUE_TAIL)
-		));
+			State.ID, NonTerminals.LVALUE_TAIL));
 		
 		// LVALUE_TAIL
 		addRule(new ProductionRule(NonTerminals.LVALUE_TAIL,
-			new Token(State.LBRACK),
-			new NonTerminalParserSymbol(NonTerminals.EXPR), 
-			new Token(State.RBRACK),
-			new NonTerminalParserSymbol(NonTerminals.LVALUE_TAIL)
-		));
+			State.LBRACK, NonTerminals.EXPR, 
+			State.RBRACK, NonTerminals.LVALUE_TAIL));
 		
 		addRule(new ProductionRule(NonTerminals.LVALUE_TAIL,
-			new Token(State.NULL)
-		));
+			State.NULL));
 	}
 }
