@@ -283,7 +283,7 @@ public class TigerGrammar extends Grammar {
 
 		//	OR_EXPR
 		addRule(new ProductionRule(NonTerminals.OR_EXPR,
-			NonTerminals.BOOL_EXPR, NonTerminals.OR_EXPR_TAIL));
+			NonTerminals.AND_EXPR, NonTerminals.OR_EXPR_TAIL));
 
 		// OR_EXPR_TAIL
 		addRule(new ProductionRule(NonTerminals.OR_EXPR_TAIL,
