@@ -3,7 +3,6 @@ import java.util.Iterator;
 public class ProductionRule implements Iterable<ParserSymbol>{
 		private NonTerminalParserSymbol left;
 		private ParserSymbol[] right;
-		int curr;
 
 
 		public ProductionRule(NonTerminals left, Enum... rightEnums){
@@ -20,8 +19,6 @@ public class ProductionRule implements Iterable<ParserSymbol>{
 					right[i++] = new NonTerminalParserSymbol((NonTerminals)e);
 				}
 			}
-
-			curr = right.length - 1;
 		}
 
 
