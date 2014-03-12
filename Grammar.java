@@ -51,7 +51,7 @@ public class Grammar {
 		arr.add(rule);
 	}
 
-	public Set<Token> findFirstSet(ProductionRule productionRule, Set<ProductionRule> exclude) {
+	public Set<Token> findFirstSet(ProductionRule productionRule) {
 		Set<Token> set = new HashSet<Token>();
 
 		for(ParserSymbol parserSymbol : productionRule) {
@@ -59,7 +59,7 @@ public class Grammar {
 				set.add((Token) parserSymbol);
 				break;
 			} else {
-				Set<Token> first = findTotalFirstSet((NonTerminalParserSymbol)parserSymbol, exclude);
+				Set<Token> first = findTotalFirstSet((NonTerminalParserSymbol)parserSymbol);
 
 				Token nullSmbl = new Token(State.NULL);
 				if (first.contains(nullSmbl)) {
@@ -77,24 +77,14 @@ public class Grammar {
 		return set;
 	}
 
-	public Set<Token> findFirstSet(ProductionRule productionRule) {
-		Set<ProductionRule> exclude = new HashSet<ProductionRule>();
-		exclude.add(productionRule);
-		return findFirstSet(productionRule, exclude);
-	}
-
-	public Set<Token> findTotalFirstSet(NonTerminalParserSymbol nonterminal, Set<ProductionRule> exclude) {
+	public Set<Token> findTotalFirstSet(NonTerminalParserSymbol nonterminal) {
 		//	the first set of @nonterminal for ALL rules where it is the left-hand-side
 		Set<Token> first = new HashSet<>();
 
 		//	loop through each rule where @nonterminal is the left-hand-side to build @first
 		for (ProductionRule rule : rules.get(nonterminal)) {
-			if (!exclude.contains(rule)) {
-				exclude.add(rule);
-				System.out.println("Rule: " + rule);
-				Set<Token> firstForRule = findFirstSet(rule, exclude);
-				first.addAll(firstForRule);
-			}
+			Set<Token> firstForRule = findFirstSet(rule);
+			first.addAll(firstForRule);
 		}
 
 		return first;
@@ -138,7 +128,7 @@ public class Grammar {
 							first = new HashSet<>();
 							first.add((Token)smbl);
 						} else {
-							first = findTotalFirstSet((NonTerminalParserSymbol)smbl, new HashSet<ProductionRule>());
+							first = findTotalFirstSet((NonTerminalParserSymbol)smbl);
 						}
 
 						Token nullSmbl = new Token(State.NULL);
