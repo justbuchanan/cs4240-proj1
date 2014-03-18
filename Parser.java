@@ -10,16 +10,17 @@ public class Parser{
 	private Grammar grammar;
 	private int NUM_NONTERMINALS = 49;
 	private int NUM_TERMINALS = 49;
-
+	private ParseTree parseTree;
 
 	public Parser(Scanner scanner, Grammar grammar){
 		this.scanner = scanner;
 		this.grammar = grammar;
+		parseTree = new ParseTree();
 		buildParserTable();
 	}
 
 	public boolean parseText() {
-		boolean debug = true;
+		boolean debug = false;
 		if (debug) 		System.out.println("-------------------------------STARTING PARSE-------------------------------");
 
 		Stack<ParserSymbol> symbolStack = new Stack<>();
@@ -78,9 +79,16 @@ public class Parser{
 					) {
 
 				} else {
+					parseTree.newLevel(productionRule.left());
+					ArrayList<ParserSymbol> parserSymbolList = new ArrayList<ParserSymbol>();	
 					for(int i = productionRule.right().length - 1; i >= 0; i--) {
 						System.out.println(">> Parser Push: " + productionRule.right()[i]);
 						symbolStack.push(productionRule.right()[i]);
+						parserSymbolList.add(productionRule.right()[i]);
+					}
+					
+					for(int i = parserSymbolList.size() - 1; i >= 0; i--) {
+						parseTree.add(parserSymbolList.get(i));
 					}
 				}
 				
@@ -195,5 +203,10 @@ public class Parser{
 		}
 
 		return output;
+	}
+
+	public void printTree() {
+		System.out.println("Number of nodes in parse tree: " + parseTree.getSize());
+		System.out.println(parseTree.getRoot());
 	}
 }
