@@ -82,7 +82,7 @@ public class Parser{
 					parseTree.newLevel(productionRule.left());
 					ArrayList<ParserSymbol> parserSymbolList = new ArrayList<ParserSymbol>();	
 					for(int i = productionRule.right().length - 1; i >= 0; i--) {
-						System.out.println(">> Parser Push: " + productionRule.right()[i]);
+						if (debug) System.out.println(">> Parser Push: " + productionRule.right()[i]);
 						symbolStack.push(productionRule.right()[i]);
 						parserSymbolList.add(productionRule.right()[i]);
 					}

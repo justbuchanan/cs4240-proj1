@@ -45,7 +45,6 @@ public class Token extends ParserSymbol {
 	}
 
 	public String toString() {
-		// return new String("Token(" + type + ": '" + value + "')");
-		return type.toString();
+		return type.toString() + "(" + value + ")";
 	}
 }

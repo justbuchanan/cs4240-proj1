@@ -99,7 +99,6 @@ public class Grammar {
 		for (ProductionRule rule : rules.get(nonterminal)) {
 			if (!exclude.contains(rule)) {
 				exclude.add(rule);
-				System.out.println("Rule: " + rule);
 				Set<Token> firstForRule = findFirstSet(rule, exclude);
 				first.addAll(firstForRule);
 			}
