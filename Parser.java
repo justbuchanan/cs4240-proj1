@@ -20,14 +20,14 @@ public class Parser{
 	}
 
 	public boolean parseText() {
-		boolean debug = false;
-		if (debug) 		System.out.println("-------------------------------STARTING PARSE-------------------------------");
+		boolean debug = true;
+		if (debug) System.out.println("-------------------------------STARTING PARSE-------------------------------");
 
 		Stack<ParserSymbol> symbolStack = new Stack<>();
 		symbolStack.push(new Token(State.$));
 		symbolStack.push(new NonTerminalParserSymbol(NonTerminals.TIGER_PROGRAM));
 
-		while(!symbolStack.isEmpty()){
+		while (true) {
 			Token token = scanner.peekToken();
 			
 			//	when the scanner returns null, it means we're at the end of the file
@@ -54,11 +54,25 @@ public class Parser{
 
 			if (debug) System.out.println("< Popped parser symbol: " + parserSymbol);
 
+			//	we hit a null, which is our marker in the symbol stack that we've matched all of the right-hand-side of some non-terminal
+			//	this is our signal to pop the current level on the parse tree
+			if (parserSymbol == null) {
+				if (debug) System.out.println("Popped parse tree level");
+				parseTree.popLevel();
+				continue;
+			}
+
 			if(parserSymbol instanceof Token) {
 				if(token.equals(parserSymbol)) {
-					scanner.nextToken();	//	eat the token we just peeked
+					parseTree.add(token);	//	add it to the parse tree
+					scanner.nextToken();	//	eat the token we just peeked and 
 					if (debug) System.out.println("Matched the token!\n");
-					continue;
+
+					if (token.type() == State.$) {
+						break;	//	we completed the parse!
+					} else {
+						continue;
+					}
 				} else {
 					System.out.println("ERROR: Found " + token + ", expecting " + parserSymbol);
 					return false;
@@ -71,7 +85,6 @@ public class Parser{
 					return false;
 				}
 
-
 				ParserSymbol rightSymbol = productionRule.right()[0];
 				if (productionRule.right().length == 1 &&
 					rightSymbol.isTerminal() &&
@@ -79,19 +92,15 @@ public class Parser{
 					) {
 
 				} else {
-					parseTree.newLevel(productionRule.left());
-					ArrayList<ParserSymbol> parserSymbolList = new ArrayList<ParserSymbol>();	
+					parseTree.pushLevel(productionRule.left());
+
+					symbolStack.push(null);	//	push null onto the stack so we know when to pop this level on the parse tree
+
 					for(int i = productionRule.right().length - 1; i >= 0; i--) {
 						if (debug) System.out.println(">> Parser Push: " + productionRule.right()[i]);
 						symbolStack.push(productionRule.right()[i]);
-						parserSymbolList.add(productionRule.right()[i]);
-					}
-					
-					for(int i = parserSymbolList.size() - 1; i >= 0; i--) {
-						parseTree.add(parserSymbolList.get(i));
 					}
 				}
-				
 			}
 		}
 		

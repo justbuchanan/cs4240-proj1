@@ -3,7 +3,7 @@ public class TigerGrammar extends Grammar {
 	TigerGrammar() {
 		// TIGER_PROGRAM
 		addRule(new ProductionRule(NonTerminals.TIGER_PROGRAM,
-			State.LET, NonTerminals.DECLARATION_SEGMENT, State.IN, NonTerminals.STAT_SEQ, State.END));
+			State.LET, NonTerminals.DECLARATION_SEGMENT, State.IN, NonTerminals.STAT_SEQ, State.END, State.$));
 		
 		// DECLARATION_SEGMENT
 		addRule(new ProductionRule(NonTerminals.DECLARATION_SEGMENT,

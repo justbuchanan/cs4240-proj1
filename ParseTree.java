@@ -9,35 +9,32 @@ public class ParseTree {
 		size = 0;
 	}
 
-	public void newLevel(NonTerminalParserSymbol nonTerminal) {
-		if(root == null) {
+	public void pushLevel(NonTerminalParserSymbol nonTerminal) {
+		if (root == null) {
 			root = new TreeNode(null, nonTerminal);
 			current = root;
 		} else {
-			boolean continueFlag = true;
-			while(continueFlag) {
-				ArrayList<TreeNode> children = current.getChildren();
-				for (TreeNode treeNode : children) {
-					if(treeNode.getSymbol().equals(nonTerminal)) {
-						current = treeNode;
-						continueFlag = false;
-						break;
-					}
-				}
-				if(continueFlag) {
-					current = current.getParent();
-				}
-			}
+			TreeNode newNode = new TreeNode(current, nonTerminal);
+			current.addChild(newNode);
+			current = newNode;
 		}
 	}
 
-	public void add(ParserSymbol parserSymbol) {
-		size++;
-		if(parserSymbol.isTerminal()) {
-			current.addChild((Token) parserSymbol);
-		} else {
-			current.addChild((NonTerminalParserSymbol) parserSymbol);
+	public void popLevel() {
+		current = current.getParent();
+	}
+
+	public void add(Token token) {
+		if (token == null) {
+			throw new IllegalArgumentException("token can not be null!");
 		}
+
+		if (current == null) {
+			throw new RuntimeException("current == null at add()");
+		}
+
+		size++;
+		current.addChild(token);
 	}
 
 	public int getSize() {

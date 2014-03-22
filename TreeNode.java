@@ -5,24 +5,30 @@ public class TreeNode {
 	private ArrayList<TreeNode> children;
 	private ParserSymbol parserSymbol;
 
-	public TreeNode(TreeNode parent, NonTerminalParserSymbol nonTerminal) {
+	public TreeNode(TreeNode parent, ParserSymbol symbol) {
+		if (symbol == null) {
+			throw new IllegalArgumentException("TreeNode can't have a null symbol");
+		}
+
+		this.parserSymbol = symbol;
 		this.parent = parent;
-		parserSymbol = (ParserSymbol) nonTerminal;
-		children = new ArrayList<>();
+		this.children = new ArrayList<>();
+	}
+
+	public TreeNode(TreeNode parent, NonTerminalParserSymbol nonTerminal) {
+		this(parent, (ParserSymbol)nonTerminal);
 	}
 
 	public TreeNode(TreeNode parent, Token token) {
-		this.parent = parent;
-		parserSymbol = (ParserSymbol) token;
-		children = new ArrayList<>();
-	}
-	
-	public void addChild(NonTerminalParserSymbol nonTerminal) {
-		children.add(new TreeNode(this, nonTerminal));
+		this(parent, (ParserSymbol)token);
 	}
 	
 	public void addChild(Token token) {
 		children.add(new TreeNode(this, token));
+	}
+
+	public void addChild(TreeNode node) {
+		children.add(node);
 	}
 
 	public ArrayList<TreeNode> getChildren() {
