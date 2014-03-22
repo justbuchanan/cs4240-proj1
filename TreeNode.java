@@ -36,4 +36,20 @@ public class TreeNode {
 	public TreeNode getParent() {
 		return parent;
 	}
+
+	public String toString(int depth) {
+		String prefix = "|";
+		for (int i = 1; i < depth; i++) {
+			prefix += " |";
+		}
+		
+		String desc = prefix;
+		desc += children.size() > 0 ? "-+= " : "--= ";
+		desc += parserSymbol.toString() + "\n";
+		for (TreeNode childNode : children) {
+			desc += childNode.toString(depth + 1);
+		}
+
+		return desc;
+	}
 }

@@ -43,29 +43,6 @@ public class ParseTree {
 	public int getSize() {
 		return size;
 	}
-
-	public String getRoot() {
-		String returnString = "";
-		ArrayList<String> outputList = new ArrayList<>();
-		outputList.add(new String(""));
-		boolean continueFlag = true;
-		TreeNode curr = root;
-		ArrayList<TreeNode> children = curr.getChildren();
-		System.out.println(children.size());
-		int currentCount = 1;
-		System.out.println(curr.getSymbol().toString());
-		System.out.println("\n" + curr.getSymbol().toString());
-		for (TreeNode treeNode : children) {
-			System.out.println(treeNode.getSymbol().toString());
-			if (!treeNode.getSymbol().isTerminal()) {				
-				System.out.println("\n" + treeNode.getSymbol().toString());
-				helper(treeNode);
-			}
-		}
-
-
-		return returnString;
-	}
 	
 	public void helper(TreeNode treeNodeVar) {
 		for (TreeNode treeNode : treeNodeVar.getChildren()) {
@@ -75,6 +52,23 @@ public class ParseTree {
 				helper(treeNode);
 				System.out.println("Bottom of tree...");
 			}
+		}
+	}
+
+	/**
+	 * Returns a String in a format similar to:
+	 *
+	 * + parent
+	 * |--= Child
+	 * |-+= Child
+	 * | +--= Subchild
+	 * |--= Child3
+	 */
+	public String toString() {
+		if (root != null) {
+			return "ParseTree:\n" + root.toString(0);
+		} else {
+			return "ParseTree: null";
 		}
 	}
 }
