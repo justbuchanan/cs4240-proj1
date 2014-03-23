@@ -44,13 +44,20 @@ public class TreeNode {
 	}
 
 	public String toString(int depth) {
-		String prefix = "|";
-		for (int i = 1; i < depth; i++) {
-			prefix += " |";
+		String prefix = "";
+		if (depth > 0) {
+			prefix = "|";
+			for (int i = 1; i < depth; i++) {
+				prefix += " |";
+			}
 		}
 		
 		String desc = prefix;
-		desc += children.size() > 0 ? "-+= " : "--= ";
+
+		if (depth > 0) {
+			desc += "-";
+		}
+		desc += children.size() > 0 ? "+= " : "-= ";
 		desc += parserSymbol.toString() + "\n";
 		for (TreeNode childNode : children) {
 			desc += childNode.toString(depth + 1);
