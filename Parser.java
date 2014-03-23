@@ -53,7 +53,7 @@ public class Parser{
 				continue;
 			}
 
-			if (debug) System.out.println("Peeked token: " + token + ":" + token.value());
+			if (debug) System.out.println("Peeked token: " + token);
 
 			ParserSymbol parserSymbol = symbolStack.pop();
 
