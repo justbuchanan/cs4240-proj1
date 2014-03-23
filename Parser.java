@@ -11,16 +11,21 @@ public class Parser{
 	private int NUM_NONTERMINALS = 49;
 	private int NUM_TERMINALS = 49;
 	private ParseTree parseTree;
+	private SymbolTable symbolTable;
 
 	public Parser(Scanner scanner, Grammar grammar){
 		this.scanner = scanner;
 		this.grammar = grammar;
 		parseTree = new ParseTree();
 		buildParserTable();
+		symbolTable = new SymbolTable();
 	}
 
 	public boolean parseText() {
+		int currScope = 0;
+		String currFunc = "LET";
 		boolean debug = false;
+		ArrayList<String> typelessIDs = new ArrayList();
 		if (debug) 		System.out.println("-------------------------------STARTING PARSE-------------------------------");
 
 		Stack<ParserSymbol> symbolStack = new Stack<>();
@@ -70,7 +75,16 @@ public class Parser{
 					System.out.println("ERROR: Trying to match '" + parserSymbol + "', but found: '" + token + "' on line: " + token.lineNumber);
 					return false;
 				}
-
+				
+				if (productionRule.left().getNonTerminal() == NonTerminals.TYPE_DECLARATION){
+					buildTypeAndAddToTable();
+					continue;
+				}
+				
+				if(productionRule.left().getNonTerminal() == NonTerminals.VAR_DECLARATION){
+					buildVarAndAddToTable();
+					continue;
+				}
 
 				ParserSymbol rightSymbol = productionRule.right()[0];
 				if (productionRule.right().length == 1 &&
@@ -102,10 +116,87 @@ public class Parser{
 		}
 
 		System.out.println("\nSuccessful parse!!!");
-
+		// print symbol table on success
+		symbolTable.printSymbolTable();
 		return true;
 	}
-
+	
+	/*
+	 * Assumes last symbol popped was TYPE_DECLARATION
+	 */
+	private void buildTypeAndAddToTable(){
+		String typeName = "";
+		PrimitiveTypes.PrimitiveType primitiveType = null;
+		int arrSize = 0;
+		Token currToken;
+		currToken = scanner.nextToken();
+		while(currToken.type() != State.SEMI){ // semi marks end of type declaration
+			if(currToken.type() == State.ID){
+				if(currToken.value().equals("string")) primitiveType = PrimitiveTypes.PrimitiveType.STRING;
+				else if(currToken.value().equals("int")) primitiveType = PrimitiveTypes.PrimitiveType.INT;
+				else typeName = currToken.value();
+			}
+			else if(currToken.type() == State.INTLIT) arrSize = Integer.parseInt(currToken.value());
+			currToken = scanner.nextToken();
+		}
+		
+		symbolTable.addType(typeName, primitiveType, arrSize);
+	}
+	
+	/*
+	 *  Assumes last symbol popped was VAR_DECLARATION
+	 */
+	private void buildVarAndAddToTable(){
+		LinkedList<String> varNames = new LinkedList();
+		String typeName = null;
+		String varVal;
+		Token currToken;
+		currToken = scanner.nextToken();
+		while(currToken.type() != State.SEMI){
+			if(currToken.type() == State.ID){
+				varNames.add(currToken.value());
+			}
+			if(currToken.type() == State.COLON){
+				currToken = scanner.nextToken();
+				// should be type
+				if(currToken.type() == State.ID){
+					typeName = currToken.value();
+				}
+			}
+			if(currToken.type() == State.STRLIT || currToken.type() == State.INTLIT){
+				varVal = currToken.value();
+			}
+			currToken = scanner.nextToken();
+		}
+		
+		for(String varName : varNames){
+			symbolTable.addVar(varName, typeName);
+		}
+	}
+	
+	/*
+	 *  Assumes last symbol popped was FUNCT_DECLARATION
+	 */
+	private void buildFuncAndAddToTable(){
+		
+		Token currToken;
+		String funcName;
+		currToken = scanner.nextToken(); // func
+		boolean gotFuncName = false;
+		while(currToken.type() != State.BEGIN){
+			if(currToken.type() == State.ID){
+				if(!gotFuncName){
+					funcName = currToken.value();
+					symbolTable.beginScope(funcName);
+					gotFuncName = true;
+				}
+				else{
+					
+				}
+			}
+		}
+	}
+	
 	private void buildParserTable(){
 		parserTable = new ProductionRule[NUM_NONTERMINALS][NUM_TERMINALS];
 

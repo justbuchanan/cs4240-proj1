@@ -1,11 +1,9 @@
-public class SymbolTableEntry {
+public abstract class SymbolTableEntry {
 	private String name;
-	private String type;
-	private String scope;
+	private Scope scope;
 
-	public SymbolTableEntry(String name, String type, String scope) {
+	public SymbolTableEntry(String name, Scope scope) {
 		this.name = name;
-		this.type = type;
 		this.scope = scope;
 	}
 
@@ -13,11 +11,7 @@ public class SymbolTableEntry {
 		return name;
 	}
 	
-	public String getType() {
-		return type;
-	}
-
-	public String getScope() {
+	public Scope getScope() {
 		return scope;
 	}
 }
