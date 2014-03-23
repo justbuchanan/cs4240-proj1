@@ -89,15 +89,6 @@ public class Parser{
 					System.out.println("ERROR: Trying to match '" + parserSymbol + "', but found: '" + token + "' on line: " + token.lineNumber);
 					return false;
 				}
-				if (productionRule.left().getNonTerminal() == NonTerminals.TYPE_DECLARATION){
-					buildTypeAndAddToTable();
-					continue;
-				}
-
-				if(productionRule.left().getNonTerminal() == NonTerminals.VAR_DECLARATION){
-					buildVarAndAddToTable();
-					continue;
-				}
 
 				ParserSymbol rightSymbol = productionRule.right()[0];
 				if (productionRule.right().length == 1 &&
@@ -114,6 +105,12 @@ public class Parser{
 						if (debug) System.out.println(">> Parser Push: " + productionRule.right()[i]);
 						symbolStack.push(productionRule.right()[i]);
 					}
+				}
+
+				if (productionRule.left().getNonTerminal() == NonTerminals.TYPE_DECLARATION){
+					buildTypeAndAddToTable();
+				} else if (productionRule.left().getNonTerminal() == NonTerminals.VAR_DECLARATION){
+					buildVarAndAddToTable();
 				}
 			}
 		}
@@ -138,7 +135,7 @@ public class Parser{
 		PrimitiveTypes.PrimitiveType primitiveType = null;
 		int arrSize = 0;
 		Token currToken;
-		currToken = scanner.nextToken();
+		currToken = scanner.peekToken();
 		while(currToken.type() != State.SEMI){ // semi marks end of type declaration
 			if(currToken.type() == State.ID){
 				if(currToken.value().equals("string")) primitiveType = PrimitiveTypes.PrimitiveType.STRING;
@@ -146,7 +143,7 @@ public class Parser{
 				else typeName = currToken.value();
 			}
 			else if(currToken.type() == State.INTLIT) arrSize = Integer.parseInt(currToken.value());
-			currToken = scanner.nextToken();
+			currToken = scanner.peekToken();
 		}
 
 		symbolTable.addType(typeName, primitiveType, arrSize);
@@ -160,13 +157,13 @@ public class Parser{
 		String typeName = null;
 		String varVal;
 		Token currToken;
-		currToken = scanner.nextToken();
+		currToken = scanner.peekToken();
 		while(currToken.type() != State.SEMI){
 			if(currToken.type() == State.ID){
 				varNames.add(currToken.value());
 			}
 			if(currToken.type() == State.COLON){
-				currToken = scanner.nextToken();
+				currToken = scanner.peekToken();
 				// should be type
 				if(currToken.type() == State.ID){
 					typeName = currToken.value();
@@ -175,7 +172,7 @@ public class Parser{
 			if(currToken.type() == State.STRLIT || currToken.type() == State.INTLIT){
 				varVal = currToken.value();
 			}
-			currToken = scanner.nextToken();
+			currToken = scanner.peekToken();
 		}
 
 		for(String varName : varNames){
@@ -190,7 +187,7 @@ public class Parser{
 
 		Token currToken;
 		String funcName;
-		currToken = scanner.nextToken(); // func
+		currToken = scanner.peekToken(); // func
 		boolean gotFuncName = false;
 		while(currToken.type() != State.BEGIN){
 			if(currToken.type() == State.ID){
