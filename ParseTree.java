@@ -90,4 +90,13 @@ public class ParseTree {
 			return "ParseTree: null";
 		}
 	}
+
+	/**
+	 * Removes ALL occurrences of the given Token from the tree
+	 */
+	public void removeTerminal(Token terminal) {
+		if (root != null) {
+			root.removeTerminal(terminal);
+		}
+	}
 }

@@ -73,4 +73,24 @@ public class TreeNode {
 
 		return desc;
 	}
+
+	/**
+	 * Removes ALL occurrences of the given Token from the node and all of it's subnodes
+	 */
+	public void removeTerminal(Token terminal) {
+		for (int i = 0; i < children.size();) {
+			ParserSymbol childSymbol = children.get(i).getSymbol();
+			if (childSymbol instanceof Token) {
+				if (((Token)childSymbol).equals(terminal)) {
+					children.remove(i);	//	delete the token
+					continue;	//	reloop and examine the current index again, which will contain a different child node
+				}
+			} else {
+				children.get(i).removeTerminal(terminal);
+			}
+
+			//	we only move to the next index if we didn't just delete a token
+			i++;
+		}
+	}
 }
