@@ -316,6 +316,7 @@ public class ParseTree {
 
 		removeTerminal(State.LPAREN);
 		removeTerminal(State.RPAREN);
+		removeTerminal(State.COLON);
 
 
 		return this;
