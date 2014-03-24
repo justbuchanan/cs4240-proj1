@@ -58,6 +58,7 @@ public class ParseTree {
 		removeNonTerminal(NonTerminals.ATOM_EXPR);
 		removeNonTerminal(NonTerminals.MULT_DIV_OP);
 		removeNonTerminal(NonTerminals.STAT_AFTER_ID);
+		removeNonTerminal(NonTerminals.STAT_SEQ_PRIME);
 
 		//	un-needed terminals
 		removeTerminal(State.$);
@@ -103,6 +104,31 @@ public class ParseTree {
 					}
 				});
 		}
+
+
+		//	NEGATED_EXPR transform
+		applyTransformer(new NonTerminalParserSymbol(NonTerminals.NEGATED_EXPR), null,
+			new TreeTransformer() {
+				public TreeNode transform(ParserSymbol parentSymbol,	//	the parent will be NEGATED_EXPR
+					ArrayList<TreeNode> left,
+					TreeNode subSymbolTree,
+					ArrayList<TreeNode> right) {
+					
+					//	if there are 2 args, it's a "-x", otherwise it's just "x"
+					if (left.size() == 2) {
+						//	new tree with 
+						TreeNode newTree = new TreeNode(null, parentSymbol);
+						TreeNode arg = left.get(1);
+						newTree.getChildren().add(arg);
+						arg.setParent(newTree);
+
+						return newTree;
+					} else {
+						return left.get(0);
+					}
+				}
+			});
+
 
 		//	FIXME: most of this infix stuff doesn't behave as expected because there are other transformations that have to happen first
 		//	infix operators
