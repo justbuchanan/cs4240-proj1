@@ -105,6 +105,25 @@ public class ParseTree {
 				});
 		}
 
+		//	WHILE statement transforms
+		removeTerminal(State.DO);
+		applyTransformer(new NonTerminalParserSymbol(NonTerminals.STAT), new Token(State.WHILE),
+			new TreeTransformer() {
+				public TreeNode transform(ParserSymbol parentSymbol,
+					ArrayList<TreeNode> left,
+					TreeNode subSymbolTree,
+					ArrayList<TreeNode> right) {
+					
+					//	(STAT WHILE EXPR STAT_SEQ) -> (WHILE EXPR STAT_SEQ)
+					subSymbolTree.getChildren().addAll(right);
+					for (TreeNode child : subSymbolTree.getChildren()) {
+						child.setParent(subSymbolTree);
+					}
+
+					return subSymbolTree;
+				}
+			});
+
 
 		//	NEGATED_EXPR transform
 		applyTransformer(new NonTerminalParserSymbol(NonTerminals.NEGATED_EXPR), null,
