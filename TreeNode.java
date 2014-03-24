@@ -89,6 +89,7 @@ public class TreeNode {
 
 				if (newChild != null) {
 					children.add(i, newChild);
+					newChild.setParent(this);
 				} else {
 					continue;	//	don't increment the index
 				}
