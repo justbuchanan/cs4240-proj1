@@ -262,6 +262,50 @@ public class Parser{
 		
 	}
 
+	public void semanticCheck() {
+		ParseTree ast = parseTree.getAST();
+		checkBinaryOperands(ast.getRoot());
+	}
+
+	public void checkBinaryOperands(TreeNode treeNodeParam) {
+		for (TreeNode treeNode : treeNodeParam.getChildren()) {			
+			if (treeNode.getSymbol().isTerminal() && (((Token) treeNode.getSymbol()).equals(State.PLUS) || 
+				((Token) treeNode.getSymbol()).equals(State.MINUS) ||
+				((Token) treeNode.getSymbol()).equals(State.MULT) ||
+				((Token) treeNode.getSymbol()).equals(State.DIV))) {
+				System.out.println("FOUND PLUS/SUB/MULT/DIV...Checking operands");
+				ArrayList<TreeNode> operatorChildren = treeNode.getChildren();
+				if (operatorChildren.size() != 2) {
+					System.out.println("ERROR: WRONG NUMBER OF OPERANDS FOR PLUS/SUB/MULT/DIV");
+					continue;
+				}
+				TreeNode left = operatorChildren.get(0);
+				TreeNode right = operatorChildren.get(1);
+				if (!left.getSymbol().isTerminal() || !right.getSymbol().isTerminal()) {
+					System.out.println("ERROR: CHILDREN SHOULD BOTH BE TERMINALS");
+					continue;
+				}
+				if (!(((Token) left.getSymbol()).equals(State.PLUS) ||
+                                	((Token) left.getSymbol()).equals(State.MINUS) ||
+                                	((Token) left.getSymbol()).equals(State.MULT) ||
+                                	((Token) left.getSymbol()).equals(State.DIV) ||
+					((Token) left.getSymbol()).equals(State.INTLIT))) {
+					System.out.println("ERROR: LEFT CHILD IS NOT OF TYPE INT/PLUS/MINUS/MULT/DIV");
+				}
+				if (!(((Token) right.getSymbol()).equals(State.PLUS) ||
+                                        ((Token) right.getSymbol()).equals(State.MINUS) ||
+                                        ((Token) right.getSymbol()).equals(State.MULT) ||
+                                        ((Token) right.getSymbol()).equals(State.DIV) ||
+                                        ((Token) right.getSymbol()).equals(State.INTLIT))) {
+                                        System.out.println("ERROR: RIGHT CHILD IS NOT OF TYPE INT/PLUS/MINUS/MULT/DIV");
+                                }
+				System.out.println("OPERANDS CORRECT!!!");
+			} else {
+				checkBinaryOperands(treeNode);
+			}
+		}
+	}
+
 	private void buildParserTable(){
 		parserTable = new ProductionRule[NUM_NONTERMINALS][NUM_TERMINALS];
 
