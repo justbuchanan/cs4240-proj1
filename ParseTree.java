@@ -52,6 +52,47 @@ public class ParseTree {
 		}
 	}
 
+	public ParseTree getAST() {
+		ParseTree parseTree = this;
+		removeNonTerminal(null, new NonTerminalParserSymbol(NonTerminals.CONST));
+
+		//	un-needed terminals
+		removeTerminal(State.$);
+		removeTerminal(State.SEMI);
+		removeTerminal(State.COMMA);
+
+		return parseTree;
+	}
+
+	public void removeNonTerminal(TreeNode treeNodeVar, NonTerminalParserSymbol symbol) {
+		if (treeNodeVar == null) {
+			treeNodeVar = root;
+		}
+	
+		for (TreeNode treeNode : treeNodeVar.getChildren()) {
+			if(!treeNode.getSymbol().isTerminal() && ((NonTerminalParserSymbol) treeNode.getSymbol()).equals(symbol)) {
+				ArrayList<TreeNode> parentsChildren = (ArrayList<TreeNode>) treeNode.getParent().getChildren().clone();
+				int counter = 0;
+				for (TreeNode treeNodeParent : parentsChildren) {					
+					if (!treeNodeParent.getSymbol().isTerminal() 
+						&& ((NonTerminalParserSymbol) treeNodeParent.getSymbol()).equals(symbol)) {
+						break;
+					}
+					counter++;
+				}
+				
+				parentsChildren.remove(counter);
+				for (int i = treeNode.getChildren().size() - 1; i >= 0; i--) {
+					parentsChildren.add(counter, treeNode.getChildren().get(i));
+				}
+				treeNode.getParent().setChildren(parentsChildren);
+				removeNonTerminal(treeNode, symbol);
+			} else if(!treeNode.getSymbol().isTerminal()) {
+				removeNonTerminal(treeNode, symbol);
+			}
+		}
+	}
+
 	/**
 	 * Returns a String in a format similar to:
 	 *
@@ -66,6 +107,15 @@ public class ParseTree {
 			return "ParseTree:\n" + root.toString(0);
 		} else {
 			return "ParseTree: null";
+		}
+	}
+
+	/**
+	 * Removes ALL occurrences of the given Token from the tree
+	 */
+	public void removeTerminal(State terminal) {
+		if (root != null) {
+			root.removeTerminal(terminal);
 		}
 	}
 }
