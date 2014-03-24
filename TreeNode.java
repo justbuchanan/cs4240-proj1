@@ -35,8 +35,15 @@ public class TreeNode {
 		return children;
 	}
 
+	/**
+	 * Replaces the @children array with the given array.
+	 * Also updates @parent for each new child node
+	 */
 	public void setChildren(ArrayList<TreeNode> children) {
 		this.children = children;
+		for (TreeNode child : children) {
+			child.setParent(this);
+		}
 	}
 
 	public ParserSymbol getSymbol() {
@@ -75,7 +82,7 @@ public class TreeNode {
 	}
 
 	public TreeNode applyTransformer(ParserSymbol symbol, ParserSymbol subSymbol, TreeTransformer transformer) {
-		boolean debug = true;
+		boolean debug = false;
 
 		if (debug) System.out.println("TreeNode.applyTransformer()");
 

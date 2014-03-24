@@ -29,8 +29,8 @@ all: $(OBJ) $(OBJ_DOT)
 run: all
 	java -cp $(CLASSPATH) $(DRIVER)
 
-ex1: all
-	java $(DRIVER) test-input-ver-2/ex1.tiger
+ex5: all
+	java $(DRIVER) test-input-ver-2/ex5.tiger | tee ex5.log
 
 debug: all
 	jdb -cp $(CLASSPATH) $(DRIVER)
