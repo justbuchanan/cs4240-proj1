@@ -13,7 +13,8 @@ public interface TreeTransformer {
 	 * This takes a matched subtree and transforms it, returning the transformed subtree.
 	 * Note: @left and @right may be empty, but they must not be null.  @subSymbolTree may be null
 	 */
-	TreeNode transform(ArrayList<TreeNode> left,
-						TreeNode subSymbolTree,
-						ArrayList<TreeNode> right);
+	TreeNode transform(ParserSymbol parentSymbol,
+		ArrayList<TreeNode> left,
+		TreeNode subSymbolTree,
+		ArrayList<TreeNode> right);
 }

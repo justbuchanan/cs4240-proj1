@@ -100,11 +100,11 @@ public class TreeNode {
 
 		//	check if the transformer applies to @this
 		//	do this after applying to the children, so it's bottom-up
-		if (this.parserSymbol.equals(symbol)) {
+		if (symbol == null || this.parserSymbol.equals(symbol)) {
 			if (debug) System.out.println("TRANSFORM: tree matches given symbol: " + symbol + "\n" + this);
 
 			if (subSymbol == null) {
-				return transformer.transform(children, null, new ArrayList<TreeNode>());
+				return transformer.transform(this.parserSymbol, children, null, new ArrayList<TreeNode>());
 			} else {
 				ArrayList<TreeNode> left = new ArrayList<>();
 				ArrayList<TreeNode> right = new ArrayList<>();
@@ -128,7 +128,7 @@ public class TreeNode {
 
 				if (subSymbolTree != null) {
 					//	it's a match!  do the transformer and return
-					return transformer.transform(left, subSymbolTree, right);
+					return transformer.transform(this.parserSymbol, left, subSymbolTree, right);
 				} else {
 					//	no match
 					return this;

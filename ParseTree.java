@@ -72,7 +72,8 @@ public class ParseTree {
 			//	transform STAT IF
 			applyTransformer(new NonTerminalParserSymbol(NonTerminals.STAT), new Token(State.IF),
 				new TreeTransformer() {
-					public TreeNode transform(ArrayList<TreeNode> left,
+					public TreeNode transform(ParserSymbol parentSymbol,
+						ArrayList<TreeNode> left,
 						TreeNode subSymbolTree,
 						ArrayList<TreeNode> right) {
 						
@@ -102,15 +103,28 @@ public class ParseTree {
 		return this;
 	}
 
-	//	FIXME: does this work the way we want it to?
-	//	FIXME: it should preserve the child nodes of the matched subtree rather than deleting them
+	/**
+	 * Replaces all subtrees with the given nonterminal as the root with just the arguments of the subtree.
+	 * (parent1 (symbol a, b)) --> (parent1 a, b)
+	 */
 	public void removeNonTerminal(NonTerminalParserSymbol symbol) {
-		applyTransformer(symbol, null,
+		applyTransformer(null, symbol,
 			new TreeTransformer() {
-				public TreeNode transform(ArrayList<TreeNode> left,
+				public TreeNode transform(ParserSymbol parentSymbol,
+					ArrayList<TreeNode> left,
 					TreeNode subSymbolTree,
 					ArrayList<TreeNode> right) {
-					return null;
+
+					left.addAll(subSymbolTree.getChildren());
+					left.addAll(right);
+
+					TreeNode newTree = new TreeNode(null, parentSymbol);
+					newTree.setChildren(left);
+					for (TreeNode childNode : left) {
+						childNode.setParent(newTree);
+					}
+
+					return newTree;
 				}
 			});
 	}
@@ -121,7 +135,8 @@ public class ParseTree {
 	public void removeTerminal(State terminal) {
 		applyTransformer(new Token(terminal), null,
 			new TreeTransformer() {
-				public TreeNode transform(ArrayList<TreeNode> left,
+				public TreeNode transform(ParserSymbol parentSymbol,
+					ArrayList<TreeNode> left,
 					TreeNode subSymbolTree,
 					ArrayList<TreeNode> right) {
 					return null;
@@ -148,7 +163,8 @@ public class ParseTree {
 
 	/**
 	 * Recursively applies the transformer to the tree.
-	 * It does this bottom-up and ensures that transformed trees are not re-transformed
+	 * It does this bottom-up and ensures that transformed trees are not re-transformed.
+	 * Note: if @symbol == null, it will act as a wildcard
 	 */
 	public void applyTransformer(ParserSymbol symbol, ParserSymbol subSymbol, TreeTransformer transformer) {
 		if (root != null) {
