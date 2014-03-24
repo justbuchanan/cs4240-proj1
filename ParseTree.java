@@ -56,6 +56,11 @@ public class ParseTree {
 		ParseTree parseTree = this;
 		removeNonTerminal(null, new NonTerminalParserSymbol(NonTerminals.CONST));
 
+		//	un-needed terminals
+		removeTerminal(State.$);
+		removeTerminal(State.SEMI);
+		removeTerminal(State.COMMA);
+
 		return parseTree;
 	}
 
