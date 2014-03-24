@@ -80,7 +80,7 @@ public class Parser{
 			// Are we reading function/var/type?
 			if(newToken){
 				if(inFunc){
-					if(grammar.inFollowSet(token, funcFollow) && !currFunc.isEmpty()){
+					if(funcFollow.contains(token) && !currFunc.isEmpty()){
 						// have seen entire method signature
 						inFunc = false;
 						buildFuncAndAddToTable(currFunc);
@@ -91,7 +91,7 @@ public class Parser{
 					}
 				}
 				if(inVar){
-					if(grammar.inFollowSet(token, varFollow) && !currVar.isEmpty()){
+					if(varFollow.contains(token) && !currVar.isEmpty()){
 						// reached the end of the variable
 						inVar = false;
 						buildVarsAndAddToTable(currVar);
@@ -102,7 +102,6 @@ public class Parser{
 					}
 				}
 				if(inType){
-					//if(grammar.inFollowSet(token, typeFollow) && !currType.isEmpty()){
 					if(typeFollow.contains(token) && !currType.isEmpty()){
 						// reached end of type
 						inType = false;

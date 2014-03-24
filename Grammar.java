@@ -90,13 +90,6 @@ public class Grammar {
 		return findFirstSet(productionRule, exclude);
 	}
 	
-	public boolean inFollowSet(Token t, Set<Token>set){
-		for(Token setT : set){
-			if(setT.type() == t.type()) return true;
-		}
-		return false;
-	}
-
 	public Set<Token> findTotalFirstSet(NonTerminalParserSymbol nonterminal, Set<ProductionRule> exclude) {
 		//	the first set of @nonterminal for ALL rules where it is the left-hand-side
 		Set<Token> first = new HashSet<>();
