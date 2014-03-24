@@ -52,6 +52,10 @@ public class ParseTree {
 		}
 	}
 
+	public TreeNode getRoot() {
+		return root;
+	}
+
 	public ParseTree getAST() {
 		//	un-needed nonterminals
 		removeNonTerminal(NonTerminals.CONST);
