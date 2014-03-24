@@ -19,15 +19,16 @@ public class SymbolTable {
 		types.put("string", new TypeSymbolEntry("string", scopes.peek(), null, 0));
 	}
 	
-	public boolean containsVar(String varName){
-		return false;
-	}
 
 	public void addVar(String name, String type){
 		if(!vars.containsKey(name)){
 			vars.put(name, new ArrayList<VarSymbolEntry>());
 		}
 		VarSymbolEntry var = new VarSymbolEntry(name, scopes.peek(), types.get(type));
+		if(functions.containsKey(scopes.peek().getFuncName())){
+			FuncSymbolEntry func = functions.get(scopes.peek().getFuncName());
+			func.addParam(var);
+		}
 		vars.get(name).add(var);
 	}
 	
@@ -40,8 +41,8 @@ public class SymbolTable {
 		scopes.push(new Scope(funcName, currScope.getLevel() + 1));
 	}
 	
-	public void addFunc(String funcName, LinkedList<VarSymbolEntry> params){
-		functions.put(funcName, new FuncSymbolEntry(funcName, scopes.peek(), params));
+	public void addFunc(String funcName){
+		functions.put(funcName, new FuncSymbolEntry(funcName, scopes.peek()));
 	}
 	
 	public void endScope(){

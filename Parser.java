@@ -245,6 +245,7 @@ public class Parser{
 			if(currToken.type() == State.ID){
 				funcName = currToken.value();
 				symbolTable.beginScope(funcName); // tell symbol table we are in a new function
+				symbolTable.addFunc(funcName);
 			}
 			currToken = funcDecl.removeFirst();
 		}
@@ -259,7 +260,6 @@ public class Parser{
 			currParam.clear();
 			if(currToken.type() != State.RPAREN) currToken = funcDecl.removeFirst();
 		}
-		symbolTable.addFunc(funcName, funcParams);
 		
 	}
 
