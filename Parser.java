@@ -102,7 +102,8 @@ public class Parser{
 					}
 				}
 				if(inType){
-					if(grammar.inFollowSet(token, typeFollow) && !currType.isEmpty()){
+					//if(grammar.inFollowSet(token, typeFollow) && !currType.isEmpty()){
+					if(typeFollow.contains(token) && !currType.isEmpty()){
 						// reached end of type
 						inType = false;
 						buildTypeAndAddToTable(currType);
@@ -237,7 +238,8 @@ public class Parser{
 	private void buildFuncAndAddToTable(LinkedList<Token> funcDecl){
 		LinkedList<Token> currParam = new LinkedList<Token>();
 		Token currToken;
-		String funcName;
+		String funcName = null;
+		LinkedList<VarSymbolEntry> funcParams = new LinkedList();
 		currToken = funcDecl.removeFirst(); // func
 		while(currToken.type() != State.LPAREN){ // get function name
 			if(currToken.type() == State.ID){
@@ -250,14 +252,15 @@ public class Parser{
 		while(currToken.type() != State.RPAREN){ // get function params
 			
 			while(currToken.type() != State.COMMA && currToken.type() != State.RPAREN){ // read each var in param list
-				currParam.push(currToken);
+				currParam.addLast(currToken);
 				currToken = funcDecl.removeFirst();
 			}
-			
 			buildVarsAndAddToTable(currParam);
 			currParam.clear();
 			if(currToken.type() != State.RPAREN) currToken = funcDecl.removeFirst();
 		}
+		symbolTable.addFunc(funcName, funcParams);
+		
 	}
 
 	private void buildParserTable(){

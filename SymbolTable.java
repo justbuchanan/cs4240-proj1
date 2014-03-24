@@ -6,12 +6,12 @@ import java.util.LinkedList;
 public class SymbolTable {
 	private LinkedList<Scope> scopes;
 	private HashMap<String, ArrayList<VarSymbolEntry>> vars;
-	private HashMap<String, ArrayList<FuncSymbolEntry>> functions;
+	private HashMap<String, FuncSymbolEntry> functions;
 	private HashMap<String, TypeSymbolEntry> types;
 	
 	public SymbolTable() {
 		vars = new HashMap<String, ArrayList<VarSymbolEntry>>();
-		functions = new HashMap<String, ArrayList<FuncSymbolEntry>>();
+		functions = new HashMap<String, FuncSymbolEntry>();
 		types = new HashMap<String, TypeSymbolEntry>();
 		scopes = new LinkedList<Scope>();
 		scopes.push(new Scope("LET", 0));
@@ -27,8 +27,8 @@ public class SymbolTable {
 		if(!vars.containsKey(name)){
 			vars.put(name, new ArrayList<VarSymbolEntry>());
 		}
-		
-		vars.get(name).add(new VarSymbolEntry(name, scopes.peek(), types.get(type)));
+		VarSymbolEntry var = new VarSymbolEntry(name, scopes.peek(), types.get(type));
+		vars.get(name).add(var);
 	}
 	
 	public void addType(String name, String primType, int arrSize ){
@@ -38,6 +38,10 @@ public class SymbolTable {
 	public void beginScope(String funcName){
 		Scope currScope = scopes.peek();
 		scopes.push(new Scope(funcName, currScope.getLevel() + 1));
+	}
+	
+	public void addFunc(String funcName, LinkedList<VarSymbolEntry> params){
+		functions.put(funcName, new FuncSymbolEntry(funcName, scopes.peek(), params));
 	}
 	
 	public void endScope(){
@@ -54,12 +58,12 @@ public class SymbolTable {
 			}
 		}
 		System.out.println("== END VARS ==");
-		/*System.out.println("== FUNCS == ");
+		System.out.println("== FUNCS == ");
 		for(String key : functions.keySet()){
 			FuncSymbolEntry func = functions.get(key);
 			System.out.println("FUNC: " + func.toString());
 		}
-		System.out.println("== END FUNCS ==");*/
+		System.out.println("== END FUNCS ==");
 		System.out.println("== TYPES == ");
 		for(String key : types.keySet()){
 			TypeSymbolEntry type = types.get(key);
