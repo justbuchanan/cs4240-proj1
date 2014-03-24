@@ -261,7 +261,6 @@ public class ParseTree {
 		//	FIXME: most of this infix stuff doesn't behave as expected because there are other transformations that have to happen first
 		//	infix operators
 		State[] infixOps = new State[]{
-			State.ASSIGN,
 			State.PLUS,
 			State.MINUS,
 			State.MULT,
@@ -271,7 +270,8 @@ public class ParseTree {
 			State.GREATER,
 			State.LESSER,
 			State.GREATEREQ,
-			State.LESSEREQ};
+			State.LESSEREQ,
+			State.ASSIGN};
 		for (State infixOp : infixOps) {
 			applyTransformer(null, new Token(infixOp),
 			new TreeTransformer() {
@@ -281,15 +281,28 @@ public class ParseTree {
 						ArrayList<TreeNode> right) {
 						
 						//	add the args to the left and right of the operator as children of the infix operator
-						subSymbolTree.getChildren().addAll(left);
-						subSymbolTree.getChildren().addAll(right);
+						
+						int leftArgIndex = left.size() - 1;
+						TreeNode leftArg = left.get(leftArgIndex);
+						left.remove(leftArgIndex);
+
+						int rightArgIndex = 0;
+						TreeNode rightArg = right.get(0);
+						right.remove(rightArgIndex);
+
+						subSymbolTree.getChildren().add(leftArg);
+						subSymbolTree.getChildren().add(rightArg);
 						for (TreeNode arg : subSymbolTree.getChildren()) {
 							arg.setParent(subSymbolTree);
 						}
 
 						TreeNode newTree = new TreeNode(null, parentSymbol);
-						newTree.getChildren().add(subSymbolTree);
-						subSymbolTree.setParent(newTree);
+
+						ArrayList<TreeNode> children = new ArrayList<>();
+						children.addAll(left);
+						children.add(subSymbolTree);	//	the "collected" infix tree
+						children.addAll(right);
+						newTree.setChildren(children);
 
 						return newTree;
 					}
