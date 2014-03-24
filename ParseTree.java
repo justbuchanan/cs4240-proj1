@@ -56,12 +56,16 @@ public class ParseTree {
 		//	un-needed nonterminals
 		removeNonTerminal(NonTerminals.CONST);
 		removeNonTerminal(NonTerminals.ATOM_EXPR);
+		removeNonTerminal(NonTerminals.MULT_DIV_OP);
+		removeNonTerminal(NonTerminals.STAT_AFTER_ID);
 
 		//	un-needed terminals
 		removeTerminal(State.$);
+		removeTerminal(State.LET);
+		removeTerminal(State.IN);
+		removeTerminal(State.END);
 		removeTerminal(State.SEMI);
 		removeTerminal(State.COMMA);
-
 
 
 		//	IF statement transforms
@@ -96,6 +100,44 @@ public class ParseTree {
 						}
 
 						return newSubtree;
+					}
+				});
+		}
+
+		//	FIXME: most of this infix stuff doesn't behave as expected because there are other transformations that have to happen first
+		//	infix operators
+		State[] infixOps = new State[]{
+			State.PLUS,
+			State.MINUS,
+			State.MULT,
+			State.DIV,
+			State.EQ,
+			State.NEQ,
+			State.GREATER,
+			State.LESSER,
+			State.GREATEREQ,
+			State.LESSEREQ,
+			State.ASSIGN};
+		for (State infixOp : infixOps) {
+			applyTransformer(null, new Token(infixOp),
+			new TreeTransformer() {
+					public TreeNode transform(ParserSymbol parentSymbol,
+						ArrayList<TreeNode> left,
+						TreeNode subSymbolTree,	//	this is the infix operator "tree"
+						ArrayList<TreeNode> right) {
+						
+						//	add the args to the left and right of the operator as children of the infix operator
+						subSymbolTree.getChildren().addAll(left);
+						subSymbolTree.getChildren().addAll(right);
+						for (TreeNode arg : subSymbolTree.getChildren()) {
+							arg.setParent(subSymbolTree);
+						}
+
+						TreeNode newTree = new TreeNode(null, parentSymbol);
+						newTree.getChildren().add(subSymbolTree);
+						subSymbolTree.setParent(newTree);
+
+						return newTree;
 					}
 				});
 		}
@@ -166,6 +208,7 @@ public class ParseTree {
 	 * Recursively applies the transformer to the tree.
 	 * It does this bottom-up and ensures that transformed trees are not re-transformed.
 	 * Note: if @symbol == null, it will act as a wildcard
+	 * Note: when doing transformations, remember to set the parent if it changes
 	 */
 	public void applyTransformer(ParserSymbol symbol, ParserSymbol subSymbol, TreeTransformer transformer) {
 		if (root != null) {
