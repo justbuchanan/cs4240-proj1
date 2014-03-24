@@ -54,43 +54,42 @@ public class ParseTree {
 
 	public ParseTree getAST() {
 		ParseTree parseTree = this;
-		removeNonTerminal(null, new NonTerminalParserSymbol(NonTerminals.CONST));
+		removeNonTerminal(new NonTerminalParserSymbol(NonTerminals.CONST));
 
 		//	un-needed terminals
 		removeTerminal(State.$);
 		removeTerminal(State.SEMI);
 		removeTerminal(State.COMMA);
 
+		//	more complex transforms
+
+
 		return parseTree;
 	}
 
-	public void removeNonTerminal(TreeNode treeNodeVar, NonTerminalParserSymbol symbol) {
-		if (treeNodeVar == null) {
-			treeNodeVar = root;
-		}
-	
-		for (TreeNode treeNode : treeNodeVar.getChildren()) {
-			if(!treeNode.getSymbol().isTerminal() && ((NonTerminalParserSymbol) treeNode.getSymbol()).equals(symbol)) {
-				ArrayList<TreeNode> parentsChildren = (ArrayList<TreeNode>) treeNode.getParent().getChildren().clone();
-				int counter = 0;
-				for (TreeNode treeNodeParent : parentsChildren) {					
-					if (!treeNodeParent.getSymbol().isTerminal() 
-						&& ((NonTerminalParserSymbol) treeNodeParent.getSymbol()).equals(symbol)) {
-						break;
-					}
-					counter++;
+	public void removeNonTerminal(NonTerminalParserSymbol symbol) {
+		applyTransformer(symbol, null,
+			new TreeTransformer() {
+				public TreeNode transform(ArrayList<TreeNode> left,
+					TreeNode subSymbolTree,
+					ArrayList<TreeNode> right) {
+					return null;
 				}
-				
-				parentsChildren.remove(counter);
-				for (int i = treeNode.getChildren().size() - 1; i >= 0; i--) {
-					parentsChildren.add(counter, treeNode.getChildren().get(i));
+			});
+	}
+
+	/**
+	 * Removes ALL occurrences of the given Token from the tree
+	 */
+	public void removeTerminal(State terminal) {
+		applyTransformer(new Token(terminal), null,
+			new TreeTransformer() {
+				public TreeNode transform(ArrayList<TreeNode> left,
+					TreeNode subSymbolTree,
+					ArrayList<TreeNode> right) {
+					return null;
 				}
-				treeNode.getParent().setChildren(parentsChildren);
-				removeNonTerminal(treeNode, symbol);
-			} else if(!treeNode.getSymbol().isTerminal()) {
-				removeNonTerminal(treeNode, symbol);
-			}
-		}
+			});
 	}
 
 	/**
@@ -108,20 +107,6 @@ public class ParseTree {
 		} else {
 			return "ParseTree: null";
 		}
-	}
-
-	/**
-	 * Removes ALL occurrences of the given Token from the tree
-	 */
-	public void removeTerminal(State terminal) {
-		applyTransformer(new Token(terminal), null,
-			new TreeTransformer() {
-				public TreeNode transform(ArrayList<TreeNode> left,
-					TreeNode subSymbolTree,
-					ArrayList<TreeNode> right) {
-					return null;
-				}
-			});
 	}
 
 	/**
