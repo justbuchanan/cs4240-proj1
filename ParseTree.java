@@ -54,7 +54,8 @@ public class ParseTree {
 
 	public ParseTree getAST() {
 		//	un-needed nonterminals
-		removeNonTerminal(new NonTerminalParserSymbol(NonTerminals.CONST));
+		removeNonTerminal(NonTerminals.CONST);
+		removeNonTerminal(NonTerminals.ATOM_EXPR);
 
 		//	un-needed terminals
 		removeTerminal(State.$);
@@ -107,8 +108,8 @@ public class ParseTree {
 	 * Replaces all subtrees with the given nonterminal as the root with just the arguments of the subtree.
 	 * (parent1 (symbol a, b)) --> (parent1 a, b)
 	 */
-	public void removeNonTerminal(NonTerminalParserSymbol symbol) {
-		applyTransformer(null, symbol,
+	public void removeNonTerminal(NonTerminals nonterminal) {
+		applyTransformer(null, new NonTerminalParserSymbol(nonterminal),
 			new TreeTransformer() {
 				public TreeNode transform(ParserSymbol parentSymbol,
 					ArrayList<TreeNode> left,
