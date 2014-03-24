@@ -53,7 +53,7 @@ public class ParseTree {
 	}
 
 	public ParseTree getAST() {
-		ParseTree parseTree = this;
+		//	un-needed nonterminals
 		removeNonTerminal(new NonTerminalParserSymbol(NonTerminals.CONST));
 
 		//	un-needed terminals
@@ -61,12 +61,49 @@ public class ParseTree {
 		removeTerminal(State.SEMI);
 		removeTerminal(State.COMMA);
 
-		//	more complex transforms
 
 
-		return parseTree;
+		//	IF statement transforms
+		{
+			removeTerminal(State.ELSE);
+			removeTerminal(State.THEN);
+			removeTerminal(State.ENDIF);
+
+			//	transform STAT IF
+			applyTransformer(new NonTerminalParserSymbol(NonTerminals.STAT), new Token(State.IF),
+				new TreeTransformer() {
+					public TreeNode transform(ArrayList<TreeNode> left,
+						TreeNode subSymbolTree,
+						ArrayList<TreeNode> right) {
+						
+						//	after the transform, the IF becomes the root symbol, not the STAT
+						TreeNode newSubtree = new TreeNode(null, new Token(State.IF));
+
+						for (TreeNode subNode : right) {
+
+							if (subNode.getSymbol().equals(new NonTerminalParserSymbol(NonTerminals.STAT_IF_TAIL))) {
+								//	add everything under STAT_IF_TAIL to be under the IF
+								for (TreeNode subSubNode : subNode.getChildren()) {
+									newSubtree.getChildren().add(subSubNode);
+									subSubNode.setParent(newSubtree);
+								}
+							} else {
+								newSubtree.getChildren().add(subNode);
+								subNode.setParent(newSubtree);
+							}
+						}
+
+						return newSubtree;
+					}
+				});
+		}
+
+
+		return this;
 	}
 
+	//	FIXME: does this work the way we want it to?
+	//	FIXME: it should preserve the child nodes of the matched subtree rather than deleting them
 	public void removeNonTerminal(NonTerminalParserSymbol symbol) {
 		applyTransformer(symbol, null,
 			new TreeTransformer() {
