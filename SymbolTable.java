@@ -1,9 +1,10 @@
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 
 
 public class SymbolTable {
-	private Scope currScope = new Scope("LET", 0);
+	private LinkedList<Scope> scopes;
 	private HashMap<String, ArrayList<VarSymbolEntry>> vars;
 	private HashMap<String, ArrayList<FuncSymbolEntry>> functions;
 	private HashMap<String, TypeSymbolEntry> types;
@@ -12,8 +13,10 @@ public class SymbolTable {
 		vars = new HashMap<String, ArrayList<VarSymbolEntry>>();
 		functions = new HashMap<String, ArrayList<FuncSymbolEntry>>();
 		types = new HashMap<String, TypeSymbolEntry>();
-		types.put("int", new TypeSymbolEntry("int", currScope, PrimitiveTypes.PrimitiveType.INT, 0));
-		types.put("string", new TypeSymbolEntry("string", currScope, PrimitiveTypes.PrimitiveType.STRING, 0));
+		scopes = new LinkedList<Scope>();
+		scopes.push(new Scope("LET", 0));
+		types.put("int", new TypeSymbolEntry("int", scopes.peek(), null, 0));
+		types.put("string", new TypeSymbolEntry("string", scopes.peek(), null, 0));
 	}
 	
 	public boolean containsVar(String varName){
@@ -25,19 +28,20 @@ public class SymbolTable {
 			vars.put(name, new ArrayList<VarSymbolEntry>());
 		}
 		
-		vars.get(name).add(new VarSymbolEntry(name, currScope, types.get(type)));
+		vars.get(name).add(new VarSymbolEntry(name, scopes.peek(), types.get(type)));
 	}
 	
-	public void addType(String name, PrimitiveTypes.PrimitiveType primType, int arrSize ){
-			types.put(name, new TypeSymbolEntry(name, currScope, primType, arrSize));
+	public void addType(String name, String primType, int arrSize ){
+			types.put(name, new TypeSymbolEntry(name, scopes.peek(), primType, arrSize));
 	}
 	
 	public void beginScope(String funcName){
-		
+		Scope currScope = scopes.peek();
+		scopes.push(new Scope(funcName, currScope.getLevel() + 1));
 	}
 	
 	public void endScope(){
-		
+		scopes.pop();
 	}
 	
 	public void printSymbolTable(){

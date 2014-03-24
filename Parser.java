@@ -22,18 +22,35 @@ public class Parser{
 	}
 
 	public boolean parseText() {
-		int currScope = 0;
-		String currFunc = "LET";
 		boolean debug = false;
-		ArrayList<String> typelessIDs = new ArrayList();
+		
+		boolean inFunc = false;
+		boolean inVar = false;
+		boolean inType = false;
+		LinkedList<Token> currFunc = new LinkedList<Token>();
+		LinkedList<Token> currVar = new LinkedList<Token>();
+		LinkedList<Token> currType = new LinkedList<Token>();
+		NonTerminalParserSymbol funcRule = new NonTerminalParserSymbol(NonTerminals.FUNCT_DECLARATION);
+		NonTerminalParserSymbol varRule = new NonTerminalParserSymbol(NonTerminals.VAR_DECLARATION);
+		NonTerminalParserSymbol typeRule = new NonTerminalParserSymbol(NonTerminals.TYPE_DECLARATION);
+		Set<Token> funcFollow = grammar.findFollowSet(funcRule);
+		Set<Token> varFollow = grammar.findFollowSet(varRule);
+		Set<Token> typeFollow = grammar.findFollowSet(typeRule);
+		
 		if (debug) 		System.out.println("-------------------------------STARTING PARSE-------------------------------");
 
 		Stack<ParserSymbol> symbolStack = new Stack<>();
 		symbolStack.push(new Token(State.$));
 		symbolStack.push(new NonTerminalParserSymbol(NonTerminals.TIGER_PROGRAM));
-
+		Token prevToken = null;
+		Token token = scanner.peekToken();
+		boolean newToken = false;
+		
 		while (true) {
-			Token token = scanner.peekToken();
+			prevToken = token;
+			token = scanner.peekToken();
+			if(prevToken != token) newToken = true;
+			else newToken = false;
 
 			//	when the scanner returns null, it means we're at the end of the file
 			if (token == null) {
@@ -54,7 +71,49 @@ public class Parser{
 			}
 
 			if (debug) System.out.println("Peeked token: " + token + ":" + token.value());
-
+			
+			// did we begin a variable, function, or type?
+			if(token.type() == State.VAR) inVar = true;
+			if(token.type() == State.TYPE)inType = true;
+			if(token.type() == State.FUNC)inFunc = true; 
+			
+			// Are we reading function/var/type?
+			if(newToken){
+				if(inFunc){
+					if(grammar.inFollowSet(token, funcFollow) && !currFunc.isEmpty()){
+						// have seen entire method signature
+						inFunc = false;
+						buildFuncAndAddToTable(currFunc);
+						currFunc.clear();
+					}
+					else{
+						currFunc.addLast(token);
+					}
+				}
+				if(inVar){
+					if(grammar.inFollowSet(token, varFollow) && !currVar.isEmpty()){
+						// reached the end of the variable
+						inVar = false;
+						buildVarsAndAddToTable(currVar);
+						currVar.clear();
+					}
+					else{
+						currVar.addLast(token);
+					}
+				}
+				if(inType){
+					if(grammar.inFollowSet(token, typeFollow) && !currType.isEmpty()){
+						// reached end of type
+						inType = false;
+						buildTypeAndAddToTable(currType);
+						currType.clear();
+					}
+					else{
+						currType.addLast(token);
+					}
+				}
+			}
+			
 			ParserSymbol parserSymbol = symbolStack.pop();
 
 			if (debug) System.out.println("< Popped parser symbol: " + parserSymbol);
@@ -89,16 +148,7 @@ public class Parser{
 					System.out.println("ERROR: Trying to match '" + parserSymbol + "', but found: '" + token + "' on line: " + token.lineNumber);
 					return false;
 				}
-				if (productionRule.left().getNonTerminal() == NonTerminals.TYPE_DECLARATION){
-					buildTypeAndAddToTable();
-					continue;
-				}
-
-				if(productionRule.left().getNonTerminal() == NonTerminals.VAR_DECLARATION){
-					buildVarAndAddToTable();
-					continue;
-				}
-
+				
 				ParserSymbol rightSymbol = productionRule.right()[0];
 				if (productionRule.right().length == 1 &&
 					rightSymbol.isTerminal() &&
@@ -129,80 +179,84 @@ public class Parser{
 		symbolTable.printSymbolTable();
 		return true;
 	}
+	
+	
+	/**
+	 *  Assumes last token popped was var. Reads var/type name, sticks it in symbol table 
+	 */
+	private void buildVarsAndAddToTable(LinkedList<Token> varDecl){
+		LinkedList<String> varNames = new LinkedList();
+		String typeName = null;
+		String varVal;
+		Token currToken = varDecl.removeFirst();
+		while(currToken.type() != State.COLON){
+			if(currToken.type() == State.ID){
+				varNames.push(currToken.value());
+			}
+			currToken = varDecl.removeFirst();
+		}
+		
+		// currToken now = : 
+		currToken = varDecl.removeFirst();
+		// currToken now = TYPE 
+		typeName = currToken.value();
+		
+		for(String var : varNames){
+			symbolTable.addVar(var, typeName);
+		}
+	}
+	
 
 	/*
 	 * Assumes last symbol popped was TYPE_DECLARATION
 	 */
-	private void buildTypeAndAddToTable(){
+	private void buildTypeAndAddToTable(LinkedList<Token> typeDecl){
 		String typeName = "";
-		PrimitiveTypes.PrimitiveType primitiveType = null;
+		String eltTypeName = "";
 		int arrSize = 0;
 		Token currToken;
-		currToken = scanner.nextToken();
-		while(currToken.type() != State.SEMI){ // semi marks end of type declaration
+		currToken = typeDecl.removeFirst();
+		while(currToken.type() != State.OF){ // Read everything up to 'of'
 			if(currToken.type() == State.ID){
-				if(currToken.value().equals("string")) primitiveType = PrimitiveTypes.PrimitiveType.STRING;
-				else if(currToken.value().equals("int")) primitiveType = PrimitiveTypes.PrimitiveType.INT;
-				else typeName = currToken.value();
+				typeName = currToken.value();
 			}
 			else if(currToken.type() == State.INTLIT) arrSize = Integer.parseInt(currToken.value());
-			currToken = scanner.nextToken();
+			currToken = typeDecl.removeFirst();
 		}
+		
+		// curr token now = of
+		currToken = typeDecl.removeFirst(); // of eltType
+		eltTypeName = currToken.value();
 
-		symbolTable.addType(typeName, primitiveType, arrSize);
-	}
-
-	/*
-	 *  Assumes last symbol popped was VAR_DECLARATION
-	 */
-	private void buildVarAndAddToTable(){
-		LinkedList<String> varNames = new LinkedList();
-		String typeName = null;
-		String varVal;
-		Token currToken;
-		currToken = scanner.nextToken();
-		while(currToken.type() != State.SEMI){
-			if(currToken.type() == State.ID){
-				varNames.add(currToken.value());
-			}
-			if(currToken.type() == State.COLON){
-				currToken = scanner.nextToken();
-				// should be type
-				if(currToken.type() == State.ID){
-					typeName = currToken.value();
-				}
-			}
-			if(currToken.type() == State.STRLIT || currToken.type() == State.INTLIT){
-				varVal = currToken.value();
-			}
-			currToken = scanner.nextToken();
-		}
-
-		for(String varName : varNames){
-			symbolTable.addVar(varName, typeName);
-		}
+		symbolTable.addType(typeName, eltTypeName, arrSize);
 	}
 
 	/*
 	 *  Assumes last symbol popped was FUNCT_DECLARATION
 	 */
-	private void buildFuncAndAddToTable(){
-
+	private void buildFuncAndAddToTable(LinkedList<Token> funcDecl){
+		LinkedList<Token> currParam = new LinkedList<Token>();
 		Token currToken;
 		String funcName;
-		currToken = scanner.nextToken(); // func
-		boolean gotFuncName = false;
-		while(currToken.type() != State.BEGIN){
+		currToken = funcDecl.removeFirst(); // func
+		while(currToken.type() != State.LPAREN){ // get function name
 			if(currToken.type() == State.ID){
-				if(!gotFuncName){
-					funcName = currToken.value();
-					symbolTable.beginScope(funcName);
-					gotFuncName = true;
-				}
-				else{
-
-				}
+				funcName = currToken.value();
+				symbolTable.beginScope(funcName); // tell symbol table we are in a new function
 			}
+			currToken = funcDecl.removeFirst();
+		}
+		
+		while(currToken.type() != State.RPAREN){ // get function params
+			
+			while(currToken.type() != State.COMMA && currToken.type() != State.RPAREN){ // read each var in param list
+				currParam.push(currToken);
+				currToken = funcDecl.removeFirst();
+			}
+			
+			buildVarsAndAddToTable(currParam);
+			currParam.clear();
+			if(currToken.type() != State.RPAREN) currToken = funcDecl.removeFirst();
 		}
 	}
 

@@ -1,17 +1,17 @@
 
 public class TypeSymbolEntry extends SymbolTableEntry{
 	
-	private PrimitiveTypes.PrimitiveType primitiveType;
+	private String eltType;
 	private int arrSize;
 	
-	public TypeSymbolEntry(String name, Scope scope, PrimitiveTypes.PrimitiveType primitiveType, int arrSize){
+	public TypeSymbolEntry(String name, Scope scope, String eltType, int arrSize){
 		super(name, scope);
-		this.primitiveType = primitiveType;
+		this.eltType = eltType;
 		this.arrSize = arrSize;
 	}
 	
-	public PrimitiveTypes.PrimitiveType getPrimType(){
-		return primitiveType;
+	public String getEltType(){
+		return eltType;
 	}
 	
 	public int getArrSize(){
@@ -20,7 +20,7 @@ public class TypeSymbolEntry extends SymbolTableEntry{
 	
 	public String toString(){
 		return "(name: " + this.getName() + " | level: " + this.getScope().getLevel() + " | func: "
-				+ this.getScope().getFuncName() + " | primType " + primitiveType.values()[primitiveType.ordinal()]+
+				+ this.getScope().getFuncName() + " | eltType " + eltType +
 				" | arrSize " + arrSize +  ")";
 	}
 }

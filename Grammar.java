@@ -9,7 +9,6 @@ import java.util.Collection;
 public class Grammar {
 	private HashMap<NonTerminalParserSymbol, ArrayList<ProductionRule> > rules;
 
-
 	Grammar() {
 		rules = new HashMap<>();
 	}
@@ -89,6 +88,13 @@ public class Grammar {
 		Set<ProductionRule> exclude = new HashSet<ProductionRule>();
 		exclude.add(productionRule);
 		return findFirstSet(productionRule, exclude);
+	}
+	
+	public boolean inFollowSet(Token t, Set<Token>set){
+		for(Token setT : set){
+			if(setT.type() == t.type()) return true;
+		}
+		return false;
 	}
 
 	public Set<Token> findTotalFirstSet(NonTerminalParserSymbol nonterminal, Set<ProductionRule> exclude) {
