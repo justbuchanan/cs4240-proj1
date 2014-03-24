@@ -4,6 +4,14 @@
 		{
 			"path": "."
 		}
+	],
+	"build_systems":
+	[
+		{
+			"name": "Run ex5.tiger",
+			"cmd": ["make", "ex5"],
+			"working_dir": "${project_path}"
+		}
 	]
 }
 
