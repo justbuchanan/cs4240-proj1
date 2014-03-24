@@ -66,7 +66,21 @@ public class ParseTree {
 	
 		for (TreeNode treeNode : treeNodeVar.getChildren()) {
 			if(!treeNode.getSymbol().isTerminal() && ((NonTerminalParserSymbol) treeNode.getSymbol()).equals(symbol)) {
-				treeNode.getParent().setChildren(treeNode.getChildren());
+				ArrayList<TreeNode> parentsChildren = (ArrayList<TreeNode>) treeNode.getParent().getChildren().clone();
+				int counter = 0;
+				for (TreeNode treeNodeParent : parentsChildren) {					
+					if (!treeNodeParent.getSymbol().isTerminal() 
+						&& ((NonTerminalParserSymbol) treeNodeParent.getSymbol()).equals(symbol)) {
+						break;
+					}
+					counter++;
+				}
+				
+				parentsChildren.remove(counter);
+				for (int i = treeNode.getChildren().size() - 1; i >= 0; i--) {
+					parentsChildren.add(counter, treeNode.getChildren().get(i));
+				}
+				treeNode.getParent().setChildren(parentsChildren);
 				removeNonTerminal(treeNode, symbol);
 			} else if(!treeNode.getSymbol().isTerminal()) {
 				removeNonTerminal(treeNode, symbol);
