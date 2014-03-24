@@ -75,6 +75,10 @@ public class TreeNode {
 	}
 
 	public TreeNode applyTransformer(ParserSymbol symbol, ParserSymbol subSymbol, TreeTransformer transformer) {
+		boolean debug = true;
+
+		if (debug) System.out.println("TreeNode.applyTransformer()");
+
 		for (int i = 0; i < children.size();) {
 			TreeNode child = children.get(i);
 			TreeNode newChild = child.applyTransformer(symbol, subSymbol, transformer);
@@ -88,14 +92,16 @@ public class TreeNode {
 				} else {
 					continue;	//	don't increment the index
 				}
-
-				i++;
 			}
+
+			i++;
 		}
 
 		//	check if the transformer applies to @this
 		//	do this after applying to the children, so it's bottom-up
 		if (this.parserSymbol.equals(symbol)) {
+			if (debug) System.out.println("TRANSFORM: tree matches given symbol: " + symbol + "\n" + this);
+
 			if (subSymbol == null) {
 				return transformer.transform(children, null, new ArrayList<TreeNode>());
 			} else {
