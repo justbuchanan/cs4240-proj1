@@ -55,10 +55,20 @@ public class ParseTree {
 	public ParseTree getAST() {
 		//	un-needed nonterminals
 		removeNonTerminal(NonTerminals.CONST);
-		removeNonTerminal(NonTerminals.ATOM_EXPR);
 		removeNonTerminal(NonTerminals.MULT_DIV_OP);
 		removeNonTerminal(NonTerminals.STAT_AFTER_ID);
 		removeNonTerminal(NonTerminals.STAT_SEQ_PRIME);
+
+		removeNonTerminal(NonTerminals.EXPR_ANY_TAIL);
+		removeNonTerminal(NonTerminals.ADD_SUB_EXPR_TAIL);
+		removeNonTerminal(NonTerminals.MULT_DIV_EXPR_TAIL);
+		removeNonTerminal(NonTerminals.BOOL_EXPR_TAIL);
+		removeNonTerminal(NonTerminals.AND_EXPR_TAIL);
+		removeNonTerminal(NonTerminals.OR_EXPR_TAIL);
+
+		removeNonTerminal(NonTerminals.EXPR_OR_ID);
+		removeNonTerminal(NonTerminals.ID_LIST_PRIME);
+		removeNonTerminal(NonTerminals.OPTIONAL_INIT);
 
 		//	un-needed terminals
 		removeTerminal(State.$);
@@ -67,7 +77,54 @@ public class ParseTree {
 		removeTerminal(State.END);
 		removeTerminal(State.SEMI);
 		removeTerminal(State.COMMA);
+		removeTerminal(State.VAR);
 
+
+		//	flatten ID_LIST
+		applyTransformer(new NonTerminalParserSymbol(NonTerminals.ID_LIST), new NonTerminalParserSymbol(NonTerminals.ID_LIST),
+			new TreeTransformer() {
+				public TreeNode transform(ParserSymbol parentSymbol,
+					ArrayList<TreeNode> left,
+					TreeNode subSymbolTree,
+					ArrayList<TreeNode> right) {
+
+					left.addAll(subSymbolTree.getChildren());
+					left.addAll(right);
+
+					TreeNode newTree = new TreeNode(null, parentSymbol);
+					newTree.setChildren(left);
+
+					return newTree;
+				}
+			});
+
+
+
+		//	
+		// removeNonTerminal(NonTerminals.EXPR_OR_FUNC);
+
+
+
+		//	TODO: EXPR_NO_LVALUE
+
+
+		//	EXPR
+		applyTransformer(new NonTerminalParserSymbol(NonTerminals.ATOM_EXPR), new Token(State.LPAREN),
+			new TreeTransformer() {
+				public TreeNode transform(ParserSymbol parentSymbol,
+					ArrayList<TreeNode> left,
+					TreeNode subSymbolTree,
+					ArrayList<TreeNode> right) {
+
+					TreeNode newTree = new TreeNode(null, parentSymbol);
+					right.remove(right.size() - 2);	//	remove the RPAREN off the end
+					newTree.setChildren(right);
+
+					return newTree;
+				}
+			});
+		removeNonTerminal(NonTerminals.EXPR);		//	handle EXPRs that don't have parentheses
+		removeNonTerminal(NonTerminals.ATOM_EXPR);	//
 
 		//	IF statement transforms
 		{
@@ -186,6 +243,22 @@ public class ParseTree {
 					}
 				});
 		}
+
+
+		//	remove infix expressions (nonte: this must be done after handling the infix operators)
+		NonTerminals[] infixExprs = new NonTerminals[]{
+			NonTerminals.MULT_DIV_EXPR,
+			NonTerminals.ADD_SUB_EXPR,
+			NonTerminals.BOOL_EXPR,
+			NonTerminals.AND_EXPR,
+			NonTerminals.OR_EXPR
+		};
+		for (NonTerminals infixExpr : infixExprs) {
+			removeNonTerminal(infixExpr);
+		}
+
+
+		removeNonTerminal(NonTerminals.STAT);
 
 
 		return this;
