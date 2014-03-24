@@ -5,13 +5,16 @@ public class FuncSymbolEntry extends SymbolTableEntry{
 	
 	private LinkedList<VarSymbolEntry> params;
 	
-	public FuncSymbolEntry(String name, Scope scope, LinkedList<VarSymbolEntry> params) {
+	public FuncSymbolEntry(String name, Scope scope) {
 		super(name, scope);
-		this.params = params;
+		params = new LinkedList();
 	}
 	
 	public LinkedList<VarSymbolEntry> getParams(){
 		return params;
 	}
 
+	public void addParam(VarSymbolEntry var){
+		params.add(var);
+	}
 }
