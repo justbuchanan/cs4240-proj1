@@ -114,8 +114,23 @@ public class ParseTree {
 	 * Removes ALL occurrences of the given Token from the tree
 	 */
 	public void removeTerminal(State terminal) {
+		applyTransformer(new Token(terminal), null,
+			new TreeTransformer() {
+				public TreeNode transform(ArrayList<TreeNode> left,
+					TreeNode subSymbolTree,
+					ArrayList<TreeNode> right) {
+					return null;
+				}
+			});
+	}
+
+	/**
+	 * Recursively applies the transformer to the tree.
+	 * It does this bottom-up and ensures that transformed trees are not re-transformed
+	 */
+	public void applyTransformer(ParserSymbol symbol, ParserSymbol subSymbol, TreeTransformer transformer) {
 		if (root != null) {
-			root.removeTerminal(terminal);
+			root = root.applyTransformer(symbol, subSymbol, transformer);
 		}
 	}
 }

@@ -74,23 +74,62 @@ public class TreeNode {
 		return desc;
 	}
 
-	/**
-	 * Removes ALL occurrences of the given Token from the node and all of it's subnodes
-	 */
-	public void removeTerminal(State terminal) {
+	public TreeNode applyTransformer(ParserSymbol symbol, ParserSymbol subSymbol, TreeTransformer transformer) {
 		for (int i = 0; i < children.size();) {
-			ParserSymbol childSymbol = children.get(i).getSymbol();
-			if (childSymbol instanceof Token) {
-				if (((Token)childSymbol).type().equals(terminal)) {
-					children.remove(i);	//	delete the token
-					continue;	//	reloop and examine the current index again, which will contain a different child node
-				}
-			} else {
-				children.get(i).removeTerminal(terminal);
-			}
+			TreeNode child = children.get(i);
+			TreeNode newChild = child.applyTransformer(symbol, subSymbol, transformer);
 
-			//	we only move to the next index if we didn't just delete a token
-			i++;
+			//	replace the old subtree with the new
+			if (newChild != child) {
+				children.remove(i);	//	remove old child
+
+				if (newChild != null) {
+					children.add(i, newChild);
+				} else {
+					continue;	//	don't increment the index
+				}
+
+				i++;
+			}
+		}
+
+		//	check if the transformer applies to @this
+		//	do this after applying to the children, so it's bottom-up
+		if (this.parserSymbol.equals(symbol)) {
+			if (subSymbol == null) {
+				return transformer.transform(children, null, new ArrayList<TreeNode>());
+			} else {
+				ArrayList<TreeNode> left = new ArrayList<>();
+				ArrayList<TreeNode> right = new ArrayList<>();
+				TreeNode subSymbolTree = null;
+
+				//	loop through all the children looking for the given @subSymbol and building the left and right arrays
+				for (int i = 0; i < children.size(); i++) {
+					TreeNode child = children.get(i);
+
+					//	we haven't found @subSymbol yet...
+					if (subSymbolTree == null) {
+						if (child.parserSymbol.equals(subSymbol)) {
+							subSymbolTree = child;
+						} else {
+							left.add(child);
+						}
+					} else {
+						right.add(child);
+					}
+				}
+
+				if (subSymbolTree != null) {
+					//	it's a match!  do the transformer and return
+					return transformer.transform(left, subSymbolTree, right);
+				} else {
+					//	no match
+					return this;
+				}
+			}
+		} else {
+			//	didn't match conditions, this node doesn't change
+			return this;
 		}
 	}
 }
