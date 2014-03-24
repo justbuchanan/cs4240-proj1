@@ -35,12 +35,20 @@ public class TreeNode {
 		return children;
 	}
 
+	public void setChildren(ArrayList<TreeNode> children) {
+		this.children = children;
+	}
+
 	public ParserSymbol getSymbol() {
 		return parserSymbol;
 	}
 
 	public TreeNode getParent() {
 		return parent;
+	}
+
+	public void setParent(TreeNode parent) {
+		this.parent = parent;
 	}
 
 	public String toString(int depth) {

@@ -52,6 +52,28 @@ public class ParseTree {
 		}
 	}
 
+	public ParseTree getAST() {
+		ParseTree parseTree = this;
+		removeNonTerminal(null, new NonTerminalParserSymbol(NonTerminals.CONST));
+
+		return parseTree;
+	}
+
+	public void removeNonTerminal(TreeNode treeNodeVar, NonTerminalParserSymbol symbol) {
+		if (treeNodeVar == null) {
+			treeNodeVar = root;
+		}
+	
+		for (TreeNode treeNode : treeNodeVar.getChildren()) {
+			if(!treeNode.getSymbol().isTerminal() && ((NonTerminalParserSymbol) treeNode.getSymbol()).equals(symbol)) {
+				treeNode.getParent().setChildren(treeNode.getChildren());
+				removeNonTerminal(treeNode, symbol);
+			} else if(!treeNode.getSymbol().isTerminal()) {
+				removeNonTerminal(treeNode, symbol);
+			}
+		}
+	}
+
 	/**
 	 * Returns a String in a format similar to:
 	 *
