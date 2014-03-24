@@ -56,7 +56,6 @@ public class ParseTree {
 		//	un-needed nonterminals
 		removeNonTerminal(NonTerminals.CONST);
 		removeNonTerminal(NonTerminals.MULT_DIV_OP);
-		removeNonTerminal(NonTerminals.STAT_AFTER_ID);
 		removeNonTerminal(NonTerminals.STAT_SEQ_PRIME);
 
 		removeNonTerminal(NonTerminals.EXPR_ANY_TAIL);
@@ -100,12 +99,60 @@ public class ParseTree {
 
 
 
-		//	
-		// removeNonTerminal(NonTerminals.EXPR_OR_FUNC);
 
 
 
 		//	TODO: EXPR_NO_LVALUE
+
+
+
+
+		// function calls
+		for (NonTerminals nonterminal : new NonTerminals[]{NonTerminals.EXPR_OR_FUNC, NonTerminals.STAT_AFTER_ID}) {
+			applyTransformer(null, new NonTerminalParserSymbol(nonterminal),
+				new TreeTransformer() {
+					public TreeNode transform(ParserSymbol parentSymbol,
+						ArrayList<TreeNode> left,
+						TreeNode subSymbolTree,
+						ArrayList<TreeNode> right) {
+
+						//	note: right should always be empty
+						if (right.size() > 0) {
+							throw new RuntimeException("right should never have stuff in it");
+						}
+
+						//	see if first child of EXPR_OR_FUNC is a LPAREN
+						if (subSymbolTree.getChildren().size() > 0) {
+							TreeNode firstChild = subSymbolTree.getChildren().get(0);
+							if (firstChild.getSymbol() instanceof Token) {
+								State tokVal = ((Token)firstChild.getSymbol()).type();
+								if (tokVal.equals(State.LPAREN)) {
+
+									//	it's a function call!
+
+									TreeNode funcCallTree = new TreeNode(null, new NonTerminalParserSymbol(NonTerminals.FUNCTION_CALL));
+									left.addAll(subSymbolTree.getChildren());	//	add func args as children of funcCallTree
+									funcCallTree.setChildren(left);
+
+									//	we mathed based on a child node, so add our new tree back into the parent
+									TreeNode newTree = new TreeNode(null, parentSymbol);
+									ArrayList<TreeNode> children = new ArrayList<>();
+									children.add(funcCallTree);
+									newTree.setChildren(children);
+
+									return newTree;
+								}
+							}
+						}
+
+						//	if it wasn't a function, we'll just let it be, but remove the EXPR_OR_FUNC
+						TreeNode newTree = new TreeNode(null, parentSymbol);
+						left.addAll(subSymbolTree.getChildren());
+						newTree.setChildren(left);
+						return newTree;
+					}
+				});
+		}
 
 
 		//	EXPR
@@ -125,6 +172,7 @@ public class ParseTree {
 			});
 		removeNonTerminal(NonTerminals.EXPR);		//	handle EXPRs that don't have parentheses
 		removeNonTerminal(NonTerminals.ATOM_EXPR);	//
+
 
 		//	IF statement transforms
 		{
@@ -209,6 +257,7 @@ public class ParseTree {
 		//	FIXME: most of this infix stuff doesn't behave as expected because there are other transformations that have to happen first
 		//	infix operators
 		State[] infixOps = new State[]{
+			State.ASSIGN,
 			State.PLUS,
 			State.MINUS,
 			State.MULT,
@@ -218,8 +267,7 @@ public class ParseTree {
 			State.GREATER,
 			State.LESSER,
 			State.GREATEREQ,
-			State.LESSEREQ,
-			State.ASSIGN};
+			State.LESSEREQ};
 		for (State infixOp : infixOps) {
 			applyTransformer(null, new Token(infixOp),
 			new TreeTransformer() {
@@ -259,6 +307,11 @@ public class ParseTree {
 
 
 		removeNonTerminal(NonTerminals.STAT);
+		removeNonTerminal(NonTerminals.LVALUE);
+		removeNonTerminal(NonTerminals.EXPR_LIST);
+
+		removeTerminal(State.LPAREN);
+		removeTerminal(State.RPAREN);
 
 
 		return this;
