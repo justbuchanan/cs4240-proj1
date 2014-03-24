@@ -56,6 +56,11 @@ public class ParseTree {
 		ParseTree parseTree = this;
 		removeNonTerminal(null, new NonTerminalParserSymbol(NonTerminals.CONST));
 
+		//	un-needed terminals
+		removeTerminal(State.$);
+		removeTerminal(State.SEMI);
+		removeTerminal(State.COMMA);
+
 		return parseTree;
 	}
 
@@ -108,7 +113,7 @@ public class ParseTree {
 	/**
 	 * Removes ALL occurrences of the given Token from the tree
 	 */
-	public void removeTerminal(Token terminal) {
+	public void removeTerminal(State terminal) {
 		if (root != null) {
 			root.removeTerminal(terminal);
 		}
