@@ -8,8 +8,13 @@
 	"build_systems":
 	[
 		{
-			"name": "Run ex5.tiger",
+			"name": "Parse ex5.tiger",
 			"cmd": ["make", "ex5"],
+			"working_dir": "${project_path}"
+		},
+		{
+			"name": "Parse ex1.tiger",
+			"cmd": ["make", "ex1"],
 			"working_dir": "${project_path}"
 		}
 	]

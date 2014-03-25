@@ -32,6 +32,9 @@ run: all
 ex5: all
 	java $(DRIVER) test-input-ver-2/ex5.tiger &> ex5.log
 
+ex1: all
+	java $(DRIVER) test-input-ver-2/ex1.tiger &> ex1.log
+
 debug: all
 	jdb -cp $(CLASSPATH) $(DRIVER)
 
