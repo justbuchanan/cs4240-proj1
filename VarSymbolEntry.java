@@ -7,6 +7,10 @@ public class VarSymbolEntry extends SymbolTableEntry {
 		super(name, scope);
 		this.type = type;
 	}
+
+	public TypeSymbolEntry getType(){
+		return this.type;
+	}
 	
 	public String toString(){
 		return "(name: " + this.getName() + " | level: " + this.getScope().getLevel() + " | func: "

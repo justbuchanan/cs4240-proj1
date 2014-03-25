@@ -32,6 +32,19 @@ public class SymbolTable {
 		vars.get(name).add(var);
 	}
 	
+	public boolean containsVar(String name){
+		// TODO: Is everything in scope LET,0?
+		return vars.get(name).get(0) != null;
+	}
+
+	public VarSymbolEntry getVar(String varName){
+		return vars.get(varName).get(0);
+	}
+
+	public FuncSymbolEntry getFunc(String funcName){
+		return functions.get(funcName);
+	}
+
 	public void addType(String name, String primType, int arrSize ){
 			types.put(name, new TypeSymbolEntry(name, scopes.peek(), primType, arrSize));
 	}
@@ -44,7 +57,11 @@ public class SymbolTable {
 	public void addFunc(String funcName){
 		functions.put(funcName, new FuncSymbolEntry(funcName, scopes.peek()));
 	}
-	
+
+	public boolean containsFunc(String funcName){
+		return functions.get(funcName) != null;
+	}
+
 	public void endScope(){
 		scopes.pop();
 	}

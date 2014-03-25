@@ -1,16 +1,16 @@
 import java.util.LinkedList;
-
+import java.util.ArrayList;
 
 public class FuncSymbolEntry extends SymbolTableEntry{
 	
-	private LinkedList<VarSymbolEntry> params;
+	private ArrayList<VarSymbolEntry> params;
 	
 	public FuncSymbolEntry(String name, Scope scope) {
 		super(name, scope);
-		params = new LinkedList();
+		params = new ArrayList();
 	}
 	
-	public LinkedList<VarSymbolEntry> getParams(){
+	public ArrayList<VarSymbolEntry> getParams(){
 		return params;
 	}
 
