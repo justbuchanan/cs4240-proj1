@@ -146,4 +146,16 @@ public class TreeNode {
 			return this;
 		}
 	}
+
+	public void reParent() {
+		for (TreeNode child : children) {
+			child.reParent();
+			child.setParent(this);
+		}
+	}
+
+
+	public String toString() {
+		return parserSymbol.toString() + "{" + children.toString() + "}";
+	}
 }
