@@ -59,8 +59,11 @@ public class ParseTree {
 	public ParseTree getAST() {
 		//	un-needed nonterminals
 		removeNonTerminal(NonTerminals.CONST);
-		removeNonTerminal(NonTerminals.MULT_DIV_OP);
 		removeNonTerminal(NonTerminals.STAT_SEQ_PRIME);
+
+		removeNonTerminal(NonTerminals.MULT_DIV_OP);
+		removeNonTerminal(NonTerminals.ADD_SUB_OP);
+		removeNonTerminal(NonTerminals.BOOL_OP);
 
 		removeNonTerminal(NonTerminals.EXPR_ANY_TAIL);
 		removeNonTerminal(NonTerminals.ADD_SUB_EXPR_TAIL);
@@ -72,6 +75,7 @@ public class ParseTree {
 		removeNonTerminal(NonTerminals.EXPR_OR_ID);
 		removeNonTerminal(NonTerminals.ID_LIST_PRIME);
 		removeNonTerminal(NonTerminals.OPTIONAL_INIT);
+
 
 		//	un-needed terminals
 		removeTerminal(State.$);
@@ -272,7 +276,7 @@ public class ParseTree {
 						ArrayList<TreeNode> right) {
 						
 						//	add the args to the left and right of the operator as children of the infix operator
-						
+
 						int leftArgIndex = left.size() - 1;
 						TreeNode leftArg = left.get(leftArgIndex);
 						left.remove(leftArgIndex);
@@ -301,6 +305,29 @@ public class ParseTree {
 		}
 
 
+
+		//	assignment operator in var declaration (optional init)
+		applyTransformer(new NonTerminalParserSymbol(NonTerminals.VAR_DECLARATION), new Token(State.ASSIGN),
+			new TreeTransformer() {
+				public TreeNode transform(ParserSymbol parentSymbol,	//	the parent will be NEGATED_EXPR
+					ArrayList<TreeNode> left,
+					TreeNode subSymbolTree,
+					ArrayList<TreeNode> right) {
+					
+					//	note: right should be empty because the assign comes last
+					
+					TreeNode newTree = new TreeNode(null, parentSymbol);
+					ArrayList<TreeNode> children = new ArrayList<>();
+					children.addAll(left);
+					children.addAll(subSymbolTree.getChildren());
+					newTree.setChildren(children);
+
+					return newTree;
+				}
+			});
+
+
+
 		//	remove infix expressions (nonte: this must be done after handling the infix operators)
 		NonTerminals[] infixExprs = new NonTerminals[]{
 			NonTerminals.MULT_DIV_EXPR,
@@ -322,6 +349,7 @@ public class ParseTree {
 		removeTerminal(State.LPAREN);
 		removeTerminal(State.RPAREN);
 		removeTerminal(State.COLON);
+		removeTerminal(State.TYPE);
 
 
 		return this;
