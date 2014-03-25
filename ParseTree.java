@@ -59,8 +59,11 @@ public class ParseTree {
 	public ParseTree getAST() {
 		//	un-needed nonterminals
 		removeNonTerminal(NonTerminals.CONST);
-		removeNonTerminal(NonTerminals.MULT_DIV_OP);
 		removeNonTerminal(NonTerminals.STAT_SEQ_PRIME);
+
+		removeNonTerminal(NonTerminals.MULT_DIV_OP);
+		removeNonTerminal(NonTerminals.ADD_SUB_OP);
+		removeNonTerminal(NonTerminals.BOOL_OP);
 
 		removeNonTerminal(NonTerminals.EXPR_ANY_TAIL);
 		removeNonTerminal(NonTerminals.ADD_SUB_EXPR_TAIL);
@@ -73,6 +76,7 @@ public class ParseTree {
 		removeNonTerminal(NonTerminals.ID_LIST_PRIME);
 		removeNonTerminal(NonTerminals.OPTIONAL_INIT);
 
+
 		//	un-needed terminals
 		removeTerminal(State.$);
 		removeTerminal(State.LET);
@@ -83,24 +87,31 @@ public class ParseTree {
 		removeTerminal(State.VAR);
 
 
-		//	flatten ID_LIST
-		applyTransformer(new NonTerminalParserSymbol(NonTerminals.ID_LIST), new NonTerminalParserSymbol(NonTerminals.ID_LIST),
-			new TreeTransformer() {
-				public TreeNode transform(ParserSymbol parentSymbol,
-					ArrayList<TreeNode> left,
-					TreeNode subSymbolTree,
-					ArrayList<TreeNode> right) {
+		//	flatten ID_LIST, VAR_DECLARATION_LIST, TYPE_DECLARATION_LIST
+		NonTerminals[] toFlatten = new NonTerminals[]{
+			NonTerminals.ID_LIST,
+			NonTerminals.TYPE_DECLARATION_LIST,
+			NonTerminals.VAR_DECLARATION_LIST,
+		};
+		for (NonTerminals nonterminal : toFlatten) {
+			applyTransformer(new NonTerminalParserSymbol(nonterminal), new NonTerminalParserSymbol(nonterminal),
+				new TreeTransformer() {
+					public TreeNode transform(ParserSymbol parentSymbol,
+						ArrayList<TreeNode> left,
+						TreeNode subSymbolTree,
+						ArrayList<TreeNode> right) {
 
-					left.addAll(subSymbolTree.getChildren());
-					left.addAll(right);
+						ArrayList<TreeNode> children = new ArrayList<>();
+						children.addAll(left);
+						children.addAll(subSymbolTree.getChildren());
+						children.addAll(right);
 
-					TreeNode newTree = new TreeNode(null, parentSymbol);
-					newTree.setChildren(left);
-
-					return newTree;
-				}
-			});
-
+						TreeNode newTree = new TreeNode(null, parentSymbol);
+						newTree.setChildren(children);
+						return newTree;
+					}
+				});
+		}
 
 		// function calls
 		for (NonTerminals nonterminal : new NonTerminals[]{NonTerminals.EXPR_OR_FUNC, NonTerminals.STAT_AFTER_ID}) {
@@ -205,25 +216,6 @@ public class ParseTree {
 				});
 		}
 
-		//	WHILE statement transforms
-		removeTerminal(State.DO);
-		applyTransformer(new NonTerminalParserSymbol(NonTerminals.STAT), new Token(State.WHILE),
-			new TreeTransformer() {
-				public TreeNode transform(ParserSymbol parentSymbol,
-					ArrayList<TreeNode> left,
-					TreeNode subSymbolTree,
-					ArrayList<TreeNode> right) {
-					
-					//	(STAT WHILE EXPR STAT_SEQ) -> (WHILE EXPR STAT_SEQ)
-					subSymbolTree.getChildren().addAll(right);
-					for (TreeNode child : subSymbolTree.getChildren()) {
-						child.setParent(subSymbolTree);
-					}
-
-					return subSymbolTree;
-				}
-			});
-
 
 		//	NEGATED_EXPR transform
 		applyTransformer(new NonTerminalParserSymbol(NonTerminals.NEGATED_EXPR), null,
@@ -272,7 +264,7 @@ public class ParseTree {
 						ArrayList<TreeNode> right) {
 						
 						//	add the args to the left and right of the operator as children of the infix operator
-						
+
 						int leftArgIndex = left.size() - 1;
 						TreeNode leftArg = left.get(leftArgIndex);
 						left.remove(leftArgIndex);
@@ -301,7 +293,101 @@ public class ParseTree {
 		}
 
 
-		//	remove infix expressions (nonte: this must be done after handling the infix operators)
+
+		//	assignment operator in var declaration (optional init)
+		applyTransformer(new NonTerminalParserSymbol(NonTerminals.VAR_DECLARATION), new Token(State.ASSIGN),
+			new TreeTransformer() {
+				public TreeNode transform(ParserSymbol parentSymbol,	//	the parent will be NEGATED_EXPR
+					ArrayList<TreeNode> left,
+					TreeNode subSymbolTree,
+					ArrayList<TreeNode> right) {
+					
+					//	note: right should be empty because the assign comes last
+					
+					TreeNode newTree = new TreeNode(null, parentSymbol);
+					ArrayList<TreeNode> children = new ArrayList<>();
+					children.addAll(left);
+					children.addAll(subSymbolTree.getChildren());
+					newTree.setChildren(children);
+
+					return newTree;
+				}
+			});
+
+		//	EQ in TYPE_DECLARATION
+		applyTransformer(new NonTerminalParserSymbol(NonTerminals.TYPE_DECLARATION), new Token(State.EQ),
+			new TreeTransformer() {
+				public TreeNode transform(ParserSymbol parentSymbol,	//	the parent will be NEGATED_EXPR
+					ArrayList<TreeNode> left,
+					TreeNode subSymbolTree,
+					ArrayList<TreeNode> right) {
+					
+					//	note: right and left should be empty
+					
+					TreeNode newTree = new TreeNode(null, parentSymbol);
+					ArrayList<TreeNode> children = new ArrayList<>();
+					children.addAll(subSymbolTree.getChildren());
+					newTree.setChildren(children);
+
+					return newTree;
+				}
+			});
+
+
+
+		//	WHILE statement transforms
+		removeTerminal(State.DO);
+		applyTransformer(new NonTerminalParserSymbol(NonTerminals.STAT), new Token(State.WHILE),
+			new TreeTransformer() {
+				public TreeNode transform(ParserSymbol parentSymbol,
+					ArrayList<TreeNode> left,
+					TreeNode subSymbolTree,
+					ArrayList<TreeNode> right) {
+					
+					//	(STAT WHILE EXPR STAT_SEQ) -> (WHILE EXPR STAT_SEQ)
+					subSymbolTree.getChildren().addAll(right);
+					for (TreeNode child : subSymbolTree.getChildren()) {
+						child.setParent(subSymbolTree);
+					}
+
+					return subSymbolTree;
+				}
+			});
+
+
+		//	FOR statement
+		removeTerminal(State.TO);
+		applyTransformer(new NonTerminalParserSymbol(NonTerminals.STAT), new Token(State.FOR),
+			new TreeTransformer() {
+				public TreeNode transform(ParserSymbol parentSymbol,
+					ArrayList<TreeNode> left,
+					TreeNode subSymbolTree,
+					ArrayList<TreeNode> right) {
+					
+					//	FOR will be first, so @left will be empty
+
+					//	@right should contain: ASSIGN(ID, EXPR), EXPR, STAT_SEQ
+
+					TreeNode assignTree = right.get(0);
+
+					ArrayList<TreeNode> forChildren = new ArrayList<>();
+					forChildren.addAll(assignTree.getChildren());
+					forChildren.add(right.get(1));	//	EXPR
+					forChildren.add(right.get(2));	//	STAT_SEQ
+
+					TreeNode forTree = new TreeNode(null, new Token(State.FOR));
+					forTree.setChildren(forChildren);
+
+					TreeNode newTree = new TreeNode(null, parentSymbol);	//	STAT
+					newTree.getChildren().add(forTree);
+					forTree.setParent(newTree);
+
+					return newTree;
+				}
+			});
+
+
+		//	remove infix expressions (none: this must be done after handling the infix operators)
 		NonTerminals[] infixExprs = new NonTerminals[]{
 			NonTerminals.MULT_DIV_EXPR,
 			NonTerminals.ADD_SUB_EXPR,
@@ -318,10 +404,13 @@ public class ParseTree {
 		removeNonTerminal(NonTerminals.LVALUE);
 		removeNonTerminal(NonTerminals.EXPR_LIST);
 		removeNonTerminal(NonTerminals.EXPR_NO_LVALUE);
+		removeNonTerminal(NonTerminals.EXPR);
+		removeNonTerminal(NonTerminals.LVALUE_TAIL);
 
 		removeTerminal(State.LPAREN);
 		removeTerminal(State.RPAREN);
 		removeTerminal(State.COLON);
+		removeTerminal(State.TYPE);
 
 
 		return this;
