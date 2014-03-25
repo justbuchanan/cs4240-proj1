@@ -137,8 +137,10 @@ public class ParseTree {
 									//	it's a function call!
 
 									TreeNode funcCallTree = new TreeNode(null, new NonTerminalParserSymbol(NonTerminals.FUNCTION_CALL));
-									left.addAll(subSymbolTree.getChildren());	//	add func args as children of funcCallTree
-									funcCallTree.setChildren(left);
+									ArrayList<TreeNode> funcChildren = new ArrayList<>();
+									funcChildren.addAll(left);
+									funcChildren.addAll(subSymbolTree.getChildren());
+									funcCallTree.setChildren(funcChildren);
 
 									//	we mathed based on a child node, so add our new tree back into the parent
 									TreeNode newTree = new TreeNode(null, parentSymbol);
@@ -401,11 +403,17 @@ public class ParseTree {
 
 
 		removeNonTerminal(NonTerminals.STAT);
-		removeNonTerminal(NonTerminals.LVALUE);
 		removeNonTerminal(NonTerminals.EXPR_LIST);
 		removeNonTerminal(NonTerminals.EXPR_NO_LVALUE);
 		removeNonTerminal(NonTerminals.EXPR);
 		removeNonTerminal(NonTerminals.LVALUE_TAIL);
+
+
+		//	FIXME: remove this hack, this is disgusting...
+		removeNonTerminal(NonTerminals.LVALUE);
+		this.getRoot().reParent();
+		removeNonTerminal(NonTerminals.LVALUE);
+
 
 		removeTerminal(State.LPAREN);
 		removeTerminal(State.RPAREN);
@@ -428,14 +436,13 @@ public class ParseTree {
 					TreeNode subSymbolTree,
 					ArrayList<TreeNode> right) {
 
-					left.addAll(subSymbolTree.getChildren());
-					left.addAll(right);
+					ArrayList<TreeNode> children = new ArrayList<>();
+					children.addAll(left);
+					children.addAll(subSymbolTree.getChildren());
+					children.addAll(right);
 
 					TreeNode newTree = new TreeNode(null, parentSymbol);
-					newTree.setChildren(left);
-					for (TreeNode childNode : left) {
-						childNode.setParent(newTree);
-					}
+					newTree.setChildren(children);
 
 					return newTree;
 				}
