@@ -306,6 +306,54 @@ public class Parser{
 		}
 	}
 
+	private void checkFuncParams(TreeNode treeNodeParam){
+		for(TreeNode node : treeNodeParam.getChildren()){
+			//if(node.getSymbol().equals(NonTerminals.FUNCTIONCALL){
+			if(false){ // TODO: REMOVE!
+				ArrayList<TreeNode> funcASTRow = node.getChildren();
+				ParserSymbol funcNameSymbol = funcASTRow.get(0).getSymbol();
+				if(funcNameSymbol.isTerminal() && 
+				symbolTable.containsFunc(((Token)funcNameSymbol).value())){ // function name
+					FuncSymbolEntry tableFunc = symbolTable.getFunc(((Token)funcNameSymbol).value());
+					ArrayList<VarSymbolEntry> tableFuncParams = tableFunc.getParams();
+					// check params
+					for(int i = 1; i < funcASTRow.size(); i++){			
+						String paramName = ((Token)funcASTRow.get(i).getSymbol()).value();
+						if(tableFuncParams.size() >= (i - 1)){ // make sure param is in func sig
+							TypeSymbolEntry tableFuncParamType = tableFuncParams.get(i-1).getType();
+							TypeSymbolEntry passedParamType = symbolTable.getVar(((Token)funcASTRow.get(i).getSymbol()).value()).getType();
+							if(((Token)funcASTRow.get(i).getSymbol()).type() == State.INTLIT || 
+								((Token)funcASTRow.get(i).getSymbol()).type() == State.STRLIT){
+								if(tableFuncParamType.equals(passedParamType)){
+									continue;
+								}
+								else{
+									System.out.println("Passed wrong type!!!!!");
+								}
+							}
+							else if(((Token)funcASTRow.get(i).getSymbol()).type() == State.ID){
+								// check if var is initialized
+								if(symbolTable.containsVar(paramName)){
+									TypeSymbolEntry varType = symbolTable.getVar(paramName).getType();
+									if(varType.equals(tableFuncParamType)) continue;
+									else{
+										System.out.println("PASSED VARIABLE OF WRONG TYPE!!!");
+									}
+								}
+							}
+						}
+						else{
+							System.out.println("ERROR, FUNC SIGNATURE DOES NOT CONTAIN PARAM AT I");
+						}
+					}	
+				}
+				else{
+					System.out.println("FUNCTION HAS NOT BEEN DECLARED!!!");
+				}
+			}
+		}
+	}
+
 	private void buildParserTable(){
 		parserTable = new ProductionRule[NUM_NONTERMINALS][NUM_TERMINALS];
 
