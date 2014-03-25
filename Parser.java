@@ -350,6 +350,12 @@ public class Parser{
 					System.out.println("FUNCTION HAS NOT BEEN DECLARED!!!");
 				}
 			}
+			else{
+				// symbol tree node is not function call, so check children
+				for(TreeNode child : node){
+					checkFuncParams(child);
+				}
+			}
 		}
 	}
 
