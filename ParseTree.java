@@ -387,7 +387,7 @@ public class ParseTree {
 			});
 
 
-		//	remove infix expressions (nonte: this must be done after handling the infix operators)
+		//	remove infix expressions (none: this must be done after handling the infix operators)
 		NonTerminals[] infixExprs = new NonTerminals[]{
 			NonTerminals.MULT_DIV_EXPR,
 			NonTerminals.ADD_SUB_EXPR,
@@ -400,11 +400,12 @@ public class ParseTree {
 		}
 
 
-		// removeNonTerminal(NonTerminals.STAT);
+		removeNonTerminal(NonTerminals.STAT);
 		removeNonTerminal(NonTerminals.LVALUE);
 		removeNonTerminal(NonTerminals.EXPR_LIST);
 		removeNonTerminal(NonTerminals.EXPR_NO_LVALUE);
 		removeNonTerminal(NonTerminals.EXPR);
+		removeNonTerminal(NonTerminals.LVALUE_TAIL);
 
 		removeTerminal(State.LPAREN);
 		removeTerminal(State.RPAREN);
