@@ -62,5 +62,6 @@ public enum NonTerminals {
 
 	//	only used in AST
 	FUNCTION_CALL,
+	ARRAY_LOOKUP,
 	
 }

@@ -219,6 +219,42 @@ public class ParseTree {
 		}
 
 
+		//	ARRAY_LOOKUP
+		removeNonTerminal(NonTerminals.LVALUE_TAIL);
+		applyTransformer(new NonTerminalParserSymbol(NonTerminals.LVALUE), null,
+			new TreeTransformer() {
+				public TreeNode transform(ParserSymbol parentSymbol,
+					ArrayList<TreeNode> left,
+					TreeNode subSymbolTree,
+					ArrayList<TreeNode> right) {
+
+
+					if (left.size() == 1) {
+						//	there's only one child, so it's just an ID
+						return left.get(0);	//	return the ID
+					} else {
+						// 	there are multiple children, so it's an array lookup (possibly multidimensional)
+						TreeNode newTree = new TreeNode(null, new NonTerminalParserSymbol(NonTerminals.ARRAY_LOOKUP));
+
+						//	take all the children of the LVALUE
+						//	it will contain an ID
+						//	and one or more [expr] sequences
+						//	we really only want the expr parts, but it's easier if we take the brackets now and remove them later because I'm lazy
+						newTree.setChildren(left);
+
+						return newTree;
+					}
+
+					
+				}
+			});
+		removeTerminal(State.RBRACK);
+		removeTerminal(State.LBRACK);
+
+
+
+
+
 		//	NEGATED_EXPR transform
 		applyTransformer(new NonTerminalParserSymbol(NonTerminals.NEGATED_EXPR), null,
 			new TreeTransformer() {
@@ -406,14 +442,6 @@ public class ParseTree {
 		removeNonTerminal(NonTerminals.EXPR_LIST);
 		removeNonTerminal(NonTerminals.EXPR_NO_LVALUE);
 		removeNonTerminal(NonTerminals.EXPR);
-		removeNonTerminal(NonTerminals.LVALUE_TAIL);
-
-
-		//	FIXME: remove this hack, this is disgusting...
-		removeNonTerminal(NonTerminals.LVALUE);
-		this.getRoot().reParent();
-		removeNonTerminal(NonTerminals.LVALUE);
-
 
 		removeTerminal(State.LPAREN);
 		removeTerminal(State.RPAREN);
