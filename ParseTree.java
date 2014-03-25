@@ -102,15 +102,6 @@ public class ParseTree {
 			});
 
 
-
-
-
-
-		//	TODO: EXPR_NO_LVALUE
-
-
-
-
 		// function calls
 		for (NonTerminals nonterminal : new NonTerminals[]{NonTerminals.EXPR_OR_FUNC, NonTerminals.STAT_AFTER_ID}) {
 			applyTransformer(null, new NonTerminalParserSymbol(nonterminal),
@@ -326,6 +317,7 @@ public class ParseTree {
 		removeNonTerminal(NonTerminals.STAT);
 		removeNonTerminal(NonTerminals.LVALUE);
 		removeNonTerminal(NonTerminals.EXPR_LIST);
+		removeNonTerminal(NonTerminals.EXPR_NO_LVALUE);
 
 		removeTerminal(State.LPAREN);
 		removeTerminal(State.RPAREN);
