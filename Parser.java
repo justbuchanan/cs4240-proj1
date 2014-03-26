@@ -308,7 +308,7 @@ public class Parser{
 
 	private void checkFuncParams(TreeNode treeNodeParam){
 		for(TreeNode node : treeNodeParam.getChildren()){
-			if(node.getSymbol().equals(NonTerminals.FUNCTIONCALL){
+			if(node.getSymbol().equals(NonTerminals.FUNCTION_CALL)) {
 				ArrayList<TreeNode> funcASTRow = node.getChildren();
 				ParserSymbol funcNameSymbol = funcASTRow.get(0).getSymbol();
 				if(funcNameSymbol.isTerminal() && 
