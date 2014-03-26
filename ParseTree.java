@@ -425,6 +425,23 @@ public class ParseTree {
 			});
 
 
+		//	RETURN statements
+		applyTransformer(new NonTerminalParserSymbol(NonTerminals.STAT), new Token(State.RETURN),
+			new TreeTransformer() {
+				public TreeNode transform(ParserSymbol parentSymbol,
+					ArrayList<TreeNode> left,
+					TreeNode subSymbolTree,
+					ArrayList<TreeNode> right) {
+
+					ArrayList<TreeNode> children = new ArrayList<>();
+					children.addAll(right);
+					subSymbolTree.setChildren(children);
+
+					return subSymbolTree;
+				}
+			});
+
+
 		//	remove infix expressions (none: this must be done after handling the infix operators)
 		NonTerminals[] infixExprs = new NonTerminals[]{
 			NonTerminals.MULT_DIV_EXPR,
