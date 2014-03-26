@@ -59,4 +59,6 @@ function exit(i : int) begin
 end;
 
 in
+	/* TODO REMOVE */
+	print("Passed std lib");
 end

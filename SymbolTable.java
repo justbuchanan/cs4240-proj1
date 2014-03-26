@@ -25,7 +25,14 @@ public class SymbolTable {
 			vars.put(name, new ArrayList<VarSymbolEntry>());
 		}
 		else{
-			
+			// we have var name, check to see if scope is the same
+			ArrayList<VarSymbolEntry> matchingVars = vars.get(name);
+			for(VarSymbolEntry varEnt : matchingVars){
+				if(varEnt.getScope().equals(scopes.peek())){
+					System.out.println("ERROR, TRIED TO ADD VAR " + name + " BUT IT'S ALREADY DECLARED");
+					break;
+				}
+			}
 		}
 		VarSymbolEntry var = new VarSymbolEntry(name, scopes.peek(), types.get(type));
 		if(functions.containsKey(scopes.peek().getFuncName())){
