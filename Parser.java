@@ -223,7 +223,7 @@ public class Parser{
 	private void buildTypeAndAddToTable(LinkedList<Token> typeDecl){
 		String typeName = "";
 		String eltTypeName = "";
-		ArrayList<Integer> arrDims;
+		ArrayList<Integer> arrDims = new ArrayList<>();
 		Token currToken;
 		currToken = typeDecl.removeFirst();
 		while(currToken.type() != State.OF){ // Read everything up to 'of'
@@ -349,7 +349,7 @@ public class Parser{
 				return "int";
 			} else if (type.equals(State.ID)) {
 				if (symbolTable.containsVar(token.value())) {
-					return symbolTable.getVar(token.value()).getType().getName();
+					return symbolTable.getVar(token.value()).getType().typeString();
 				} else {
 					//	couldn't find the ID
 					System.out.println("ERROR: Unknown ID: " + token.value());
@@ -371,7 +371,7 @@ public class Parser{
 				TreeNode idNode = treeNode.getChildren().get(0);
 				String funcName = ((Token)idNode.getSymbol()).value();
 				return null;
-				//return symbolTable.getFunc(funcName).getReturnType();
+				//return symbolTable.getFunc(funcName).getReturnType();	//	FIXME: uncomment
 			} else if (nonterminal.equals(NonTerminals.ARRAY_LOOKUP)) {
 				TreeNode idNode = treeNode.getChildren().get(0);
 				String arrayName = ((Token)idNode.getSymbol()).value();
