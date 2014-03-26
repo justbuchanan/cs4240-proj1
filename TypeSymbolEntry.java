@@ -8,7 +8,10 @@ public class TypeSymbolEntry extends SymbolTableEntry{
 	
 	public TypeSymbolEntry(String name, Scope scope, String eltType, ArrayList<Integer> arrDims) {
 		super(name, scope);
+
+		if (eltType == null) eltType = name;
 		this.eltType = eltType;
+		
 		this.arrDims = arrDims;
 	}
 	
