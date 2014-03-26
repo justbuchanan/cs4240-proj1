@@ -84,14 +84,16 @@ public class TreeNode {
 	public TreeNode applyTransformer(ParserSymbol symbol, ParserSymbol subSymbol, TreeTransformer transformer) {
 		boolean debug = false;
 
-		if (debug) System.out.println("TreeNode.applyTransformer()");
-
 		for (int i = 0; i < children.size();) {
 			TreeNode child = children.get(i);
 			TreeNode newChild = child.applyTransformer(symbol, subSymbol, transformer);
 
 			//	replace the old subtree with the new
 			if (newChild != child) {
+				String toDesc = newChild == null ? "" : newChild.toString(1);
+				String fromDesc = child.toString(1);
+				if (debug) System.out.println("TRANSFORM match(" + symbol + ", " + subSymbol + ")\nFROM:\n" + fromDesc + "TO:\n" + toDesc);
+
 				children.remove(i);	//	remove old child
 
 				if (newChild != null) {
@@ -108,7 +110,7 @@ public class TreeNode {
 		//	check if the transformer applies to @this
 		//	do this after applying to the children, so it's bottom-up
 		if (symbol == null || this.parserSymbol.equals(symbol)) {
-			if (debug) System.out.println("TRANSFORM: tree matches given symbol: " + symbol + "\n" + this);
+			// if (debug) System.out.println("TRANSFORM: tree matches given symbol: " + symbol + "\n" + this);
 
 			if (subSymbol == null) {
 				return transformer.transform(this.parserSymbol, children, null, new ArrayList<TreeNode>());
@@ -156,6 +158,6 @@ public class TreeNode {
 
 
 	public String toString() {
-		return parserSymbol.toString() + "{" + children.toString() + "}";
+		return "(" + parserSymbol.toString() + children.toString() + ")";
 	}
 }

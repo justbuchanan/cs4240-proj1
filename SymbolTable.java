@@ -15,16 +15,16 @@ public class SymbolTable {
 		types = new HashMap<String, TypeSymbolEntry>();
 		scopes = new LinkedList<Scope>();
 		scopes.push(new Scope("LET", 0));
-		// add primitive types
-		types.put("int", new TypeSymbolEntry("int", scopes.peek(), null, 0));
-		types.put("string", new TypeSymbolEntry("string", scopes.peek(), null, 0));
-
+		types.put("int", new TypeSymbolEntry("int", scopes.peek(), null, null));
+		types.put("string", new TypeSymbolEntry("string", scopes.peek(), null, null));
 	}
 	
 
 	public void addVar(String name, String type){
 		if(!vars.containsKey(name)){
 			vars.put(name, new ArrayList<VarSymbolEntry>());
+		} else {
+			System.out.println("ERROR: VARIABLE " + name + " HAS ALREADY BEEN DEFINED");
 		}
 		VarSymbolEntry var = new VarSymbolEntry(name, scopes.peek(), types.get(type));
 		if(functions.containsKey(scopes.peek().getFuncName())){
@@ -36,6 +36,9 @@ public class SymbolTable {
 	
 	public boolean containsVar(String name){
 		// TODO: Is everything in scope LET,0?
+		if (vars.get(name) == null) {
+			return false;
+		}
 		return vars.get(name).get(0) != null;
 	}
 
@@ -47,8 +50,8 @@ public class SymbolTable {
 		return functions.get(funcName);
 	}
 
-	public void addType(String name, String primType, int arrSize ){
-			types.put(name, new TypeSymbolEntry(name, scopes.peek(), primType, arrSize));
+	public void addType(String name, String primType, ArrayList<Integer> arrDims){
+			types.put(name, new TypeSymbolEntry(name, scopes.peek(), primType, arrDims));
 	}
 	
 	public void beginScope(String funcName){

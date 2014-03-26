@@ -2,15 +2,18 @@ import java.util.LinkedList;
 import java.util.Stack;
 import java.util.Set;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Parser{
 
+	
 	private ProductionRule[][] parserTable;
 	private Grammar grammar;
 	private int NUM_NONTERMINALS = 49;
 	private int NUM_TERMINALS = 49;
+	private ParseTree parseTree;
 	private SymbolTable symbolTable;
-	ParseTree parseTree; 
+	
 
 	public Parser(Grammar grammar){
 		this.grammar = grammar;
@@ -171,6 +174,13 @@ public class Parser{
 			return false;
 		}
 		
+	
+
+	//	reduce to AST and print before and after
+		System.out.println("ParseTree:\n" + parseTree);
+		parseTree.reduceToAST();
+		System.out.println("AST:\n" + parseTree);
+		
 		if(semanticCheck(verbose) && verbose){
 			System.out.println("\nSuccessful parse!!!");
 			// print symbol table on success
@@ -178,7 +188,7 @@ public class Parser{
 		}
 		return true;
 	}
-	
+
 	
 	/**
 	 *  Assumes last token popped was var. Reads var/type name, sticks it in symbol table 
@@ -212,14 +222,16 @@ public class Parser{
 	private void buildTypeAndAddToTable(LinkedList<Token> typeDecl){
 		String typeName = "";
 		String eltTypeName = "";
-		int arrSize = 0;
+		ArrayList<Integer> arrDims = new ArrayList<>();
 		Token currToken;
 		currToken = typeDecl.removeFirst();
 		while(currToken.type() != State.OF){ // Read everything up to 'of'
 			if(currToken.type() == State.ID){
 				typeName = currToken.value();
 			}
-			else if(currToken.type() == State.INTLIT) arrSize = Integer.parseInt(currToken.value());
+			else if(currToken.type() == State.INTLIT) {
+				arrDims.add(Integer.parseInt(currToken.value()));
+			}
 			currToken = typeDecl.removeFirst();
 		}
 		
@@ -227,7 +239,7 @@ public class Parser{
 		currToken = typeDecl.removeFirst(); // of eltType
 		eltTypeName = currToken.value();
 
-		symbolTable.addType(typeName, eltTypeName, arrSize);
+		symbolTable.addType(typeName, eltTypeName, arrDims);
 	}
 
 	/*
@@ -261,57 +273,144 @@ public class Parser{
 		
 	}
 
-	public boolean semanticCheck(boolean verbose) {
-		ParseTree ast = parseTree.getAST();
+	public void semanticCheck(ParseTree ast) {
 		checkBinaryOperands(ast.getRoot());
-		return checkFuncParams(ast.getRoot(), verbose); // FIXME: make checkBinaryOperands return bool
+		checkInitialization(ast.getRoot());
+		checkFuncParams(ast.getRoot());
 	}
 
-	public void checkBinaryOperands(TreeNode treeNodeParam) {
+	public boolean checkInitialization(TreeNode treeNodeParam) {
+		boolean pass = true;
+		for (TreeNode treeNode : treeNodeParam.getChildren()) {
+			if (treeNode.getSymbol().isTerminal() && ((Token) treeNode.getSymbol()).ordinal() == State.ASSIGN.ordinal()) {
+				TreeNode assignTo = treeNode.getChildren().get(0);
+				if (assignTo == null || !symbolTable.containsVar(((Token) assignTo.getSymbol()).value())) {
+					System.out.println("ERROR: VARIABLE " + ((Token) assignTo.getSymbol()).value() + " IS NOT DEFINED");
+				}
+			}
+			checkInitialization(treeNode);	
+		}
+
+		return pass;
+	}
+
+	public boolean checkBinaryOperands(TreeNode treeNodeParam) {
+		boolean pass = true;
+
 		for (TreeNode treeNode : treeNodeParam.getChildren()) {			
-			if (treeNode.getSymbol().isTerminal() && (((Token) treeNode.getSymbol()).equals(State.PLUS) || 
-				((Token) treeNode.getSymbol()).equals(State.MINUS) ||
-				((Token) treeNode.getSymbol()).equals(State.MULT) ||
-				((Token) treeNode.getSymbol()).equals(State.DIV))) {
+			if (treeNode.getSymbol().isTerminal() && (((Token) treeNode.getSymbol()).ordinal() == State.PLUS.ordinal() || 
+				((Token) treeNode.getSymbol()).ordinal() == State.MINUS.ordinal() ||
+				((Token) treeNode.getSymbol()).ordinal() == State.MULT.ordinal() ||
+				((Token) treeNode.getSymbol()).ordinal() == State.DIV.ordinal())) {
 				System.out.println("FOUND PLUS/SUB/MULT/DIV...Checking operands");
 				ArrayList<TreeNode> operatorChildren = treeNode.getChildren();
 				if (operatorChildren.size() != 2) {
 					System.out.println("ERROR: WRONG NUMBER OF OPERANDS FOR PLUS/SUB/MULT/DIV");
+					pass = false;
 					continue;
 				}
 				TreeNode left = operatorChildren.get(0);
 				TreeNode right = operatorChildren.get(1);
-				if (!left.getSymbol().isTerminal() || !right.getSymbol().isTerminal()) {
-					System.out.println("ERROR: CHILDREN SHOULD BOTH BE TERMINALS");
-					continue;
+				
+				if (getTypeOfNode(left) == null || !getTypeOfNode(left).equals("int")) {
+					System.out.println("ERROR: Variable needs to be int");
+					pass = false;
 				}
-				if (!(((Token) left.getSymbol()).equals(State.PLUS) ||
-                                	((Token) left.getSymbol()).equals(State.MINUS) ||
-                                	((Token) left.getSymbol()).equals(State.MULT) ||
-                                	((Token) left.getSymbol()).equals(State.DIV) ||
-					((Token) left.getSymbol()).equals(State.INTLIT))) {
-					System.out.println("ERROR: LEFT CHILD IS NOT OF TYPE INT/PLUS/MINUS/MULT/DIV");
+				if (getTypeOfNode(right) == null || getTypeOfNode(right) != null && !getTypeOfNode(right).equals("int")) {
+					System.out.println("ERROR: Variable needs to be int");
+					pass = false;
 				}
-				if (!(((Token) right.getSymbol()).equals(State.PLUS) ||
-                                        ((Token) right.getSymbol()).equals(State.MINUS) ||
-                                        ((Token) right.getSymbol()).equals(State.MULT) ||
-                                        ((Token) right.getSymbol()).equals(State.DIV) ||
-                                        ((Token) right.getSymbol()).equals(State.INTLIT))) {
-                                        System.out.println("ERROR: RIGHT CHILD IS NOT OF TYPE INT/PLUS/MINUS/MULT/DIV");
-                                }
-				System.out.println("OPERANDS CORRECT!!!");
+				if (pass == true) {
+					System.out.println("OPERANDS CORRECT!!!");
+				}
+			}
+			checkBinaryOperands(treeNode);
+		}
+
+		return pass;
+	}
+
+	//	Recursively get the type of a given tree
+	//
+	//	note: returns null if type isn't meaningful for the given tree
+	//	note: returns the type of the left operand for operator nodes
+	//		example: getTypeOfNode( (+ "abc" 123) ) --> "string";  getTypeOfNode( (+ 123 "abc") ) --> "int"
+	private String getTypeOfNode(TreeNode treeNode) {
+		ParserSymbol topLevelSymbol = treeNode.getSymbol();
+
+
+		ArrayList<State> operators = new ArrayList<State>(
+			Arrays.asList(new State[]{
+				State.MULT,
+				State.DIV,
+				State.PLUS,
+				State.MINUS,
+				State.GREATER,
+				State.LESSER,
+				State.GREATEREQ,
+				State.LESSEREQ,
+				State.EQ,
+				State.NEQ,
+				State.ASSIGN,
+			})
+		);
+
+
+		if (topLevelSymbol instanceof Token) {
+			Token token = (Token)topLevelSymbol;
+			State type = token.type();
+
+			if (type.equals(State.INTLIT)) {
+				return "int";
+			} else if (type.equals(State.ID)) {
+				if (symbolTable.containsVar(token.value())) {
+					return symbolTable.getVar(token.value()).getType().typeString();
+				} else {
+					//	couldn't find the ID
+					System.out.println("ERROR: Unknown ID: " + token.value());
+					return null;
+				}
+			} else if (type.equals(State.STRLIT)) {
+				return "string";
+			} else if (operators.contains(type)) {
+				return getTypeOfNode(treeNode.getChildren().get(0));	//	return left operand for binary op nodes
 			} else {
-				checkBinaryOperands(treeNode);
+				//	type is not meaningful for the given tree
+				return null;
+			}
+		} else {
+			NonTerminalParserSymbol topNonterminalSymbol = (NonTerminalParserSymbol)topLevelSymbol;
+			NonTerminals nonterminal = topNonterminalSymbol.getNonTerminal();
+
+			if (nonterminal.equals(NonTerminals.FUNCTION_CALL)) {
+				TreeNode idNode = treeNode.getChildren().get(0);
+				String funcName = ((Token)idNode.getSymbol()).value();
+				return null;
+				//return symbolTable.getFunc(funcName).getReturnType();	//	FIXME: uncomment
+			} else if (nonterminal.equals(NonTerminals.ARRAY_LOOKUP)) {
+				TreeNode idNode = treeNode.getChildren().get(0);
+				String arrayName = ((Token)idNode.getSymbol()).value();
+
+				if (symbolTable.containsVar(arrayName)) {
+					return symbolTable.getVar(arrayName).getType().getEltType();
+				} else {
+					//	couldn't find the ID
+					System.out.println("ERROR: Unknown array: " + arrayName);
+					return null;
+				}
+			} else {
+				//	type is not meaningful for the given tree
+				return null;
 			}
 		}
 	}
 
-	private boolean checkFuncParams(TreeNode treeNodeParam, boolean verbose){
+
+	private void checkFuncParams(TreeNode treeNodeParam){
+
 		for(TreeNode node : treeNodeParam.getChildren()){
 			//TODO: FIX NonTerminalParserSymbol.equals()
-			System.out.println(node.getSymbol().toString());
 			if(!node.getSymbol().isTerminal() && ((NonTerminalParserSymbol)node.getSymbol()).ordinal() == NonTerminals.FUNCTION_CALL.ordinal()){
-				System.out.println("CHECKING FUNCTION CALL PARAMS");
 				ArrayList<TreeNode> funcASTRow = node.getChildren();
 				ParserSymbol funcNameSymbol = funcASTRow.get(0).getSymbol();
 				if(funcNameSymbol.isTerminal() && 
@@ -360,7 +459,7 @@ public class Parser{
 			else{
 				// symbol tree node is not function call, so check children
 				for(TreeNode child : node.getChildren()){
-					checkFuncParams(child, verbose);
+					checkFuncParams(child);
 				}
 			}
 		}
@@ -467,7 +566,6 @@ public class Parser{
 	}
 
 	public void printTree() {
-		System.out.println("ParseTree\n" + parseTree.toString());
-		System.out.println("AST:\n" + parseTree.getAST().toString());
+		System.out.println("AST:\n" + parseTree.toString());
 	}
 }
