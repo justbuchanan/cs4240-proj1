@@ -138,13 +138,19 @@ public class ParseTree {
 
 									TreeNode funcCallTree = new TreeNode(null, new NonTerminalParserSymbol(NonTerminals.FUNCTION_CALL));
 									ArrayList<TreeNode> funcChildren = new ArrayList<>();
-									funcChildren.addAll(left);
+									funcChildren.add(left.get(left.size() - 1));	//	add the ID
 									funcChildren.addAll(subSymbolTree.getChildren());
 									funcCallTree.setChildren(funcChildren);
 
-									//	we mathed based on a child node, so add our new tree back into the parent
+									//	we matched based on a child node, so add our new tree back into the parent
 									TreeNode newTree = new TreeNode(null, parentSymbol);
 									ArrayList<TreeNode> children = new ArrayList<>();
+
+									//	add anything that came before the ID (the func name) to the parent
+									for (int i = 0; i < left.size() - 1; i++) {
+										children.add(left.get(i));
+									}
+
 									children.add(funcCallTree);
 									newTree.setChildren(children);
 
