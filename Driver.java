@@ -45,7 +45,6 @@ public class Driver {
 
 		//	parse!
 		boolean success = parser.parseText();
-		parser.printTree();
 	}
 
 	public static void writeFile(String fileName, String contents) {

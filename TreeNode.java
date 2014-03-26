@@ -82,7 +82,7 @@ public class TreeNode {
 	}
 
 	public TreeNode applyTransformer(ParserSymbol symbol, ParserSymbol subSymbol, TreeTransformer transformer) {
-		boolean debug = true;
+		boolean debug = false;
 
 		for (int i = 0; i < children.size();) {
 			TreeNode child = children.get(i);

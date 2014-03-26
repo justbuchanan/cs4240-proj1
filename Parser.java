@@ -177,8 +177,13 @@ public class Parser{
 		
 		// print symbol table on success
 		symbolTable.printSymbolTable();
+		System.out.println();
 
+		//	reduce to AST and print before and after
+		System.out.println("ParseTree:\n" + parseTree);
 		parseTree.reduceToAST();
+		System.out.println("AST:\n" + parseTree);
+
 		semanticCheck(parseTree);
 
 		return true;
