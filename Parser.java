@@ -5,25 +5,22 @@ import java.util.ArrayList;
 
 public class Parser{
 
-	private Scanner scanner;
 	private ProductionRule[][] parserTable;
 	private Grammar grammar;
 	private int NUM_NONTERMINALS = 49;
 	private int NUM_TERMINALS = 49;
-	private ParseTree parseTree;
 	private SymbolTable symbolTable;
+	ParseTree parseTree; 
 
-	public Parser(Scanner scanner, Grammar grammar){
-		this.scanner = scanner;
+	public Parser(Grammar grammar){
 		this.grammar = grammar;
-		parseTree = new ParseTree();
 		buildParserTable();
 		symbolTable = new SymbolTable();
 	}
 
-	public boolean parseText() {
+	public boolean parseText(Scanner scanner, boolean verbose) {
 		boolean debug = false;
-		
+		parseTree = new ParseTree(); // clear previous parse tree
 		boolean inFunc = false;
 		boolean inVar = false;
 		boolean inType = false;
@@ -173,10 +170,12 @@ public class Parser{
 			System.out.println("\nERROR: extra tokens left after parser finished");
 			return false;
 		}
-		semanticCheck();
-		System.out.println("\nSuccessful parse!!!");
-		// print symbol table on success
-		symbolTable.printSymbolTable();
+		
+		if(semanticCheck(verbose) && verbose){
+			System.out.println("\nSuccessful parse!!!");
+			// print symbol table on success
+			symbolTable.printSymbolTable();
+		}
 		return true;
 	}
 	
@@ -248,7 +247,7 @@ public class Parser{
 			}
 			currToken = funcDecl.removeFirst();
 		}
-		
+		currToken = funcDecl.removeFirst(); // point to id or ) depending on wether function has params or not
 		while(currToken.type() != State.RPAREN){ // get function params
 			
 			while(currToken.type() != State.COMMA && currToken.type() != State.RPAREN){ // read each var in param list
@@ -262,10 +261,10 @@ public class Parser{
 		
 	}
 
-	public void semanticCheck() {
+	public boolean semanticCheck(boolean verbose) {
 		ParseTree ast = parseTree.getAST();
 		checkBinaryOperands(ast.getRoot());
-		checkFuncParams(ast.getRoot());
+		return checkFuncParams(ast.getRoot(), verbose); // FIXME: make checkBinaryOperands return bool
 	}
 
 	public void checkBinaryOperands(TreeNode treeNodeParam) {
@@ -307,11 +306,12 @@ public class Parser{
 		}
 	}
 
-	private void checkFuncParams(TreeNode treeNodeParam){
-
+	private boolean checkFuncParams(TreeNode treeNodeParam, boolean verbose){
 		for(TreeNode node : treeNodeParam.getChildren()){
 			//TODO: FIX NonTerminalParserSymbol.equals()
+			System.out.println(node.getSymbol().toString());
 			if(!node.getSymbol().isTerminal() && ((NonTerminalParserSymbol)node.getSymbol()).ordinal() == NonTerminals.FUNCTION_CALL.ordinal()){
+				System.out.println("CHECKING FUNCTION CALL PARAMS");
 				ArrayList<TreeNode> funcASTRow = node.getChildren();
 				ParserSymbol funcNameSymbol = funcASTRow.get(0).getSymbol();
 				if(funcNameSymbol.isTerminal() && 
@@ -331,6 +331,7 @@ public class Parser{
 								}
 								else{
 									System.out.println("Passed wrong type!!!!!");
+									return false;
 								}
 							}
 							else if(((Token)funcASTRow.get(i).getSymbol()).type() == State.ID){
@@ -340,26 +341,30 @@ public class Parser{
 									if(varType.equals(tableFuncParamType)) continue;
 									else{
 										System.out.println("PASSED VARIABLE OF WRONG TYPE!!!");
+										return false;
 									}
 								}
 							}
 						}
 						else{
 							System.out.println("ERROR, FUNC SIGNATURE DOES NOT CONTAIN PARAM AT I");
+							return false;
 						}
 					}	
 				}
 				else{
 					System.out.println("FUNCTION HAS NOT BEEN DECLARED!!!");
+					return false;
 				}
 			}
 			else{
 				// symbol tree node is not function call, so check children
 				for(TreeNode child : node.getChildren()){
-					checkFuncParams(child);
+					checkFuncParams(child, verbose);
 				}
 			}
 		}
+		return true;
 	}
 
 	private void buildParserTable(){

@@ -1,0 +1,51 @@
+/*		TIGER JAVA STANDARD LIBRARY. NEEDS TO BE IN SAME DIR AS COMPILER 	*/
+
+
+let
+/* Print the string on the standard output. */
+function print(s : string) begin
+end;
+
+/*Print the integer on the standard output */
+function printi(i : int) begin
+end;
+
+/* Flush the standard output buffer. */
+function flush() begin
+end;
+
+/* Read and return a character from standard input; return an empty string at end-of-file */
+function getchar() : string begin
+end;
+
+
+/* Return the ASCII value of the first character of  */
+function ord(s : string) : int begin
+end;
+
+/* Return a single-character string for ASCII value i. Terminate program if i is out of range. */
+function chr(i : int) : string begin
+end;
+
+/* Return the number of characters in s.  */
+function size(s : string) : int begin
+end;
+
+/* Return the substring of s starting at the character f (first character is numbered zero) and going for n characters. */
+function substring(s : string, f : int, n : int) : string begin
+end;
+
+/* Return a new string consisting of s1 followed by s2 */ 
+function concat(s1 : string, s2 : string) : string begin
+end;
+
+/* Return 1 if i is zero, 0 otherwise. */
+function not(i : int) : int begin
+end;
+
+/* Terminate execution of the program with code i. */
+function exit(i : int) begin 
+end;
+
+in
+end
