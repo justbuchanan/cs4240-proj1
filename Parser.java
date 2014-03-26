@@ -189,7 +189,7 @@ public class Parser{
 
 		return true;
 	}
-	
+
 	
 	/**
 	 *  Assumes last token popped was var. Reads var/type name, sticks it in symbol table 
@@ -273,8 +273,24 @@ public class Parser{
 	}
 
 	public void semanticCheck(ParseTree ast) {
-		System.out.println(checkBinaryOperands(ast.getRoot()));
+		checkBinaryOperands(ast.getRoot());
+		checkInitialization(ast.getRoot());
 		checkFuncParams(ast.getRoot());
+	}
+
+	public boolean checkInitialization(TreeNode treeNodeParam) {
+		boolean pass = true;
+		for (TreeNode treeNode : treeNodeParam.getChildren()) {
+			if (treeNode.getSymbol().isTerminal() && ((Token) treeNode.getSymbol()).ordinal() == State.ASSIGN.ordinal()) {
+				TreeNode assignTo = treeNode.getChildren().get(0);
+				if (assignTo == null || !symbolTable.containsVar(((Token) assignTo.getSymbol()).value())) {
+					System.out.println("ERROR: VARIABLE " + ((Token) assignTo.getSymbol()).value() + " IS NOT DEFINED");
+				}
+			}
+			checkInitialization(treeNode);	
+		}
+
+		return pass;
 	}
 
 	public boolean checkBinaryOperands(TreeNode treeNodeParam) {
@@ -295,19 +311,19 @@ public class Parser{
 				TreeNode left = operatorChildren.get(0);
 				TreeNode right = operatorChildren.get(1);
 				
-				if (!getTypeOfNode(left).equals("int")) {
-					System.out.println("Variable needs to be int");
+				if (getTypeOfNode(left) == null || !getTypeOfNode(left).equals("int")) {
+					System.out.println("ERROR: Variable needs to be int");
 					pass = false;
 				}
-				if (getTypeOfNode(right) != null && !getTypeOfNode(right).equals("int")) {
-					System.out.println("Variable needs to be int");
+				if (getTypeOfNode(right) == null || getTypeOfNode(right) != null && !getTypeOfNode(right).equals("int")) {
+					System.out.println("ERROR: Variable needs to be int");
 					pass = false;
 				}
-				System.out.println("OPERANDS CORRECT!!!");
-				checkBinaryOperands(treeNode);
-			} else {
-				checkBinaryOperands(treeNode);
+				if (pass == true) {
+					System.out.println("OPERANDS CORRECT!!!");
+				}
 			}
+			checkBinaryOperands(treeNode);
 		}
 
 		return pass;
