@@ -35,8 +35,6 @@ public class Driver {
 		writeFile("parser_table.csv", parser.generateParseTableCSV());
 		writeFile("first_sets.txt", parser.prettyPrintedFirstSets());
 		writeFile("follow_sets.txt", parser.prettyPrintedFollowSets());
-
-		parser.printTree();
 	}
 	
 	public static String getFileText(String fileName){

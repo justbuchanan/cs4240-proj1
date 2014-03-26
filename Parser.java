@@ -173,10 +173,9 @@ public class Parser{
 			System.out.println("\nERROR: extra tokens left after parser finished");
 			return false;
 		}
-		
-	
 
-	//	reduce to AST and print before and after
+
+		//	reduce to AST and print before and after
 		System.out.println("ParseTree:\n" + parseTree);
 		parseTree.reduceToAST();
 		System.out.println("AST:\n" + parseTree);
