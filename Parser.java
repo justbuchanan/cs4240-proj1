@@ -275,11 +275,13 @@ public class Parser{
 	}
 
 	public void semanticCheck(ParseTree ast) {
-		checkBinaryOperands(ast.getRoot());
+		System.out.println(checkBinaryOperands(ast.getRoot()));
 		checkFuncParams(ast.getRoot());
 	}
 
-	public void checkBinaryOperands(TreeNode treeNodeParam) {
+	public boolean checkBinaryOperands(TreeNode treeNodeParam) {
+		boolean pass = true;
+
 		for (TreeNode treeNode : treeNodeParam.getChildren()) {			
 			if (treeNode.getSymbol().isTerminal() && (((Token) treeNode.getSymbol()).ordinal() == State.PLUS.ordinal() || 
 				((Token) treeNode.getSymbol()).ordinal() == State.MINUS.ordinal() ||
@@ -289,91 +291,19 @@ public class Parser{
 				ArrayList<TreeNode> operatorChildren = treeNode.getChildren();
 				if (operatorChildren.size() != 2) {
 					System.out.println("ERROR: WRONG NUMBER OF OPERANDS FOR PLUS/SUB/MULT/DIV");
+					pass = false;
 					continue;
 				}
 				TreeNode left = operatorChildren.get(0);
 				TreeNode right = operatorChildren.get(1);
 				
-				if (!left.getSymbol().isTerminal()) {
-					if (((NonTerminalParserSymbol) left.getSymbol()).toString().equals("<ARRAY_LOOKUP>")) {
-						TreeNode leftArray = left.getChildren().get(0);
-						if (symbolTable.containsVar(((Token) leftArray.getSymbol()).value())) {
-							if (!symbolTable.getVar(((Token) leftArray.getSymbol()).value()).getType().getName().equals("ArrayInt")) {
-								System.out.println("ERROR: VARIALBE " + ((Token) leftArray.getSymbol()).value() + " is not of type ArrayInt");
-							}
-						} else {
-							System.out.println("ERROR: VARIABLE " + ((Token) leftArray.getSymbol()).value() + " is not defined");
-						}
-						TreeNode rightArray = left.getChildren().get(1);
-						if (((Token) rightArray.getSymbol()).ordinal() != State.INTLIT.ordinal()) {
-							if (symbolTable.containsVar(((Token) rightArray.getSymbol()).value())) {
-								if (!symbolTable.getVar(((Token) rightArray.getSymbol()).value()).getType().getName().equals("int")) {
-									System.out.println("ERROR: VARIABLE " + ((Token) rightArray.getSymbol()).value() + " is not of type int");
-								}
-							} else {
-								System.out.println("ERROR: VARIALBE " + ((Token) rightArray.getSymbol()).value() + " is not defined");
-							}
-						}
-					}
-				} else {
-					if (!(((Token) left.getSymbol()).ordinal() == State.PLUS.ordinal() ||
-        	                        	((Token) left.getSymbol()).ordinal() == State.MINUS.ordinal() ||
-	                                	((Token) left.getSymbol()).ordinal() == State.MULT.ordinal() ||
-                                		((Token) left.getSymbol()).ordinal() == State.DIV.ordinal() ||
-						((Token) left.getSymbol()).ordinal() == State.INTLIT.ordinal() ||
-						((Token) left.getSymbol()).ordinal() == State.ID.ordinal())) {
-						System.out.println("ERROR: LEFT CHILD IS NOT OF TYPE INT/PLUS/MINUS/MULT/DIV");
-					}
-					if (((Token) left.getSymbol()).ordinal() == State.ID.ordinal()) {
-						symbolTable.getVar(((Token) left.getSymbol()).value());
-						if (symbolTable.containsVar(((Token) left.getSymbol()).value())) {
-							if (!symbolTable.getVar(((Token) left.getSymbol()).value()).getType().getName().equals("int")) {
-								System.out.println("ERROR: Variable " + ((Token) left.getSymbol()).value() + " is not of type int");
-							}
-						} else {
-							System.out.println("ERROR: Variable " + ((Token) left.getSymbol()).value() + " not defined");
-						}
-					}
+				if (!getTypeOfNode(left).equals("int")) {
+					System.out.println("Variable needs to be int");
+					pass = false;
 				}
-				if (!right.getSymbol().isTerminal()) {
-                                        if (((NonTerminalParserSymbol) right.getSymbol()).toString().equals("<ARRAY_LOOKUP>")) {
-                                                TreeNode leftArray = right.getChildren().get(0);
-                                                if (symbolTable.containsVar(((Token) leftArray.getSymbol()).value())) {
-                                                        if (!symbolTable.getVar(((Token) leftArray.getSymbol()).value()).getType().getName().equals("ArrayInt")) {
-                                                                System.out.println("ERROR: VARIALBE " + ((Token) leftArray.getSymbol()).value() + " is not of type ArrayInt");
-                                                        }
-                                                } else {
-                                                        System.out.println("ERROR: VARIABLE " + ((Token) leftArray.getSymbol()).value() + " is not defined");
-                                                }
-                                                TreeNode rightArray = right.getChildren().get(1);
-                                                if (((Token) rightArray.getSymbol()).ordinal() != State.INTLIT.ordinal()) {
-                                                        if (symbolTable.containsVar(((Token) rightArray.getSymbol()).value())) {
-                                                                if (!symbolTable.getVar(((Token) rightArray.getSymbol()).value()).getType().getName().equals("int")) {
-                                                                        System.out.println("ERROR: VARIABLE " + ((Token) rightArray.getSymbol()).value() + " is not of type int");
-                                                                }
-                                                        } else {
-                                                                System.out.println("ERROR: VARIALBE " + ((Token) rightArray.getSymbol()).value() + " is not defined");
-                                                        }
-                                                }
-                                        }
-                                } else {
-					if (!(((Token) right.getSymbol()).ordinal() == State.PLUS.ordinal() ||
-        	                                ((Token) right.getSymbol()).ordinal() == State.MINUS.ordinal() ||
-	                                        ((Token) right.getSymbol()).ordinal() == State.MULT.ordinal() ||
-                                        	((Token) right.getSymbol()).ordinal() == State.DIV.ordinal() ||
-                                	        ((Token) right.getSymbol()).ordinal() == State.INTLIT.ordinal() ||
-						((Token) right.getSymbol()).ordinal() == State.ID.ordinal())) {
-                	                        System.out.println("ERROR: RIGHT CHILD IS NOT OF TYPE INT/PLUS/MINUS/MULT/DIV");
-        	                        }
-					if (((Token) right.getSymbol()).ordinal() == State.ID.ordinal()) {
-						if (symbolTable.containsVar(((Token) right.getSymbol()).value())) {
-							if (!symbolTable.getVar(((Token) right.getSymbol()).value()).getType().getName().equals("int")) {
-								System.out.println("ERROR: Variable " + ((Token) right.getSymbol()).value() + " is not of type int");
-							}
-						} else {
-							System.out.println("ERROR: Variable " + ((Token) right.getSymbol()).value() + " not defined");
-						}
-					}
+				if (getTypeOfNode(right) != null && !getTypeOfNode(right).equals("int")) {
+					System.out.println("Variable needs to be int");
+					pass = false;
 				}
 				System.out.println("OPERANDS CORRECT!!!");
 				checkBinaryOperands(treeNode);
@@ -381,6 +311,8 @@ public class Parser{
 				checkBinaryOperands(treeNode);
 			}
 		}
+
+		return pass;
 	}
 
 	//	Recursively get the type of a given tree
@@ -438,7 +370,8 @@ public class Parser{
 			if (nonterminal.equals(NonTerminals.FUNCTION_CALL)) {
 				TreeNode idNode = treeNode.getChildren().get(0);
 				String funcName = ((Token)idNode.getSymbol()).value();
-				return symbolTable.getFunc(funcName).getReturnType();
+				return null;
+				//return symbolTable.getFunc(funcName).getReturnType();
 			} else if (nonterminal.equals(NonTerminals.ARRAY_LOOKUP)) {
 				TreeNode idNode = treeNode.getChildren().get(0);
 				String arrayName = ((Token)idNode.getSymbol()).value();
