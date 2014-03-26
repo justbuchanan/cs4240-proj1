@@ -462,8 +462,7 @@ public class Parser{
 	}
 
 	public void printTree() {
-		System.out.println("Number of nodes in parse tree: " + parseTree.getSize());
-		System.out.println(parseTree.toString());
-		System.out.println(parseTree.getAST().toString());
+		System.out.println("ParseTree\n" + parseTree.toString());
+		System.out.println("AST:\n" + parseTree.getAST().toString());
 	}
 }
