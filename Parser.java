@@ -2,6 +2,7 @@ import java.util.LinkedList;
 import java.util.Stack;
 import java.util.Set;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Parser{
 
@@ -379,6 +380,81 @@ public class Parser{
 			}
 		}
 	}
+
+	//	Recursively get the type of a given tree
+	//
+	//	note: returns null if type isn't meaningful for the given tree
+	//	note: returns the type of the left operand for operator nodes
+	//		example: getTypeOfNode( (+ "abc" 123) ) --> "string";  getTypeOfNode( (+ 123 "abc") ) --> "int"
+	private String getTypeOfNode(TreeNode treeNode) {
+		ParserSymbol topLevelSymbol = treeNode.getSymbol();
+
+
+		ArrayList<State> operators = new ArrayList<State>(
+			Arrays.asList(new State[]{
+				State.MULT,
+				State.DIV,
+				State.PLUS,
+				State.MINUS,
+				State.GREATER,
+				State.LESSER,
+				State.GREATEREQ,
+				State.LESSEREQ,
+				State.EQ,
+				State.NEQ,
+				State.ASSIGN,
+			})
+		);
+
+
+		if (topLevelSymbol instanceof Token) {
+			Token token = (Token)topLevelSymbol;
+			State type = token.type();
+
+			if (type.equals(State.INTLIT)) {
+				return "int";
+			} else if (type.equals(State.ID)) {
+				if (symbolTable.containsVar(token.value())) {
+					return symbolTable.getVar(token.value()).getType().getName();
+				} else {
+					//	couldn't find the ID
+					System.out.println("ERROR: Unknown ID: " + token.value());
+					return null;
+				}
+			} else if (type.equals(State.STRLIT)) {
+				return "string";
+			} else if (operators.contains(type)) {
+				return getTypeOfNode(treeNode.getChildren().get(0));	//	return left operand for binary op nodes
+			} else {
+				//	type is not meaningful for the given tree
+				return null;
+			}
+		} else {
+			NonTerminalParserSymbol topNonterminalSymbol = (NonTerminalParserSymbol)topLevelSymbol;
+			NonTerminals nonterminal = topNonterminalSymbol.getNonTerminal();
+
+			if (nonterminal.equals(NonTerminals.FUNCTION_CALL)) {
+				TreeNode idNode = treeNode.getChildren().get(0);
+				String funcName = ((Token)idNode.getSymbol()).value();
+				return symbolTable.getFunc(funcName).getReturnType();
+			} else if (nonterminal.equals(NonTerminals.ARRAY_LOOKUP)) {
+				TreeNode idNode = treeNode.getChildren().get(0);
+				String arrayName = ((Token)idNode.getSymbol()).value();
+
+				if (symbolTable.containsVar(arrayName)) {
+					return symbolTable.getVar(arrayName).getEltType();
+				} else {
+					//	couldn't find the ID
+					System.out.println("ERROR: Unknown array: " + arrayName);
+					return null;
+				}
+			} else {
+				//	type is not meaningful for the given tree
+				return null;
+			}
+		}
+	}
+
 
 	private void checkFuncParams(TreeNode treeNodeParam){
 
