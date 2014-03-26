@@ -442,7 +442,7 @@ public class Parser{
 				String arrayName = ((Token)idNode.getSymbol()).value();
 
 				if (symbolTable.containsVar(arrayName)) {
-					return symbolTable.getVar(arrayName).getEltType();
+					return symbolTable.getVar(arrayName).getType().getEltType();
 				} else {
 					//	couldn't find the ID
 					System.out.println("ERROR: Unknown array: " + arrayName);
