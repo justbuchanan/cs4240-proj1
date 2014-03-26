@@ -52,11 +52,9 @@ public class Driver {
 		}
 		catch (FileNotFoundException fnf) {
 			System.out.println("File not found!");
-			return;
 		}
 		catch (IOException ioexc) {
 			System.out.println("IO Error");
-			return;
 		}
 		return str;
 	}

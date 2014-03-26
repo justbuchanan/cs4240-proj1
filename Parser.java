@@ -181,7 +181,7 @@ public class Parser{
 		parseTree.reduceToAST();
 		System.out.println("AST:\n" + parseTree);
 		
-		if(semanticCheck(verbose) && verbose){
+		if(semanticCheck(parseTree) && verbose){
 			System.out.println("\nSuccessful parse!!!");
 			// print symbol table on success
 			symbolTable.printSymbolTable();
@@ -273,9 +273,9 @@ public class Parser{
 		
 	}
 
-	public void semanticCheck(ParseTree ast) {
-		checkBinaryOperands(ast.getRoot());
-		checkInitialization(ast.getRoot());
+	public boolean semanticCheck(ParseTree ast) {
+		return checkBinaryOperands(ast.getRoot()) && 
+		checkInitialization(ast.getRoot()) && 
 		checkFuncParams(ast.getRoot());
 	}
 
@@ -406,7 +406,7 @@ public class Parser{
 	}
 
 
-	private void checkFuncParams(TreeNode treeNodeParam){
+	private boolean checkFuncParams(TreeNode treeNodeParam){
 
 		for(TreeNode node : treeNodeParam.getChildren()){
 			//TODO: FIX NonTerminalParserSymbol.equals()
