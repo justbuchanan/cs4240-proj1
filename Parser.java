@@ -223,14 +223,16 @@ public class Parser{
 	private void buildTypeAndAddToTable(LinkedList<Token> typeDecl){
 		String typeName = "";
 		String eltTypeName = "";
-		int arrSize = 0;
+		ArrayList<Integer> arrDims = new ArrayList<>();
 		Token currToken;
 		currToken = typeDecl.removeFirst();
 		while(currToken.type() != State.OF){ // Read everything up to 'of'
 			if(currToken.type() == State.ID){
 				typeName = currToken.value();
 			}
-			else if(currToken.type() == State.INTLIT) arrSize = Integer.parseInt(currToken.value());
+			else if(currToken.type() == State.INTLIT) {
+				arrDims.add(Integer.parseInt(currToken.value()));
+			}
 			currToken = typeDecl.removeFirst();
 		}
 		
@@ -238,7 +240,7 @@ public class Parser{
 		currToken = typeDecl.removeFirst(); // of eltType
 		eltTypeName = currToken.value();
 
-		symbolTable.addType(typeName, eltTypeName, arrSize);
+		symbolTable.addType(typeName, eltTypeName, arrDims);
 	}
 
 	/*
@@ -363,7 +365,7 @@ public class Parser{
 				return "int";
 			} else if (type.equals(State.ID)) {
 				if (symbolTable.containsVar(token.value())) {
-					return symbolTable.getVar(token.value()).getType().getName();
+					return symbolTable.getVar(token.value()).getType().typeString();
 				} else {
 					//	couldn't find the ID
 					System.out.println("ERROR: Unknown ID: " + token.value());
@@ -385,7 +387,7 @@ public class Parser{
 				TreeNode idNode = treeNode.getChildren().get(0);
 				String funcName = ((Token)idNode.getSymbol()).value();
 				return null;
-				//return symbolTable.getFunc(funcName).getReturnType();
+				//return symbolTable.getFunc(funcName).getReturnType();	//	FIXME: uncomment
 			} else if (nonterminal.equals(NonTerminals.ARRAY_LOOKUP)) {
 				TreeNode idNode = treeNode.getChildren().get(0);
 				String arrayName = ((Token)idNode.getSymbol()).value();
