@@ -173,7 +173,7 @@ public class Parser{
 			System.out.println("\nERROR: extra tokens left after parser finished");
 			return false;
 		}
-
+		semanticCheck();
 		System.out.println("\nSuccessful parse!!!");
 		// print symbol table on success
 		symbolTable.printSymbolTable();
@@ -265,6 +265,7 @@ public class Parser{
 	public void semanticCheck() {
 		ParseTree ast = parseTree.getAST();
 		checkBinaryOperands(ast.getRoot());
+		checkFuncParams(ast.getRoot());
 	}
 
 	public void checkBinaryOperands(TreeNode treeNodeParam) {
@@ -307,8 +308,10 @@ public class Parser{
 	}
 
 	private void checkFuncParams(TreeNode treeNodeParam){
+
 		for(TreeNode node : treeNodeParam.getChildren()){
-			if(node.getSymbol().equals(NonTerminals.FUNCTION_CALL)) {
+			//TODO: FIX NonTerminalParserSymbol.equals()
+			if(!node.getSymbol().isTerminal() && ((NonTerminalParserSymbol)node.getSymbol()).ordinal() == NonTerminals.FUNCTION_CALL.ordinal()){
 				ArrayList<TreeNode> funcASTRow = node.getChildren();
 				ParserSymbol funcNameSymbol = funcASTRow.get(0).getSymbol();
 				if(funcNameSymbol.isTerminal() && 
@@ -348,6 +351,12 @@ public class Parser{
 				}
 				else{
 					System.out.println("FUNCTION HAS NOT BEEN DECLARED!!!");
+				}
+			}
+			else{
+				// symbol tree node is not function call, so check children
+				for(TreeNode child : node.getChildren()){
+					checkFuncParams(child);
 				}
 			}
 		}
