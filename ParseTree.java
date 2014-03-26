@@ -171,9 +171,11 @@ public class ParseTree {
 					TreeNode subSymbolTree,
 					ArrayList<TreeNode> right) {
 
+					ArrayList<TreeNode> children = new ArrayList<>();
+					children.add(right.get(0));	//	take the center part of the expression, we don't need the PARENs
+
 					TreeNode newTree = new TreeNode(null, parentSymbol);
-					right.remove(right.size() - 2);	//	remove the RPAREN off the end
-					newTree.setChildren(right);
+					newTree.setChildren(children);
 
 					return newTree;
 				}
@@ -244,8 +246,6 @@ public class ParseTree {
 
 						return newTree;
 					}
-
-					
 				}
 			});
 		removeTerminal(State.RBRACK);
