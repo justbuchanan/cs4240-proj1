@@ -223,14 +223,16 @@ public class Parser{
 	private void buildTypeAndAddToTable(LinkedList<Token> typeDecl){
 		String typeName = "";
 		String eltTypeName = "";
-		int arrSize = 0;
+		ArrayList<Integer> arrDims;
 		Token currToken;
 		currToken = typeDecl.removeFirst();
 		while(currToken.type() != State.OF){ // Read everything up to 'of'
 			if(currToken.type() == State.ID){
 				typeName = currToken.value();
 			}
-			else if(currToken.type() == State.INTLIT) arrSize = Integer.parseInt(currToken.value());
+			else if(currToken.type() == State.INTLIT) {
+				arrDims.add(Integer.parseInt(currToken.value()));
+			}
 			currToken = typeDecl.removeFirst();
 		}
 		
@@ -238,7 +240,7 @@ public class Parser{
 		currToken = typeDecl.removeFirst(); // of eltType
 		eltTypeName = currToken.value();
 
-		symbolTable.addType(typeName, eltTypeName, arrSize);
+		symbolTable.addType(typeName, eltTypeName, arrDims);
 	}
 
 	/*

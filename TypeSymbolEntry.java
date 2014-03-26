@@ -1,26 +1,28 @@
+import java.util.ArrayList;
 
 public class TypeSymbolEntry extends SymbolTableEntry{
 	
 	private String eltType;
 	private int arrSize;
+	private ArrayList<Integer> arrDims;
 	
-	public TypeSymbolEntry(String name, Scope scope, String eltType, int arrSize){
+	public TypeSymbolEntry(String name, Scope scope, String eltType, ArrayList<Integer> arrDims) {
 		super(name, scope);
 		this.eltType = eltType;
-		this.arrSize = arrSize;
+		this.arrDims = arrDims;
 	}
 	
 	public String getEltType(){
 		return eltType;
 	}
 	
-	public int getArrSize(){
-		return arrSize;
+	public ArrayList<Integer> getArrDims(){
+		return arrDims;
 	}
 	
 	public String toString(){
 		return "(name: " + this.getName() + " | level: " + this.getScope().getLevel() + " | func: "
 				+ this.getScope().getFuncName() + " | eltType " + eltType +
-				" | arrSize " + arrSize +  ")";
+				" | arrDims " + arrDims +  ")";
 	}
 }
