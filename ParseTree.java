@@ -465,6 +465,7 @@ public class ParseTree {
 		removeNonTerminal(NonTerminals.EXPR_LIST);
 		removeNonTerminal(NonTerminals.EXPR_NO_LVALUE);
 		removeNonTerminal(NonTerminals.EXPR);
+		removeNonTerminal(NonTerminals.TYPE_ID);
 
 		removeTerminal(State.LPAREN);
 		removeTerminal(State.RPAREN);
