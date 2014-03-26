@@ -503,9 +503,9 @@ public class ParseTree {
 	 */
 	public String toString() {
 		if (root != null) {
-			return "ParseTree:\n" + root.toString(0);
+			return root.toString(0);
 		} else {
-			return "ParseTree: null";
+			return "null";
 		}
 	}
 
