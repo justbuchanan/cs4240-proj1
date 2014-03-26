@@ -13,6 +13,11 @@
 			"working_dir": "${project_path}"
 		},
 		{
+			"name": "Parse ex2.tiger",
+			"cmd": ["make", "ex2"],
+			"working_dir": "${project_path}"
+		},
+		{
 			"name": "Parse ex3.tiger",
 			"cmd": ["make", "ex3"],
 			"working_dir": "${project_path}"

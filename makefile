@@ -35,6 +35,9 @@ ex5: all
 ex1: all
 	java $(DRIVER) test-input-ver-2/ex1.tiger &> ex1.log
 
+ex2: all
+	java $(DRIVER) test-input-ver-2/ex2.tiger &> ex2.log
+
 ex3: all
 	java $(DRIVER) test-input-ver-2/ex3.tiger &> ex3.log
 
