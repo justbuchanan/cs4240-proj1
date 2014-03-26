@@ -17,4 +17,13 @@ public class VarSymbolEntry extends SymbolTableEntry {
 				+ this.getScope().getFuncName() + " | type " + type.getName() + ")";
 	}
 	
+	public boolean equals(SymbolTableEntry var){
+		if(var.getName().equals(this.getName()) &&
+				var.getClass() == this.getClass()
+				this.getScope().equals(var.getScope()) &&
+				this.getType().equals(((VarSymbolEntry)var).getType())){
+			
+		}
+	}
+	
 }

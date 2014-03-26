@@ -23,8 +23,9 @@ public class SymbolTable {
 	public void addVar(String name, String type){
 		if(!vars.containsKey(name)){
 			vars.put(name, new ArrayList<VarSymbolEntry>());
-		} else {
-			System.out.println("ERROR: VARIABLE " + name + " HAS ALREADY BEEN DEFINED");
+		}
+		else{
+			
 		}
 		VarSymbolEntry var = new VarSymbolEntry(name, scopes.peek(), types.get(type));
 		if(functions.containsKey(scopes.peek().getFuncName())){
