@@ -173,10 +173,14 @@ public class Parser{
 			System.out.println("\nERROR: extra tokens left after parser finished");
 			return false;
 		}
-		semanticCheck();
 		System.out.println("\nSuccessful parse!!!");
+		
 		// print symbol table on success
 		symbolTable.printSymbolTable();
+
+		parseTree.reduceToAST();
+		semanticCheck(parseTree);
+
 		return true;
 	}
 	
@@ -262,8 +266,7 @@ public class Parser{
 		
 	}
 
-	public void semanticCheck() {
-		ParseTree ast = parseTree.getAST();
+	public void semanticCheck(ParseTree ast) {
 		checkBinaryOperands(ast.getRoot());
 		checkFuncParams(ast.getRoot());
 	}
@@ -462,7 +465,6 @@ public class Parser{
 	}
 
 	public void printTree() {
-		System.out.println("ParseTree\n" + parseTree.toString());
-		System.out.println("AST:\n" + parseTree.getAST().toString());
+		System.out.println("AST:\n" + parseTree.toString());
 	}
 }

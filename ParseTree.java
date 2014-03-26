@@ -56,7 +56,7 @@ public class ParseTree {
 		return root;
 	}
 
-	public ParseTree getAST() {
+	public void reduceToAST() {
 		//	un-needed nonterminals
 		removeNonTerminal(NonTerminals.CONST);
 		removeNonTerminal(NonTerminals.STAT_SEQ_PRIME);
@@ -447,9 +447,6 @@ public class ParseTree {
 		removeTerminal(State.RPAREN);
 		removeTerminal(State.COLON);
 		removeTerminal(State.TYPE);
-
-
-		return this;
 	}
 
 	/**
