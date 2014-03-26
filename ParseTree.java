@@ -56,7 +56,7 @@ public class ParseTree {
 		return root;
 	}
 
-	public ParseTree getAST() {
+	public void reduceToAST() {
 		//	un-needed nonterminals
 		removeNonTerminal(NonTerminals.CONST);
 		removeNonTerminal(NonTerminals.STAT_SEQ_PRIME);
@@ -138,13 +138,19 @@ public class ParseTree {
 
 									TreeNode funcCallTree = new TreeNode(null, new NonTerminalParserSymbol(NonTerminals.FUNCTION_CALL));
 									ArrayList<TreeNode> funcChildren = new ArrayList<>();
-									funcChildren.addAll(left);
+									funcChildren.add(left.get(left.size() - 1));	//	add the ID
 									funcChildren.addAll(subSymbolTree.getChildren());
 									funcCallTree.setChildren(funcChildren);
 
-									//	we mathed based on a child node, so add our new tree back into the parent
+									//	we matched based on a child node, so add our new tree back into the parent
 									TreeNode newTree = new TreeNode(null, parentSymbol);
 									ArrayList<TreeNode> children = new ArrayList<>();
+
+									//	add anything that came before the ID (the func name) to the parent
+									for (int i = 0; i < left.size() - 1; i++) {
+										children.add(left.get(i));
+									}
+
 									children.add(funcCallTree);
 									newTree.setChildren(children);
 
@@ -171,9 +177,11 @@ public class ParseTree {
 					TreeNode subSymbolTree,
 					ArrayList<TreeNode> right) {
 
+					ArrayList<TreeNode> children = new ArrayList<>();
+					children.add(right.get(0));	//	take the center part of the expression, we don't need the PARENs
+
 					TreeNode newTree = new TreeNode(null, parentSymbol);
-					right.remove(right.size() - 2);	//	remove the RPAREN off the end
-					newTree.setChildren(right);
+					newTree.setChildren(children);
 
 					return newTree;
 				}
@@ -244,8 +252,6 @@ public class ParseTree {
 
 						return newTree;
 					}
-
-					
 				}
 			});
 		removeTerminal(State.RBRACK);
@@ -425,6 +431,23 @@ public class ParseTree {
 			});
 
 
+		//	RETURN statements
+		applyTransformer(new NonTerminalParserSymbol(NonTerminals.STAT), new Token(State.RETURN),
+			new TreeTransformer() {
+				public TreeNode transform(ParserSymbol parentSymbol,
+					ArrayList<TreeNode> left,
+					TreeNode subSymbolTree,
+					ArrayList<TreeNode> right) {
+
+					ArrayList<TreeNode> children = new ArrayList<>();
+					children.addAll(right);
+					subSymbolTree.setChildren(children);
+
+					return subSymbolTree;
+				}
+			});
+
+
 		//	remove infix expressions (none: this must be done after handling the infix operators)
 		NonTerminals[] infixExprs = new NonTerminals[]{
 			NonTerminals.MULT_DIV_EXPR,
@@ -447,9 +470,6 @@ public class ParseTree {
 		removeTerminal(State.RPAREN);
 		removeTerminal(State.COLON);
 		removeTerminal(State.TYPE);
-
-
-		return this;
 	}
 
 	/**
@@ -503,9 +523,9 @@ public class ParseTree {
 	 */
 	public String toString() {
 		if (root != null) {
-			return "ParseTree:\n" + root.toString(0);
+			return root.toString(0);
 		} else {
-			return "ParseTree: null";
+			return "null";
 		}
 	}
 

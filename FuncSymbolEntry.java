@@ -17,4 +17,12 @@ public class FuncSymbolEntry extends SymbolTableEntry{
 	public void addParam(VarSymbolEntry var){
 		params.add(var);
 	}
+
+	public String toString(){
+		String baseStr =  "FUNC: (" + this.getName() + " | params: ";
+		for(VarSymbolEntry param : params){
+			baseStr += param.getName();
+		}
+		return baseStr += ")";
+	}
 }
