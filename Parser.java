@@ -122,16 +122,20 @@ public class Parser{
 		parseTree.reduceToAST();
 		System.out.println("AST:\n" + parseTree);
 
-
+		//	build and print symbol table
 		buildSymbolTableFromAST(parseTree);
+		if (verbose) symbolTable.printSymbolTable();
 
-		
-		if(semanticCheck(parseTree) && verbose){
-			System.out.println("\nSuccessful parse!!!");
-			// print symbol table on success
-			symbolTable.printSymbolTable();
+		//	semantic check and return success
+		boolean success = semanticCheck(parseTree);
+		if (verbose) {
+			if (success) {
+				System.out.println("\nSuccessful parse!!!");
+			} else {
+				System.out.println("\nUnsuccessful parse :(");
+			}
 		}
-		return true;
+		return success;
 	}
 
 
