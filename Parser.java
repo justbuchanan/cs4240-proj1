@@ -237,7 +237,8 @@ public class Parser{
 		checkInitialization(ast.getRoot()) && 
 		checkFuncParams(ast.getRoot());
 	}
-
+	
+	
 	public boolean checkInitialization(TreeNode treeNodeParam) {
 		boolean pass = true;
 		for (TreeNode treeNode : treeNodeParam.getChildren()) {
@@ -288,6 +289,9 @@ public class Parser{
 
 		return pass;
 	}
+	
+	
+	
 
 	//	Recursively get the type of a given tree
 	//
