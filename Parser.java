@@ -165,6 +165,8 @@ public class Parser{
 						Integer arrDim = Integer.parseInt( ((Token)intlit.getSymbol()).value() );
 						arrDims.add(arrDim);
 					}
+
+					symbolTable.addType(typeName, eltType, arrDims);
 				}
 			} else if (declList.getSymbol().equals(new NonTerminalParserSymbol(NonTerminals.VAR_DECLARATION_LIST))) {
 				//	handle var declarations
@@ -322,6 +324,8 @@ public class Parser{
 			} else if (type.equals(State.ID)) {
 				if (symbolTable.containsVar(token.value())) {
 					return symbolTable.getVar(token.value()).getType().typeString();
+				} else if (symbolTable.getType(token.value()) != null) {
+					return symbolTable.getType(token.value()).typeString();
 				} else {
 					//	couldn't find the ID
 					System.out.println("ERROR: Unknown ID: " + token.value());

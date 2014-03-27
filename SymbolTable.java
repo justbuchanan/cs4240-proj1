@@ -58,6 +58,10 @@ public class SymbolTable {
 		return functions.get(funcName);
 	}
 
+	public TypeSymbolEntry getType(String typeName) {
+		return types.get(typeName);
+	}
+
 	public void addType(String name, String primType, ArrayList<Integer> arrDims){
 			types.put(name, new TypeSymbolEntry(name, scopes.peek(), primType, arrDims));
 	}
