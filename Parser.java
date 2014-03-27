@@ -327,6 +327,26 @@ public class Parser{
 				return "int";
 			} else if (type.equals(State.ID)) {
 				if (symbolTable.containsVar(token.value())) {
+					String funcName = symbolTable.getVar(token.value()).getScope().getFuncName();
+					String realFuncName = "";
+					TreeNode treeNodeLoop = treeNode;
+					while (true) {
+						treeNodeLoop = treeNodeLoop.getParent();
+						if (treeNodeLoop.getSymbol().isTerminal() && ((Token) treeNodeLoop.getSymbol()).ordinal() == State.FUNC.ordinal()) {
+							realFuncName = ((Token) treeNodeLoop.getSymbol()).value();
+							break;
+						} else if(!treeNodeLoop.getSymbol().isTerminal() && ((NonTerminalParserSymbol) treeNodeLoop.getSymbol()).ordinal() == NonTerminals.TIGER_PROGRAM.ordinal()) {
+							realFuncName = "LET";
+							break;
+						}
+					}
+					System.out.println("Found func name: " + realFuncName);
+					System.out.println("Actual func name: " + funcName);
+					if (!realFuncName.equals(funcName)) {
+						System.out.println("ERROR: NOT IN SCOPE");
+					} else {
+						System.out.println("SCOPE CORRECT");
+					}
 					return symbolTable.getVar(token.value()).getType().typeString();
 				} else if (symbolTable.getType(token.value()) != null) {
 					return symbolTable.getType(token.value()).typeString();
