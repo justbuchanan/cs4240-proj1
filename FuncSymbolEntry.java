@@ -4,10 +4,12 @@ import java.util.ArrayList;
 public class FuncSymbolEntry extends SymbolTableEntry{
 	
 	private ArrayList<VarSymbolEntry> params;
+	private String returnType;
 	
-	public FuncSymbolEntry(String name, Scope scope) {
+	public FuncSymbolEntry(String name, Scope scope, String returnType) {
 		super(name, scope);
 		params = new ArrayList();
+		this.returnType = returnType;
 	}
 	
 	public ArrayList<VarSymbolEntry> getParams(){
@@ -16,6 +18,10 @@ public class FuncSymbolEntry extends SymbolTableEntry{
 
 	public void addParam(VarSymbolEntry var){
 		params.add(var);
+	}
+
+	public String getReturnType() {
+		return returnType;
 	}
 
 	public String toString(){

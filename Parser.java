@@ -83,7 +83,7 @@ public class Parser{
 					if(funcFollow.contains(token) && !currFunc.isEmpty()){
 						// have seen entire method signature
 						inFunc = false;
-						buildFuncAndAddToTable(currFunc);
+						// buildFuncAndAddToTable(currFunc);	//	replaced by addFunctionSymbolsFromAST()
 						currFunc.clear();
 					}
 					else{
@@ -179,6 +179,10 @@ public class Parser{
 		System.out.println("ParseTree:\n" + parseTree);
 		parseTree.reduceToAST();
 		System.out.println("AST:\n" + parseTree);
+
+
+		addFunctionSymbolsFromAST(parseTree);
+
 		
 		if(semanticCheck(parseTree) && verbose){
 			System.out.println("\nSuccessful parse!!!");
@@ -241,36 +245,75 @@ public class Parser{
 		symbolTable.addType(typeName, eltTypeName, arrDims);
 	}
 
+
+	private void addFunctionSymbolsFromAST(ParseTree ast) {
+		TreeNode declSeg = ast.getRoot().getChildren().get(0);
+
+		//	loop to find the FUNCT_DECLARATION_LIST
+		for (TreeNode declList : declSeg.getChildren()) {
+			if (((NonTerminalParserSymbol)declList.getSymbol()).getNonTerminal().equals(NonTerminals.FUNCT_DECLARATION_LIST)) {
+				TreeNode funcDeclList = declList;	//	found the func declarations!
+
+				//	function declaration has children: ID (func name), PARAM_LIST (optional?), RET_TYPE (optional), STAT_SEQ
+				for (TreeNode funcDecl : funcDeclList.getChildren()) {
+					String funcName = ((Token)funcDecl.getChildren().get(0).getSymbol()).value();	//	first child is an ID for the function name
+					
+					String funcReturnType = "";
+					TreeNode secondToLastChild = funcDecl.getChildren().get( funcDecl.getChildren().size() - 2 );
+					if (secondToLastChild.getSymbol().equals(new NonTerminalParserSymbol(NonTerminals.RET_TYPE))) {
+						funcReturnType = getTypeOfNode(secondToLastChild);
+					}
+
+					symbolTable.addFunc(funcName, funcReturnType);
+
+					//	if there's a PARAM_LIST, it'll be the second child
+					TreeNode secondChild = funcDecl.getChildren().get(1);
+					if (secondChild.getSymbol().equals(new NonTerminalParserSymbol(NonTerminals.PARAM_LIST))) {
+
+						//	add each param to the symbol table
+						for (TreeNode param : secondChild.getChildren()) {
+							String paramName = ((Token)param.getChildren().get(0).getSymbol()).value();
+							String paramType = getTypeOfNode(param.getChildren().get(1));
+
+							symbolTable.addVar(paramName, paramType);	//	FIXME: is this getting entered in the right scope?
+						}
+					}
+				}
+			}
+		}
+	}
+
+
 	/*
 	 *  Assumes last symbol popped was FUNCT_DECLARATION
 	 */
-	private void buildFuncAndAddToTable(LinkedList<Token> funcDecl){
-		LinkedList<Token> currParam = new LinkedList<Token>();
-		Token currToken;
-		String funcName = null;
-		LinkedList<VarSymbolEntry> funcParams = new LinkedList();
-		currToken = funcDecl.removeFirst(); // func
-		while(currToken.type() != State.LPAREN){ // get function name
-			if(currToken.type() == State.ID){
-				funcName = currToken.value();
-				symbolTable.beginScope(funcName); // tell symbol table we are in a new function
-				symbolTable.addFunc(funcName);
-			}
-			currToken = funcDecl.removeFirst();
-		}
-		currToken = funcDecl.removeFirst(); // point to id or ) depending on wether function has params or not
-		while(currToken.type() != State.RPAREN){ // get function params
+	// private void buildFuncAndAddToTable(LinkedList<Token> funcDecl){
+	// 	LinkedList<Token> currParam = new LinkedList<Token>();
+	// 	Token currToken;
+	// 	String funcName = null;
+	// 	LinkedList<VarSymbolEntry> funcParams = new LinkedList();
+	// 	currToken = funcDecl.removeFirst(); // func
+	// 	while(currToken.type() != State.LPAREN){ // get function name
+	// 		if(currToken.type() == State.ID){
+	// 			funcName = currToken.value();
+	// 			symbolTable.beginScope(funcName); // tell symbol table we are in a new function
+	// 			symbolTable.addFunc(funcName);
+	// 		}
+	// 		currToken = funcDecl.removeFirst();
+	// 	}
+	// 	currToken = funcDecl.removeFirst(); // point to id or ) depending on wether function has params or not
+	// 	while(currToken.type() != State.RPAREN){ // get function params
 			
-			while(currToken.type() != State.COMMA && currToken.type() != State.RPAREN){ // read each var in param list
-				currParam.addLast(currToken);
-				currToken = funcDecl.removeFirst();
-			}
-			buildVarsAndAddToTable(currParam);
-			currParam.clear();
-			if(currToken.type() != State.RPAREN) currToken = funcDecl.removeFirst();
-		}
+	// 		while(currToken.type() != State.COMMA && currToken.type() != State.RPAREN){ // read each var in param list
+	// 			currParam.addLast(currToken);
+	// 			currToken = funcDecl.removeFirst();
+	// 		}
+	// 		buildVarsAndAddToTable(currParam);
+	// 		currParam.clear();
+	// 		if(currToken.type() != State.RPAREN) currToken = funcDecl.removeFirst();
+	// 	}
 		
-	}
+	// }
 
 	public boolean semanticCheck(ParseTree ast) {
 		return checkBinaryOperands(ast.getRoot()) && 
@@ -384,8 +427,7 @@ public class Parser{
 			if (nonterminal.equals(NonTerminals.FUNCTION_CALL)) {
 				TreeNode idNode = treeNode.getChildren().get(0);
 				String funcName = ((Token)idNode.getSymbol()).value();
-				return null;
-				//return symbolTable.getFunc(funcName).getReturnType();	//	FIXME: uncomment
+				return symbolTable.getFunc(funcName).getReturnType();
 			} else if (nonterminal.equals(NonTerminals.ARRAY_LOOKUP)) {
 				TreeNode idNode = treeNode.getChildren().get(0);
 				String arrayName = ((Token)idNode.getSymbol()).value();

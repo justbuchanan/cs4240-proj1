@@ -67,8 +67,8 @@ public class SymbolTable {
 		scopes.push(new Scope(funcName, currScope.getLevel() + 1));
 	}
 	
-	public void addFunc(String funcName){
-		functions.put(funcName, new FuncSymbolEntry(funcName, scopes.peek()));
+	public void addFunc(String funcName, String returnType){
+		functions.put(funcName, new FuncSymbolEntry(funcName, scopes.peek(), returnType));
 	}
 
 	public boolean containsFunc(String funcName){
