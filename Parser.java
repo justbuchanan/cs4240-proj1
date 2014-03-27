@@ -209,18 +209,21 @@ public class Parser{
 
 					symbolTable.addFunc(funcName, funcReturnType);
 
-					//	if there's a PARAM_LIST, it'll be the second child
-					TreeNode secondChild = funcDecl.getChildren().get(1);
-					if (secondChild.getSymbol().equals(new NonTerminalParserSymbol(NonTerminals.PARAM_LIST))) {
+					symbolTable.beginScope(funcName); {
 
-						//	add each param to the symbol table
-						for (TreeNode param : secondChild.getChildren()) {
-							String paramName = ((Token)param.getChildren().get(0).getSymbol()).value();
-							String paramType = getTypeOfNode(param.getChildren().get(1));
+						//	if there's a PARAM_LIST, it'll be the second child
+						TreeNode secondChild = funcDecl.getChildren().get(1);
+						if (secondChild.getSymbol().equals(new NonTerminalParserSymbol(NonTerminals.PARAM_LIST))) {
 
-							symbolTable.addVar(paramName, paramType);	//	FIXME: is this getting entered in the right scope?
+							//	add each param to the symbol table
+							for (TreeNode param : secondChild.getChildren()) {
+								String paramName = ((Token)param.getChildren().get(0).getSymbol()).value();
+								String paramType = getTypeOfNode(param.getChildren().get(1));
+
+								symbolTable.addVar(paramName, paramType);
+							}
 						}
-					}
+					} symbolTable.endScope();
 				}
 			}
 		}
