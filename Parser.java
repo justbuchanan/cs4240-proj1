@@ -225,7 +225,7 @@ public class Parser{
 							//	add each param to the symbol table
 							for (TreeNode param : secondChild.getChildren()) {
 								String paramName = ((Token)param.getChildren().get(0).getSymbol()).value();
-								String paramType = getTypeOfNode(param.getChildren().get(1));
+								String paramType = getTypeOfNode(param.getChildren().get(1).getChildren().get(0));
 
 								symbolTable.addVar(paramName, paramType);
 							}

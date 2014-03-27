@@ -5,6 +5,12 @@ public class VarSymbolEntry extends SymbolTableEntry {
 	
 	public VarSymbolEntry(String name, Scope scope, TypeSymbolEntry type) {
 		super(name, scope);
+		
+		if (type == null) {
+			System.out.println(name + ":" + scope);
+			throw new IllegalArgumentException("Cant initialize a variable without a type");
+		}
+
 		this.type = type;
 	}
 

@@ -54,6 +54,6 @@ pkg: $(PKG_FILES)
 	javac -g -cp $(CLASSPATH) $^
 
 clean:
-	rm $(OBJ) *.png
+	rm *.class *.png
 
 
