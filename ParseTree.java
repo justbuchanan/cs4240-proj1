@@ -92,6 +92,7 @@ public class ParseTree {
 			NonTerminals.ID_LIST,
 			NonTerminals.TYPE_DECLARATION_LIST,
 			NonTerminals.VAR_DECLARATION_LIST,
+			NonTerminals.FUNCT_DECLARATION_LIST,
 		};
 		for (NonTerminals nonterminal : toFlatten) {
 			applyTransformer(new NonTerminalParserSymbol(nonterminal), new NonTerminalParserSymbol(nonterminal),
@@ -472,6 +473,7 @@ public class ParseTree {
 		removeTerminal(State.COLON);
 		removeTerminal(State.TYPE);
 		removeTerminal(State.BEGIN);
+		removeTerminal(State.FUNC);
 	}
 
 	/**
