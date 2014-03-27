@@ -32,6 +32,11 @@ public class FuncSymbolEntry extends SymbolTableEntry{
 			baseStr += " : " + param.getType().getName();
 			baseStr += ", ";
 		}
+
+		if (returnType != null) {
+			baseStr += "; returnType : " + returnType;
+		}
+
 		return baseStr += ")";
 	}
 }
