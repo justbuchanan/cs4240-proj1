@@ -471,6 +471,7 @@ public class ParseTree {
 		removeTerminal(State.RPAREN);
 		removeTerminal(State.COLON);
 		removeTerminal(State.TYPE);
+		removeTerminal(State.BEGIN);
 	}
 
 	/**
