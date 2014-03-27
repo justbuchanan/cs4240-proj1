@@ -206,7 +206,7 @@ public class Parser{
 					String funcReturnType = "";
 					TreeNode secondToLastChild = funcDecl.getChildren().get( funcDecl.getChildren().size() - 2 );
 					if (secondToLastChild.getSymbol().equals(new NonTerminalParserSymbol(NonTerminals.RET_TYPE))) {
-						funcReturnType = getTypeOfNode(secondToLastChild);
+						funcReturnType = getTypeOfNode(secondToLastChild.getChildren().get(0));
 					}
 
 					symbolTable.addFunc(funcName, funcReturnType);
