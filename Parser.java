@@ -159,7 +159,7 @@ public class Parser{
 					TreeNode typeIDNode = typeNode.getChildren().get( typeNode.getChildren().size() - 1 );
 
 					//	the element type (first child of the typeIDNode)
-					String eltType = getTypeOfNode(typeIDNode);
+					String eltType = getTypeOfNode(typeIDNode.getChildren().get(0));
 
 					//	look at everything under TYPE that comes before typeID.  these will be INTLITs specifying array dimension sizes
 					ArrayList<Integer> arrDims = new ArrayList<>();
@@ -212,7 +212,8 @@ public class Parser{
 					if (secondToLastChild.getSymbol().equals(new NonTerminalParserSymbol(NonTerminals.RET_TYPE))) {
 						funcReturnType = getTypeOfNode(secondToLastChild.getChildren().get(0));
 					}
-
+					
+						
 					symbolTable.addFunc(funcName, funcReturnType);
 
 					symbolTable.beginScope(funcName); {
@@ -241,7 +242,31 @@ public class Parser{
 		checkInitialization(ast.getRoot()) && 
 		checkFuncParams(ast.getRoot());
 	}
-
+	
+	public boolean checkFuncReturnTypes(TreeNode treeNode){
+		for(TreeNode currNode : treeNode.getChildren()){
+			if(currNode.getSymbol().equals(NonTerminals.FUNCT_DECLARATION)){
+				ArrayList<TreeNode> funcVals = currNode.getChildren();
+				String funcName = ((Token)funcVals.get(0).getSymbol()).value();
+				ArrayList<TreeNode> funcBody = funcVals.get(funcVals.size() - 1).getChildren(); // STAT, STAT_SEQ_PRIME
+				ArrayList<TreeNode> statement = funcBody.get(0).getChildren();
+				if(statement.get(0).equals(new Token(State.RETURN))){
+					// check return type of function
+					FuncSymbolEntry func = symbolTable.getFunc(funcName);
+					ArrayList<TreeNode> expr = statement.get(1).getChildren();
+					
+				}
+				
+				
+			}
+			else{
+				checkFuncReturnTypes(currNode);
+			}
+		}
+		return false;
+	}
+	
+	
 	public boolean checkInitialization(TreeNode treeNodeParam) {
 		boolean pass = true;
 		for (TreeNode treeNode : treeNodeParam.getChildren()) {
@@ -292,6 +317,9 @@ public class Parser{
 
 		return pass;
 	}
+	
+	
+	
 
 	//	Recursively get the type of a given tree
 	//
