@@ -159,7 +159,7 @@ public class Parser{
 					TreeNode typeIDNode = typeNode.getChildren().get( typeNode.getChildren().size() - 1 );
 
 					//	the element type (first child of the typeIDNode)
-					String eltType = getTypeOfNode(typeIDNode);
+					String eltType = getTypeOfNode(typeIDNode.getChildren().get(0));
 
 					//	look at everything under TYPE that comes before typeID.  these will be INTLITs specifying array dimension sizes
 					ArrayList<Integer> arrDims = new ArrayList<>();
