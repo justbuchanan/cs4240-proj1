@@ -408,6 +408,7 @@ public class Parser{
 	//
 	//	note: returns null if there's no type info for a given ID
 	//	note: throws an exception if type isn't meaningful for the given tree
+	//	note: returns "int" for comparison operators
 	//	note: returns the type of the left operand for operator nodes
 	//		example: getTypeOfNode( (+ "abc" 123) ) --> "string";  getTypeOfNode( (+ 123 "abc") ) --> "int"
 	private String getTypeOfNode(TreeNode treeNode) {
@@ -415,6 +416,22 @@ public class Parser{
 
 
 		ArrayList<State> operators = new ArrayList<State>(
+			Arrays.asList(new State[]{
+				State.MULT,
+				State.DIV,
+				State.PLUS,
+				State.MINUS,
+				State.GREATER,
+				State.LESSER,
+				State.GREATEREQ,
+				State.LESSEREQ,
+				State.EQ,
+				State.NEQ,
+				State.ASSIGN,
+			})
+		);
+
+		ArrayList<State> comparisonOperators = new ArrayList<State>(
 			Arrays.asList(new State[]{
 				State.MULT,
 				State.DIV,
@@ -469,7 +486,11 @@ public class Parser{
 			} else if (type.equals(State.STRLIT)) {
 				return "string";
 			} else if (operators.contains(type)) {
-				return getTypeOfNode(treeNode.getChildren().get(0));	//	return left operand for binary op nodes
+				if (comparisonOperators.contains(type)) {
+					return "int";
+				} else {
+					return getTypeOfNode(treeNode.getChildren().get(0));	//	return left operand for binary op nodes
+				}
 			} else {
 				throw new IllegalArgumentException("Type doesn't make sense for the given tree: " + treeNode);
 			}
