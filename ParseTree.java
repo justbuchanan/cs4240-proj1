@@ -95,7 +95,7 @@ public class ParseTree {
 			NonTerminals.FUNCT_DECLARATION_LIST,
 		};
 		for (NonTerminals nonterminal : toFlatten) {
-			applyTransformer(new NonTerminalParserSymbol(nonterminal), new NonTerminalParserSymbol(nonterminal),
+			applyTransformer(new NonTerminalParserSymbol(nonterminal), new NonTerminalParserSymbol(nonterminal), false,
 				new TreeTransformer() {
 					public TreeNode transform(ParserSymbol parentSymbol,
 						ArrayList<TreeNode> left,
@@ -116,7 +116,7 @@ public class ParseTree {
 
 		// function calls
 		for (NonTerminals nonterminal : new NonTerminals[]{NonTerminals.EXPR_OR_FUNC, NonTerminals.STAT_AFTER_ID}) {
-			applyTransformer(null, new NonTerminalParserSymbol(nonterminal),
+			applyTransformer(null, new NonTerminalParserSymbol(nonterminal), false,
 				new TreeTransformer() {
 					public TreeNode transform(ParserSymbol parentSymbol,
 						ArrayList<TreeNode> left,
@@ -171,7 +171,7 @@ public class ParseTree {
 
 
 		//	EXPR
-		applyTransformer(new NonTerminalParserSymbol(NonTerminals.ATOM_EXPR), new Token(State.LPAREN),
+		applyTransformer(new NonTerminalParserSymbol(NonTerminals.ATOM_EXPR), new Token(State.LPAREN), false,
 			new TreeTransformer() {
 				public TreeNode transform(ParserSymbol parentSymbol,
 					ArrayList<TreeNode> left,
@@ -198,7 +198,7 @@ public class ParseTree {
 			removeTerminal(State.ENDIF);
 
 			//	transform STAT IF
-			applyTransformer(new NonTerminalParserSymbol(NonTerminals.STAT), new Token(State.IF),
+			applyTransformer(new NonTerminalParserSymbol(NonTerminals.STAT), new Token(State.IF), true,
 				new TreeTransformer() {
 					public TreeNode transform(ParserSymbol parentSymbol,
 						ArrayList<TreeNode> left,
@@ -230,7 +230,7 @@ public class ParseTree {
 
 		//	ARRAY_LOOKUP
 		removeNonTerminal(NonTerminals.LVALUE_TAIL);
-		applyTransformer(new NonTerminalParserSymbol(NonTerminals.LVALUE), null,
+		applyTransformer(new NonTerminalParserSymbol(NonTerminals.LVALUE), null, false,
 			new TreeTransformer() {
 				public TreeNode transform(ParserSymbol parentSymbol,
 					ArrayList<TreeNode> left,
@@ -263,7 +263,7 @@ public class ParseTree {
 
 
 		//	NEGATED_EXPR transform
-		applyTransformer(new NonTerminalParserSymbol(NonTerminals.NEGATED_EXPR), null,
+		applyTransformer(new NonTerminalParserSymbol(NonTerminals.NEGATED_EXPR), null, false,
 			new TreeTransformer() {
 				public TreeNode transform(ParserSymbol parentSymbol,	//	the parent will be NEGATED_EXPR
 					ArrayList<TreeNode> left,
@@ -301,7 +301,7 @@ public class ParseTree {
 			State.LESSEREQ,
 			State.ASSIGN};
 		for (State infixOp : infixOps) {
-			applyTransformer(null, new Token(infixOp),
+			applyTransformer(null, new Token(infixOp), false,
 			new TreeTransformer() {
 					public TreeNode transform(ParserSymbol parentSymbol,
 						ArrayList<TreeNode> left,
@@ -340,7 +340,7 @@ public class ParseTree {
 
 
 		//	assignment operator in var declaration (optional init)
-		applyTransformer(new NonTerminalParserSymbol(NonTerminals.VAR_DECLARATION), new Token(State.ASSIGN),
+		applyTransformer(new NonTerminalParserSymbol(NonTerminals.VAR_DECLARATION), new Token(State.ASSIGN), true,
 			new TreeTransformer() {
 				public TreeNode transform(ParserSymbol parentSymbol,	//	the parent will be NEGATED_EXPR
 					ArrayList<TreeNode> left,
@@ -360,9 +360,9 @@ public class ParseTree {
 			});
 
 		//	EQ in TYPE_DECLARATION
-		applyTransformer(new NonTerminalParserSymbol(NonTerminals.TYPE_DECLARATION), new Token(State.EQ),
+		applyTransformer(new NonTerminalParserSymbol(NonTerminals.TYPE_DECLARATION), new Token(State.EQ), true,
 			new TreeTransformer() {
-				public TreeNode transform(ParserSymbol parentSymbol,	//	the parent will be NEGATED_EXPR
+				public TreeNode transform(ParserSymbol parentSymbol,	//	the parent will be TYPE_DECLARATION
 					ArrayList<TreeNode> left,
 					TreeNode subSymbolTree,
 					ArrayList<TreeNode> right) {
@@ -382,7 +382,7 @@ public class ParseTree {
 
 		//	WHILE statement transforms
 		removeTerminal(State.DO);
-		applyTransformer(new NonTerminalParserSymbol(NonTerminals.STAT), new Token(State.WHILE),
+		applyTransformer(new NonTerminalParserSymbol(NonTerminals.STAT), new Token(State.WHILE), true,
 			new TreeTransformer() {
 				public TreeNode transform(ParserSymbol parentSymbol,
 					ArrayList<TreeNode> left,
@@ -402,7 +402,7 @@ public class ParseTree {
 
 		//	FOR statement
 		removeTerminal(State.TO);
-		applyTransformer(new NonTerminalParserSymbol(NonTerminals.STAT), new Token(State.FOR),
+		applyTransformer(new NonTerminalParserSymbol(NonTerminals.STAT), new Token(State.FOR), false,
 			new TreeTransformer() {
 				public TreeNode transform(ParserSymbol parentSymbol,
 					ArrayList<TreeNode> left,
@@ -433,7 +433,7 @@ public class ParseTree {
 
 
 		//	RETURN statements
-		applyTransformer(new NonTerminalParserSymbol(NonTerminals.STAT), new Token(State.RETURN),
+		applyTransformer(new NonTerminalParserSymbol(NonTerminals.STAT), new Token(State.RETURN), true,
 			new TreeTransformer() {
 				public TreeNode transform(ParserSymbol parentSymbol,
 					ArrayList<TreeNode> left,
@@ -483,7 +483,7 @@ public class ParseTree {
 	 * (parent1 (symbol a, b)) --> (parent1 a, b)
 	 */
 	public void removeNonTerminal(NonTerminals nonterminal) {
-		applyTransformer(null, new NonTerminalParserSymbol(nonterminal),
+		applyTransformer(null, new NonTerminalParserSymbol(nonterminal), false,
 			new TreeTransformer() {
 				public TreeNode transform(ParserSymbol parentSymbol,
 					ArrayList<TreeNode> left,
@@ -507,7 +507,7 @@ public class ParseTree {
 	 * Removes ALL occurrences of the given Token from the tree
 	 */
 	public void removeTerminal(State terminal) {
-		applyTransformer(new Token(terminal), null,
+		applyTransformer(new Token(terminal), null, false,
 			new TreeTransformer() {
 				public TreeNode transform(ParserSymbol parentSymbol,
 					ArrayList<TreeNode> left,
@@ -540,10 +540,13 @@ public class ParseTree {
 	 * It does this bottom-up and ensures that transformed trees are not re-transformed.
 	 * Note: if @symbol == null, it will act as a wildcard
 	 * Note: when doing transformations, remember to set the parent if it changes
+	 *
+	 * @param matchNonLeafTokens - when reducing, sometimes (example binary operators), Tokens that started out as leaf nodes in the parse tree
+	 *  become parent nodes.  typically matchNonLeafTokens should be false to avoid re-converting those things
 	 */
-	public void applyTransformer(ParserSymbol symbol, ParserSymbol subSymbol, TreeTransformer transformer) {
+	public void applyTransformer(ParserSymbol symbol, ParserSymbol subSymbol, boolean matchNonLeafTokens, TreeTransformer transformer) {
 		if (root != null) {
-			root = root.applyTransformer(symbol, subSymbol, transformer);
+			root = root.applyTransformer(symbol, subSymbol, matchNonLeafTokens, transformer);
 		}
 	}
 }

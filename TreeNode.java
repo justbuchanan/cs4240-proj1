@@ -81,12 +81,12 @@ public class TreeNode {
 		return desc;
 	}
 
-	public TreeNode applyTransformer(ParserSymbol symbol, ParserSymbol subSymbol, TreeTransformer transformer) {
+	public TreeNode applyTransformer(ParserSymbol symbol, ParserSymbol subSymbol, boolean matchNonLeafTokens, TreeTransformer transformer) {
 		boolean debug = false;
 
 		for (int i = 0; i < children.size();) {
 			TreeNode child = children.get(i);
-			TreeNode newChild = child.applyTransformer(symbol, subSymbol, transformer);
+			TreeNode newChild = child.applyTransformer(symbol, subSymbol, matchNonLeafTokens, transformer);
 
 			//	replace the old subtree with the new
 			if (newChild != child) {
@@ -113,7 +113,10 @@ public class TreeNode {
 			// if (debug) System.out.println("TRANSFORM: tree matches given symbol: " + symbol + "\n" + this);
 
 			if (subSymbol == null) {
-				return transformer.transform(this.parserSymbol, children, null, new ArrayList<TreeNode>());
+				//	we double-apply becaus sometimes we can match the same subtree again - this should never cause an infinite loop
+				TreeNode reduced = transformer.transform(this.parserSymbol, children, null, new ArrayList<TreeNode>());
+				if (reduced != null) reduced = reduced.applyTransformer(symbol, subSymbol, matchNonLeafTokens, transformer);
+				return reduced;
 			} else {
 				ArrayList<TreeNode> left = new ArrayList<>();
 				ArrayList<TreeNode> right = new ArrayList<>();
@@ -126,7 +129,13 @@ public class TreeNode {
 					//	we haven't found @subSymbol yet...
 					if (subSymbolTree == null) {
 						if (child.parserSymbol.equals(subSymbol)) {
-							subSymbolTree = child;
+							//	in some cases, we transform a leaf Token node to be a parent (all binary operators for example)
+							//	this is a workaround so that once transformed to be a non-terminal parese tree node, we no longer match it
+							if (matchNonLeafTokens || (child.parserSymbol instanceof NonTerminalParserSymbol || child.getChildren().size() == 0)) {
+								subSymbolTree = child;
+							} else {
+								left.add(child);
+							}
 						} else {
 							left.add(child);
 						}
@@ -137,7 +146,9 @@ public class TreeNode {
 
 				if (subSymbolTree != null) {
 					//	it's a match!  do the transformer and return
-					return transformer.transform(this.parserSymbol, left, subSymbolTree, right);
+					TreeNode reduced = transformer.transform(this.parserSymbol, left, subSymbolTree, right);
+					if (reduced != null) reduced = reduced.applyTransformer(symbol, subSymbol, matchNonLeafTokens, transformer);
+					return reduced;
 				} else {
 					//	no match
 					return this;
@@ -158,6 +169,7 @@ public class TreeNode {
 
 
 	public String toString() {
-		return "(" + parserSymbol.toString() + children.toString() + ")";
+		return toString(0);
+		// return "(" + parserSymbol.toString() + children.toString() + ")";
 	}
 }
