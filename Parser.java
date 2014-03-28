@@ -139,8 +139,25 @@ public class Parser{
 	}
 
 
+	/**
+	 * Throws an exception if the node's symbol doesn't match the given type.
+	 */
+	private void assertNodeType(TreeNode node, Enum type) {
+		if (type instanceof State) {
+			if ( !((Token)node.getSymbol()).type().equals((State)type) ) {
+				throw new RuntimeException("Expected node type '" + type + "', got node: " + node);
+			}
+		} else {
+			if ( !((NonTerminalParserSymbol)node.getSymbol()).getNonTerminal().equals((NonTerminals)type) ) {
+				throw new RuntimeException("Expected node type '" + type + "', got node: " + node);
+			}
+		}
+	}
+
+
 	private void buildSymbolTableFromAST(ParseTree ast) {
 		TreeNode declSeg = ast.getRoot().getChildren().get(0);
+		assertNodeType(declSeg, NonTerminals.DECLARATION_SEGMENT);
 
 		//	look for the different declaration lists (var, type, funct)
 		for (TreeNode declList : declSeg.getChildren()) {
@@ -155,16 +172,19 @@ public class Parser{
 
 					//	nonterminal TYPE
 					TreeNode typeNode = typeDecl.getChildren().get(1);
+					assertNodeType(typeNode, NonTerminals.TYPE);
 
 					TreeNode typeIDNode = typeNode.getChildren().get( typeNode.getChildren().size() - 1 );
+					assertNodeType(typeIDNode, NonTerminals.TYPE_ID);
 
 					//	the element type (first child of the typeIDNode)
 					String eltType = getTypeOfNode(typeIDNode.getChildren().get(0));
 
 					//	look at everything under TYPE that comes before typeID.  these will be INTLITs specifying array dimension sizes
 					ArrayList<Integer> arrDims = new ArrayList<>();
-					for (int i = 0; i < typeNode.getChildren().size() - 2; i++) {
+					for (int i = 0; i <= typeNode.getChildren().size() - 2; i++) {
 						TreeNode intlit = typeNode.getChildren().get(i);
+						assertNodeType(intlit, State.INTLIT);
 
 						Integer arrDim = Integer.parseInt( ((Token)intlit.getSymbol()).value() );
 						arrDims.add(arrDim);
@@ -178,7 +198,7 @@ public class Parser{
 				//	look at each var declaration
 				for (TreeNode varDecl : declList.getChildren()) {
 					ArrayList<String> idList = new ArrayList<>();
-					String varType = "";
+					String varType = null;
 
 					//	get variable names and type info
 					for (TreeNode varDeclChild : varDecl.getChildren()) {
@@ -189,7 +209,9 @@ public class Parser{
 								idList.add(varName);
 							}
 						} else if (varDeclChild.getSymbol().equals(new NonTerminalParserSymbol(NonTerminals.TYPE_ID))) {
-							varType = getTypeOfNode(varDeclChild.getChildren().get(0));
+							TreeNode varTypeNode = varDeclChild.getChildren().get(0);
+							assertNodeType(varTypeNode, State.ID);
+							varType = ((Token)varTypeNode.getSymbol()).value();
 						}
 					}
 

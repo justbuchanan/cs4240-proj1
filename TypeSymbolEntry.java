@@ -2,13 +2,17 @@ import java.util.ArrayList;
 
 public class TypeSymbolEntry extends SymbolTableEntry{
 	
+	private SymbolTable symbolTable;
 	private String eltType;
 	private int arrSize;
 	private ArrayList<Integer> arrDims;
 	private String typeString;
+	private String canonicalTypeString;
 	
-	public TypeSymbolEntry(String name, Scope scope, String eltType, ArrayList<Integer> arrDims) {
+	public TypeSymbolEntry(SymbolTable symbolTable, String name, Scope scope, String eltType, ArrayList<Integer> arrDims) {
 		super(name, scope);
+
+		this.symbolTable = symbolTable;
 
 		if (eltType == null) eltType = name;
 		this.eltType = eltType;
@@ -20,6 +24,24 @@ public class TypeSymbolEntry extends SymbolTableEntry{
 		if (arrDims != null) {
 			for (Integer dim : arrDims) {
 				this.typeString += "[]";
+			}
+		}
+
+		//	canonicalTypeString
+		System.out.println("THIS: " + this);
+		System.out.println("LOOKUP: " + symbolTable.getType(eltType));
+		//	traverse until we hit a base type
+		TypeSymbolEntry ancestor = this;
+		while (ancestor != null && !ancestor.getName().equals("int") && !ancestor.getName().equals("string")) {
+			ancestor = symbolTable.getType(eltType);
+		}
+
+		if (ancestor != null) {
+			this.canonicalTypeString = ancestor.getName();
+			if (arrDims != null) {
+				for (Integer dim : arrDims) {
+					this.canonicalTypeString += "[]";
+				}
 			}
 		}
 	}
@@ -36,6 +58,15 @@ public class TypeSymbolEntry extends SymbolTableEntry{
 	public String typeString() {
 		return typeString;
 	}
+
+	/**
+	 * This can be used to see the "base" or "canonical" type of a type.
+	 *
+	 * If "bar" is a type defined to be an "int", then the canonical type of "bar" is "int".
+	 */
+	public String canonicalTypeString() {
+		return canonicalTypeString;
+	}
 	
 	public ArrayList<Integer> getArrDims(){
 		return arrDims;
@@ -44,6 +75,6 @@ public class TypeSymbolEntry extends SymbolTableEntry{
 	public String toString(){
 		return "(name: " + this.getName() + " | level: " + this.getScope().getLevel() + " | func: "
 				+ this.getScope().getFuncName() + " | eltType " + eltType +
-				" | arrDims " + arrDims +  ")";
+				" | arrDims: " + arrDims + " | canonTypeStr " + canonicalTypeString +  ")";
 	}
 }

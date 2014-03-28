@@ -15,8 +15,8 @@ public class SymbolTable {
 		types = new HashMap<String, TypeSymbolEntry>();
 		scopes = new LinkedList<Scope>();
 		scopes.push(new Scope("LET", 0));
-		types.put("int", new TypeSymbolEntry("int", scopes.peek(), null, null));
-		types.put("string", new TypeSymbolEntry("string", scopes.peek(), null, null));
+		types.put("int", new TypeSymbolEntry(this, "int", scopes.peek(), null, null));
+		types.put("string", new TypeSymbolEntry(this, "string", scopes.peek(), null, null));
 	}
 	
 
@@ -63,7 +63,7 @@ public class SymbolTable {
 	}
 
 	public void addType(String name, String primType, ArrayList<Integer> arrDims){
-			types.put(name, new TypeSymbolEntry(name, scopes.peek(), primType, arrDims));
+			types.put(name, new TypeSymbolEntry(this, name, scopes.peek(), primType, arrDims));
 	}
 	
 	public void beginScope(String funcName){
