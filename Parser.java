@@ -143,14 +143,16 @@ public class Parser{
 	 * Throws an exception if the node's symbol doesn't match the given type.
 	 */
 	private void assertNodeType(TreeNode node, Enum type) {
+		if ( !nodeIsType(node, type) ) {
+			throw new RuntimeException("Expected node type '" + type + "', got node: " + node);
+		}
+	}
+
+	private boolean nodeIsType(TreeNode node, Enum type) {
 		if (type instanceof State) {
-			if ( !((Token)node.getSymbol()).type().equals((State)type) ) {
-				throw new RuntimeException("Expected node type '" + type + "', got node: " + node);
-			}
+			return ((Token)node.getSymbol()).type().equals((State)type);
 		} else {
-			if ( !((NonTerminalParserSymbol)node.getSymbol()).getNonTerminal().equals((NonTerminals)type) ) {
-				throw new RuntimeException("Expected node type '" + type + "', got node: " + node);
-			}
+			return ((NonTerminalParserSymbol)node.getSymbol()).getNonTerminal().equals((NonTerminals)type);
 		}
 	}
 
@@ -258,6 +260,24 @@ public class Parser{
 		}
 	}
 
+
+	private ArrayList<TreeNode> findOccurrencesOfNodeType(TreeNode tree, Enum nodeType) {
+		ArrayList<TreeNode> result = new ArrayList<>();
+		addOccurrencesOfNodeType(tree, nodeType, result);
+		return result;
+	}
+
+	private void ArrayList<TreeNode> addOccurrencesOfNodeType(TreeNode tree, Enum nodeType, ArrayList<TreeNode> list) {
+		//	add tree if it matches
+		if (nodeIsType(tree, nodeType)) {
+			list.add(tree);
+		}
+
+		//	recurse
+		for (TreeNode child : tree.getChildren()) {
+			addOccurrencesOfNodeType(child, nodeType, list);
+		}
+	}
 
 	public boolean semanticCheck(ParseTree ast) {
 		return checkBinaryOperands(ast.getRoot()) && 
