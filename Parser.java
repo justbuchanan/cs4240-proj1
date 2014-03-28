@@ -234,7 +234,7 @@ public class Parser{
 					String funcReturnType = "";
 					TreeNode secondToLastChild = funcDecl.getChildren().get( funcDecl.getChildren().size() - 2 );
 					if (secondToLastChild.getSymbol().equals(new NonTerminalParserSymbol(NonTerminals.RET_TYPE))) {
-						funcReturnType = getTypeOfNode(secondToLastChild.getChildren().get(0));
+						funcReturnType = getTypeOfNode(secondToLastChild.getChildren().get(0).getChildren().get(0));
 					}
 					
 						
@@ -267,7 +267,7 @@ public class Parser{
 		return result;
 	}
 
-	private void ArrayList<TreeNode> addOccurrencesOfNodeType(TreeNode tree, Enum nodeType, ArrayList<TreeNode> list) {
+	private void addOccurrencesOfNodeType(TreeNode tree, Enum nodeType, ArrayList<TreeNode> list) {
 		//	add tree if it matches
 		if (nodeIsType(tree, nodeType)) {
 			list.add(tree);
@@ -448,7 +448,7 @@ public class Parser{
 			} else if (operators.contains(type)) {
 				return getTypeOfNode(treeNode.getChildren().get(0));	//	return left operand for binary op nodes
 			} else {
-				throw IllegalArgumentException("Type doesn't make sense for the given tree: " + treeNode);
+				throw new IllegalArgumentException("Type doesn't make sense for the given tree: " + treeNode);
 			}
 		} else {
 			NonTerminalParserSymbol topNonterminalSymbol = (NonTerminalParserSymbol)topLevelSymbol;
@@ -470,7 +470,7 @@ public class Parser{
 					return null;
 				}
 			} else {
-				throw IllegalArgumentException("Type doesn't make sense for the given tree: " + treeNode);
+				throw new IllegalArgumentException("Type doesn't make sense for the given tree: " + treeNode);
 			}
 		}
 	}
