@@ -280,7 +280,7 @@ public class Parser{
 	}
 
 	public boolean semanticCheck(ParseTree ast) {
-		return checkBinaryOperands(ast.getRoot()) && 
+		return findAssignmentStatement(ast.getRoot()) && 
 		checkInitialization(ast.getRoot()) && 
 		checkFuncParams(ast.getRoot());
 	}
@@ -324,7 +324,20 @@ public class Parser{
 		return pass;
 	}
 
-	public boolean checkBinaryOperands(TreeNode treeNodeParam) {
+	public boolean findAssignmentStatement(TreeNode treeNodeParam) {
+		boolean pass = true;
+		for (TreeNode treeNode : treeNodeParam.getChildren()) {
+			if (treeNode.getSymbol().isTerminal() && ((Token) treeNode.getSymbol()).ordinal() == State.ASSIGN.ordinal()) {
+				TreeNode assignTo = treeNode.getChildren().get(0);
+				pass = checkBinaryOperands(treeNode, symbolTable.getVar(((Token) assignTo.getSymbol()).value()).getType().getName());
+			}
+			findAssignmentStatement(treeNode);
+		}
+
+		return pass;
+	}
+
+	public boolean checkBinaryOperands(TreeNode treeNodeParam, String type) {
 		boolean pass = true;
 
 		//	operators that work only on ints
@@ -352,30 +365,38 @@ public class Parser{
 				if (operatorChildren.size() != 2) {
 					System.out.println("ERROR: WRONG NUMBER OF OPERANDS FOR PLUS/SUB/MULT/DIV");
 					pass = false;
-					continue;
-				}
-				TreeNode left = operatorChildren.get(0);
-				TreeNode right = operatorChildren.get(1);
-				
-				if (getTypeOfNode(left) == null || !getTypeOfNode(left).equals("int")) {
-					System.out.println("ERROR: Variable needs to be int");
-					pass = false;
-				}
-				if (getTypeOfNode(right) == null || getTypeOfNode(right) != null && !getTypeOfNode(right).equals("int")) {
-					System.out.println("ERROR: Variable needs to be int");
-					pass = false;
-				}
-				if (pass == true) {
-					System.out.println("OPERANDS CORRECT!!!");
+				} else {
+					TreeNode left = operatorChildren.get(0);
+					TreeNode right = operatorChildren.get(1);
+					String varName = "";				
+					if (getTypeOfNode(left) == null || !getTypeOfNode(left).equals(type)) {
+						if (symbolTable.containsVar(((Token) left.getSymbol()).value())) {
+							System.out.println("ERROR: Variable " + symbolTable.getVar(((Token) left.getSymbol()).value()) + " at line number " + ((Token) left.getSymbol()).lineNumber + " needs to be " + type);
+						} else {
+							System.out.println("ERROR: Variable at line number " + ((Token) left.getSymbol()).lineNumber + " needs to be " + type);
+						}
+						pass = false;
+					}
+					if (getTypeOfNode(right) == null || !getTypeOfNode(right).equals(type)) {
+						if (symbolTable.containsVar(((Token) right.getSymbol()).value())) {
+							System.out.println("ERROR: Variable " + symbolTable.getVar(((Token) right.getSymbol()).value()) + " at line number " + ((Token) left.getSymbol()).lineNumber + " needs to be " + type);
+						} else {
+							System.out.println("ERROR: Variable at line number needs to be " + type);
+						}
+						pass = false;
+					}
+					if (pass == true) {
+						System.out.println("OPERANDS CORRECT!!!");
+					}
 				}
 			}
 
 			//	if a subtree fails, the whole thing fails
-			if ( !checkBinaryOperands(treeNode) ) pass = false;
+			if ( !checkBinaryOperands(treeNode, type) ) pass = false;
 		}
 
 		//	FIXME: what operators can apply to strings as well as ints?
-		//	FIXME: line numbers and ID values for error messages
+		//	FIXME: ID values for error messages
 
 		return pass;
 	}
