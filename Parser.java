@@ -327,12 +327,25 @@ public class Parser{
 	public boolean checkBinaryOperands(TreeNode treeNodeParam) {
 		boolean pass = true;
 
+		//	operators that work only on ints
+		ArrayList<State> intOperators = new ArrayList<State>(
+			Arrays.asList(new State[]{
+				State.MULT,
+				State.DIV,
+				State.PLUS,
+				State.MINUS,
+				State.GREATER,
+				State.LESSER,
+				State.GREATEREQ,
+				State.LESSEREQ,
+				State.EQ,
+				State.NEQ,
+			})
+		);
+
 		for (TreeNode treeNode : treeNodeParam.getChildren()) {			
-			if (treeNode.getSymbol().isTerminal() && (((Token) treeNode.getSymbol()).ordinal() == State.PLUS.ordinal() || 
-				((Token) treeNode.getSymbol()).ordinal() == State.MINUS.ordinal() ||
-				((Token) treeNode.getSymbol()).ordinal() == State.MULT.ordinal() ||
-				((Token) treeNode.getSymbol()).ordinal() == State.DIV.ordinal())) {
-				System.out.println("FOUND PLUS/SUB/MULT/DIV...Checking operands");
+			if (intOperators.contains(treeNode.getSymbol())) {
+				System.out.println("FOUND int-only operator (MULT, LESSER, etc)... Checking operands");
 				ArrayList<TreeNode> operatorChildren = treeNode.getChildren();
 				if (operatorChildren.size() != 2) {
 					System.out.println("ERROR: WRONG NUMBER OF OPERANDS FOR PLUS/SUB/MULT/DIV");
@@ -356,6 +369,9 @@ public class Parser{
 			}
 			checkBinaryOperands(treeNode);
 		}
+
+		//	FIXME: what operators can apply to strings as well as ints?
+		//	FIXME: line numbers and ID values for error messages
 
 		return pass;
 	}
