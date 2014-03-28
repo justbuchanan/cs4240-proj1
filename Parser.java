@@ -340,6 +340,8 @@ public class Parser{
 				State.LESSEREQ,
 				State.EQ,
 				State.NEQ,
+				State.AND,
+				State.OR,
 			})
 		);
 
