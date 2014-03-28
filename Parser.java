@@ -328,24 +328,24 @@ public class Parser{
 		boolean pass = true;
 
 		//	operators that work only on ints
-		ArrayList<State> intOperators = new ArrayList<State>(
-			Arrays.asList(new State[]{
-				State.MULT,
-				State.DIV,
-				State.PLUS,
-				State.MINUS,
-				State.GREATER,
-				State.LESSER,
-				State.GREATEREQ,
-				State.LESSEREQ,
-				State.EQ,
-				State.NEQ,
-				State.AND,
-				State.OR,
+		ArrayList<Token> intOperators = new ArrayList<Token>(
+			Arrays.asList(new Token[]{
+				new Token(State.MULT),
+				new Token(State.DIV),
+				new Token(State.PLUS),
+				new Token(State.MINUS),
+				new Token(State.GREATER),
+				new Token(State.LESSER),
+				new Token(State.GREATEREQ),
+				new Token(State.LESSEREQ),
+				new Token(State.EQ),
+				new Token(State.NEQ),
+				new Token(State.AND),
+				new Token(State.OR),
 			})
 		);
 
-		for (TreeNode treeNode : treeNodeParam.getChildren()) {			
+		for (TreeNode treeNode : treeNodeParam.getChildren()) {	
 			if (intOperators.contains(treeNode.getSymbol())) {
 				System.out.println("FOUND int-only operator (MULT, LESSER, etc)... Checking operands");
 				ArrayList<TreeNode> operatorChildren = treeNode.getChildren();
@@ -369,7 +369,9 @@ public class Parser{
 					System.out.println("OPERANDS CORRECT!!!");
 				}
 			}
-			checkBinaryOperands(treeNode);
+
+			//	if a subtree fails, the whole thing fails
+			if ( !checkBinaryOperands(treeNode) ) pass = false;
 		}
 
 		//	FIXME: what operators can apply to strings as well as ints?
