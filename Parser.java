@@ -365,7 +365,8 @@ public class Parser{
 
 	//	Recursively get the type of a given tree
 	//
-	//	note: returns null if type isn't meaningful for the given tree
+	//	note: returns null if there's no type info for a given ID
+	//	note: throws an exception if type isn't meaningful for the given tree
 	//	note: returns the type of the left operand for operator nodes
 	//		example: getTypeOfNode( (+ "abc" 123) ) --> "string";  getTypeOfNode( (+ 123 "abc") ) --> "int"
 	private String getTypeOfNode(TreeNode treeNode) {
@@ -430,8 +431,7 @@ public class Parser{
 			} else if (operators.contains(type)) {
 				return getTypeOfNode(treeNode.getChildren().get(0));	//	return left operand for binary op nodes
 			} else {
-				//	type is not meaningful for the given tree
-				return null;
+				throw IllegalArgumentException("Type doesn't make sense for the given tree: " + treeNode);
 			}
 		} else {
 			NonTerminalParserSymbol topNonterminalSymbol = (NonTerminalParserSymbol)topLevelSymbol;
@@ -453,8 +453,7 @@ public class Parser{
 					return null;
 				}
 			} else {
-				//	type is not meaningful for the given tree
-				return null;
+				throw IllegalArgumentException("Type doesn't make sense for the given tree: " + treeNode);
 			}
 		}
 	}
