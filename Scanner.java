@@ -214,12 +214,12 @@ public class Scanner{
 						if (c != -1) pushChar(c);
 
 						if (state == State.ID.ordinal() && _keywordTable.get(str) !=  null) {
-							return new Token(_keywordTable.get(str).ordinal(), str, currLine);
+							return new Token(_keywordTable.get(str).ordinal(), str, currLine - 2);
 						} else {
-							return new Token(state, str, currLine);
+							return new Token(state, str, currLine - 2);
 						}
 					} else {
-						return new Token(State.ERROR.ordinal(), null, currLine);
+						return new Token(State.ERROR.ordinal(), null, currLine - 2);
 					}
 				} else {
 					str += (char)c;
