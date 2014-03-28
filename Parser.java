@@ -143,14 +143,16 @@ public class Parser{
 	 * Throws an exception if the node's symbol doesn't match the given type.
 	 */
 	private void assertNodeType(TreeNode node, Enum type) {
+		if ( !nodeIsType(node, type) ) {
+			throw new RuntimeException("Expected node type '" + type + "', got node: " + node);
+		}
+	}
+
+	private boolean nodeIsType(TreeNode node, Enum type) {
 		if (type instanceof State) {
-			if ( !((Token)node.getSymbol()).type().equals((State)type) ) {
-				throw new RuntimeException("Expected node type '" + type + "', got node: " + node);
-			}
+			return ((Token)node.getSymbol()).type().equals((State)type);
 		} else {
-			if ( !((NonTerminalParserSymbol)node.getSymbol()).getNonTerminal().equals((NonTerminals)type) ) {
-				throw new RuntimeException("Expected node type '" + type + "', got node: " + node);
-			}
+			return ((NonTerminalParserSymbol)node.getSymbol()).getNonTerminal().equals((NonTerminals)type);
 		}
 	}
 
@@ -259,6 +261,24 @@ public class Parser{
 	}
 
 
+	private ArrayList<TreeNode> findOccurrencesOfNodeType(TreeNode tree, Enum nodeType) {
+		ArrayList<TreeNode> result = new ArrayList<>();
+		addOccurrencesOfNodeType(tree, nodeType, result);
+		return result;
+	}
+
+	private void ArrayList<TreeNode> addOccurrencesOfNodeType(TreeNode tree, Enum nodeType, ArrayList<TreeNode> list) {
+		//	add tree if it matches
+		if (nodeIsType(tree, nodeType)) {
+			list.add(tree);
+		}
+
+		//	recurse
+		for (TreeNode child : tree.getChildren()) {
+			addOccurrencesOfNodeType(child, nodeType, list);
+		}
+	}
+
 	public boolean semanticCheck(ParseTree ast) {
 		return checkBinaryOperands(ast.getRoot()) && 
 		checkInitialization(ast.getRoot()) && 
@@ -307,12 +327,27 @@ public class Parser{
 	public boolean checkBinaryOperands(TreeNode treeNodeParam) {
 		boolean pass = true;
 
+		//	operators that work only on ints
+		ArrayList<State> intOperators = new ArrayList<State>(
+			Arrays.asList(new State[]{
+				State.MULT,
+				State.DIV,
+				State.PLUS,
+				State.MINUS,
+				State.GREATER,
+				State.LESSER,
+				State.GREATEREQ,
+				State.LESSEREQ,
+				State.EQ,
+				State.NEQ,
+				State.AND,
+				State.OR,
+			})
+		);
+
 		for (TreeNode treeNode : treeNodeParam.getChildren()) {			
-			if (treeNode.getSymbol().isTerminal() && (((Token) treeNode.getSymbol()).ordinal() == State.PLUS.ordinal() || 
-				((Token) treeNode.getSymbol()).ordinal() == State.MINUS.ordinal() ||
-				((Token) treeNode.getSymbol()).ordinal() == State.MULT.ordinal() ||
-				((Token) treeNode.getSymbol()).ordinal() == State.DIV.ordinal())) {
-				System.out.println("FOUND PLUS/SUB/MULT/DIV...Checking operands");
+			if (intOperators.contains(treeNode.getSymbol())) {
+				System.out.println("FOUND int-only operator (MULT, LESSER, etc)... Checking operands");
 				ArrayList<TreeNode> operatorChildren = treeNode.getChildren();
 				if (operatorChildren.size() != 2) {
 					System.out.println("ERROR: WRONG NUMBER OF OPERANDS FOR PLUS/SUB/MULT/DIV");
@@ -337,6 +372,9 @@ public class Parser{
 			checkBinaryOperands(treeNode);
 		}
 
+		//	FIXME: what operators can apply to strings as well as ints?
+		//	FIXME: line numbers and ID values for error messages
+
 		return pass;
 	}
 	
@@ -345,7 +383,8 @@ public class Parser{
 
 	//	Recursively get the type of a given tree
 	//
-	//	note: returns null if type isn't meaningful for the given tree
+	//	note: returns null if there's no type info for a given ID
+	//	note: throws an exception if type isn't meaningful for the given tree
 	//	note: returns the type of the left operand for operator nodes
 	//		example: getTypeOfNode( (+ "abc" 123) ) --> "string";  getTypeOfNode( (+ 123 "abc") ) --> "int"
 	private String getTypeOfNode(TreeNode treeNode) {
@@ -409,8 +448,7 @@ public class Parser{
 			} else if (operators.contains(type)) {
 				return getTypeOfNode(treeNode.getChildren().get(0));	//	return left operand for binary op nodes
 			} else {
-				//	type is not meaningful for the given tree
-				return null;
+				throw IllegalArgumentException("Type doesn't make sense for the given tree: " + treeNode);
 			}
 		} else {
 			NonTerminalParserSymbol topNonterminalSymbol = (NonTerminalParserSymbol)topLevelSymbol;
@@ -432,8 +470,7 @@ public class Parser{
 					return null;
 				}
 			} else {
-				//	type is not meaningful for the given tree
-				return null;
+				throw IllegalArgumentException("Type doesn't make sense for the given tree: " + treeNode);
 			}
 		}
 	}
