@@ -711,4 +711,19 @@ public class Parser{
 	public void printTree() {
 		System.out.println("AST:\n" + parseTree.toString());
 	}
+
+	/** 
+	 * Returns the reduced parse tree.
+	 * Assumes that parseText() has already been called.
+	 */
+	public ParseTree getAST() {
+		return parseTree;
+	}
+
+	/**
+	 * Assumes that parseText() has already been called.
+	 */
+	public SymbolTable getSymbolTable() {
+		return symbolTable;
+	}
 }

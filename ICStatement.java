@@ -25,6 +25,14 @@ public class ICStatement {
 		components.add(operand2Reg);
 	}
 
+	public String toString() {
+		if (isLabel()) {
+			return "label: " + labelName;
+		} else {
+			return getOperator() + " " + getOutputRegister() + ", " + getLeftOperand() + ", " + getRightOperand();
+		}
+	}
+
 
 	//	Operation Statement
 	////////////////////////////////////////////////////////////////////////////////

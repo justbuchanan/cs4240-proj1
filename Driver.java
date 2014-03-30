@@ -3,6 +3,7 @@ import java.io.FileReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 
 public class Driver {
 	public static void main(String[] args) {
@@ -28,7 +29,14 @@ public class Driver {
 		parser.parseText(stdlibScanner, false);
 		
 		// parse input file
-		parser.parseText(sourceScanner, true);
+		boolean parseSuccess = parser.parseText(sourceScanner, true);
+
+		//	IR Code
+		if (parseSuccess) {
+			System.out.println("Generating IR code...\n");
+			ArrayList<ICStatement> irCode = IRCodeGenerator.generateIRCode(parser.getAST(), parser.getSymbolTable());
+			System.out.println("IR Code:\n" + irCode);
+		}
 
 		//	write debug files
 		writeFile("parser_rules.txt", grammar.prettyPrintedRules());
