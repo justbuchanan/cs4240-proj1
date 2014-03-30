@@ -139,27 +139,9 @@ public class Parser{
 	}
 
 
-	/**
-	 * Throws an exception if the node's symbol doesn't match the given type.
-	 */
-	private void assertNodeType(TreeNode node, Enum type) {
-		if ( !nodeIsType(node, type) ) {
-			throw new RuntimeException("Expected node type '" + type + "', got node: " + node);
-		}
-	}
-
-	private boolean nodeIsType(TreeNode node, Enum type) {
-		if (type instanceof State) {
-			return ((Token)node.getSymbol()).type().equals((State)type);
-		} else {
-			return ((NonTerminalParserSymbol)node.getSymbol()).getNonTerminal().equals((NonTerminals)type);
-		}
-	}
-
-
 	private void buildSymbolTableFromAST(ParseTree ast) {
 		TreeNode declSeg = ast.getRoot().getChildren().get(0);
-		assertNodeType(declSeg, NonTerminals.DECLARATION_SEGMENT);
+		declSeg.assertNodeType(NonTerminals.DECLARATION_SEGMENT);
 
 		//	look for the different declaration lists (var, type, funct)
 		for (TreeNode declList : declSeg.getChildren()) {
@@ -174,10 +156,10 @@ public class Parser{
 
 					//	nonterminal TYPE
 					TreeNode typeNode = typeDecl.getChildren().get(1);
-					assertNodeType(typeNode, NonTerminals.TYPE);
+					typeNode.assertNodeType(NonTerminals.TYPE);
 
 					TreeNode typeIDNode = typeNode.getChildren().get( typeNode.getChildren().size() - 1 );
-					assertNodeType(typeIDNode, NonTerminals.TYPE_ID);
+					typeIDNode.assertNodeType(NonTerminals.TYPE_ID);
 
 					//	the element type (first child of the typeIDNode)
 					String eltType = getTypeOfNode(typeIDNode.getChildren().get(0));
@@ -186,7 +168,7 @@ public class Parser{
 					ArrayList<Integer> arrDims = new ArrayList<>();
 					for (int i = 0; i <= typeNode.getChildren().size() - 2; i++) {
 						TreeNode intlit = typeNode.getChildren().get(i);
-						assertNodeType(intlit, State.INTLIT);
+						intlit.assertNodeType(State.INTLIT);
 
 						Integer arrDim = Integer.parseInt( ((Token)intlit.getSymbol()).value() );
 						arrDims.add(arrDim);
@@ -212,7 +194,7 @@ public class Parser{
 							}
 						} else if (varDeclChild.getSymbol().equals(new NonTerminalParserSymbol(NonTerminals.TYPE_ID))) {
 							TreeNode varTypeNode = varDeclChild.getChildren().get(0);
-							assertNodeType(varTypeNode, State.ID);
+							varTypeNode.assertNodeType(State.ID);
 							varType = ((Token)varTypeNode.getSymbol()).value();
 						}
 					}
@@ -269,7 +251,7 @@ public class Parser{
 
 	private void addOccurrencesOfNodeType(TreeNode tree, Enum nodeType, ArrayList<TreeNode> list) {
 		//	add tree if it matches
-		if (nodeIsType(tree, nodeType)) {
+		if (tree.isNodeType(nodeType)) {
 			list.add(tree);
 		}
 

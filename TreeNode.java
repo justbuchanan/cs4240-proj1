@@ -36,6 +36,23 @@ public class TreeNode {
 	}
 
 	/**
+	 * Throws an exception if the node's symbol doesn't match the given type.
+	 */
+	public void assertNodeType(Enum type) {
+		if ( !isNodeType(type) ) {
+			throw new RuntimeException("Expected node type '" + type + "', got node: " + this);
+		}
+	}
+
+	public boolean isNodeType(Enum type) {
+		if (type instanceof State) {
+			return ((Token)getSymbol()).type().equals((State)type);
+		} else {
+			return ((NonTerminalParserSymbol)getSymbol()).getNonTerminal().equals((NonTerminals)type);
+		}
+	}
+
+	/**
 	 * Replaces the @children array with the given array.
 	 * Also updates @parent for each new child node
 	 */
