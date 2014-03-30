@@ -288,25 +288,53 @@ public class Parser{
 	
 	public boolean checkFuncReturnTypes(TreeNode treeNode){
 		for(TreeNode currNode : treeNode.getChildren()){
-			if(currNode.getSymbol().equals(NonTerminals.FUNCT_DECLARATION)){
-				ArrayList<TreeNode> funcVals = currNode.getChildren();
-				String funcName = ((Token)funcVals.get(0).getSymbol()).value();
-				ArrayList<TreeNode> funcBody = funcVals.get(funcVals.size() - 1).getChildren(); // STAT, STAT_SEQ_PRIME
-				ArrayList<TreeNode> statement = funcBody.get(0).getChildren();
-				if(statement.get(0).equals(new Token(State.RETURN))){
-					// check return type of function
-					FuncSymbolEntry func = symbolTable.getFunc(funcName);
-					ArrayList<TreeNode> expr = statement.get(1).getChildren();
-					
+			if(currNode.getSymbol().equals(new NonTerminalParserSymbol(NonTerminals.FUNCT_DECLARATION))){
+				TreeNode idNode = currNode.getChildren().get(0);
+				String funcName = ((Token)idNode.getSymbol()).value();
+				FuncSymbolEntry func = symbolTable.getFunc(funcName);
+				// descend subtree and look for return type
+				ArrayList<TreeNode> returnStatements = findSymbolSubTree(currNode, new Token(State.RETURN), new ArrayList<TreeNode>());
+				if(func.getReturnType() == null && !returnStatements.isEmpty()){
+					System.out.println("ERROR: WRONG RETURN TYPE FOR FUNC " + funcName + " , "
+							+ "expected void" );
+					return false;
 				}
-				
-				
+				for(TreeNode retNode : returnStatements){
+					String retType = checkFuncReturnTypeHelper(retNode);
+					if(retType != null && retType.equals(symbolTable.getFunc(funcName).getReturnType())){
+						System.out.println("ERROR: WRONG RETURN TYPE FOR FUNCTION " + funcName + " "
+								+ "expected " + symbolTable.getFunc(funcName).getReturnType() + " but found " + retType);
+						return false;
+					}
+				}
 			}
 			else{
 				checkFuncReturnTypes(currNode);
 			}
 		}
-		return false;
+		return true;
+	}
+
+	public String checkFuncReturnTypeHelper(TreeNode retNode){
+		if(retNode.getSymbol().isTerminal() && ((Token)retNode.getSymbol()).type() == State.RETURN){
+			ArrayList<TreeNode> returnVals = retNode.getChildren();
+			return getTypeOfNode(returnVals.get(0));
+		}
+		else{
+			throw new RuntimeException("Called checkFuncReturnTypeHelper with wrong type!");
+		}
+	}
+
+	public ArrayList<TreeNode> findSymbolSubTree(TreeNode currNode, ParserSymbol target, ArrayList<TreeNode> foundTargets){
+		if(currNode.getSymbol().equals(target)){
+			foundTargets.add(currNode);
+		}
+		else{
+			for(TreeNode child : currNode.getChildren()){
+				findSymbolSubTree(child, target, foundTargets);
+			}
+		}
+		return foundTargets;
 	}
 	
 	
