@@ -231,7 +231,7 @@ public class Parser{
 				for (TreeNode funcDecl : funcDeclList.getChildren()) {
 					String funcName = ((Token)funcDecl.getChildren().get(0).getSymbol()).value();	//	first child is an ID for the function name
 					
-					String funcReturnType = "";
+					String funcReturnType = null;
 					TreeNode secondToLastChild = funcDecl.getChildren().get( funcDecl.getChildren().size() - 2 );
 					if (secondToLastChild.getSymbol().equals(new NonTerminalParserSymbol(NonTerminals.RET_TYPE))) {
 						funcReturnType = getTypeOfNode(secondToLastChild.getChildren().get(0).getChildren().get(0));
@@ -280,9 +280,10 @@ public class Parser{
 	}
 
 	public boolean semanticCheck(ParseTree ast) {
-		return findAssignmentStatement(ast.getRoot()) && 
-		checkInitialization(ast.getRoot()) && 
-		checkFuncParams(ast.getRoot());
+		return findAssignmentStatement(ast.getRoot()) &&
+		checkInitialization(ast.getRoot()) &&
+		checkFuncParams(ast.getRoot()) &&
+		checkFuncReturnTypes(ast.getRoot());
 	}
 	
 	public boolean checkFuncReturnTypes(TreeNode treeNode){
