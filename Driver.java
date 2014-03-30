@@ -35,7 +35,7 @@ public class Driver {
 		if (parseSuccess) {
 			System.out.println("Generating IR code...\n");
 			ArrayList<ICStatement> irCode = IRCodeGenerator.generateIRCode(parser.getAST(), parser.getSymbolTable());
-			System.out.println("IR Code:\n" + irCode);
+			System.out.println("\nIR Code:\n" + irCode);
 		}
 
 		//	write debug files

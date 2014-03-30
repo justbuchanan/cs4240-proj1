@@ -54,7 +54,7 @@ public class ICStatement {
 	}
 
 
-	//	Label Statement
+	//	Label "Statement"
 	////////////////////////////////////////////////////////////////////////////////
 
 	public String getLabelName() {
