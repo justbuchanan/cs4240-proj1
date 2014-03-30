@@ -301,7 +301,7 @@ public class Parser{
 				}
 				for(TreeNode retNode : returnStatements){
 					String retType = checkFuncReturnTypeHelper(retNode);
-					if(retType != null && retType.equals(symbolTable.getFunc(funcName).getReturnType())){
+					if(retType != null && !retType.equals(symbolTable.getFunc(funcName).getReturnType())){
 						System.out.println("ERROR: WRONG RETURN TYPE FOR FUNCTION " + funcName + " "
 								+ "expected " + symbolTable.getFunc(funcName).getReturnType() + " but found " + retType);
 						return false;
