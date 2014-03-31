@@ -55,8 +55,14 @@ public class SymbolTable {
 		return vars.keySet();
 	}
 
+	// TODO: check calls to function and make sure caller accounts for scope!
 	public VarSymbolEntry getVar(String varName){
-		return vars.get(varName).get(0);
+		if(vars.containsKey(varName)) return vars.get(varName).get(0);
+		else return null;
+	}
+	
+	public ArrayList<VarSymbolEntry> getVarList(String varName){
+		return vars.get(varName);
 	}
 
 	public FuncSymbolEntry getFunc(String funcName){

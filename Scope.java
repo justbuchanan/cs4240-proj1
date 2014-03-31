@@ -15,4 +15,9 @@ public class Scope {
 	public int getLevel(){
 		return level;
 	}
+	
+	public boolean equals(Scope scp){
+		return funcName.equals(scp.getFuncName()) && 
+				level == scp.getLevel();
+	}
 }

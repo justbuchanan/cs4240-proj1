@@ -30,12 +30,12 @@ end;
 
 /* Return a single-character string for ASCII value i. Terminate program if i is out of range. */
 function chr(i : int) : string begin
-	return(i);
+	return("RETURN");
 end;
 
 /* Return the number of characters in s.  */
 function size(s : string) : int begin
-	return(s);
+	return(-1);
 end;
 
 /* Return the substring of s starting at the character f (first character is numbered zero) and going for n characters. */
