@@ -3,17 +3,17 @@
 
 let
 /* Print the string on the standard output. */
-function print(s : string) begin
+function print(s : string) : string begin
 	return(s);
 end;
 
 /*Print the integer on the standard output */
-function printi(i : int) begin
+function printi(i : int) : int begin
 	return(i);
 end;
 
 /* Flush the standard output buffer. */
-function flush() begin
+function flush() : int begin
 	return(nil);
 end;
 
@@ -25,7 +25,7 @@ end;
 
 /* Return the ASCII value of the first character of  */
 function ord(s : string) : int begin
-	return(s);
+	return(1);
 end;
 
 /* Return a single-character string for ASCII value i. Terminate program if i is out of range. */
@@ -54,7 +54,7 @@ function not(i : int) : int begin
 end;
 
 /* Terminate execution of the program with code i. */
-function exit(i : int) begin 
+function exit(i : int) : int begin 
 	return(i);
 end;
 
