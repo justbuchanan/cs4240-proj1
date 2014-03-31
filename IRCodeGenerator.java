@@ -380,6 +380,10 @@ public class IRCodeGenerator {
 			codeOut.add(new ICStatement(endLabelName));
 
 			return null;
+		} else if (parentSymbol.equals(State.RETURN)) {
+			String returnExprVar = generateIRCodeForNode(tree.getChildren().get(0), codeOut);
+			codeOut.add(new ICStatement("return", returnExprVar, "", ""));
+			return null;
 		} else {
 			throw new RuntimeException("Don't know how to generate IR for node type: " + parentSymbol);
 		}
