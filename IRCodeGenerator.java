@@ -312,6 +312,30 @@ public class IRCodeGenerator {
 			codeOut.add(new ICStatement(endLabelName));
 
 			return null;
+		} else if (parentSymbol.equals(State.WHILE)) {
+
+			//	label that goes after the contents of the loop
+			String endLabelName = unique_label("while_loop_end");
+
+			//	label for the top of the loop
+			String labelName = unique_label("while_loop");
+			codeOut.add(new ICStatement(labelName));
+
+			// //	evaluate loop expr
+			TreeNode loopExprNode = tree.getChildren().get(0);
+			String loopVar = generateIRCodeForNode(loopExprNode, codeOut);
+
+			//	check condition, jump to end if we're done
+			codeOut.add(new ICStatement("brneq", loopVar, "0", endLabelName));
+
+			//	loop contents
+			TreeNode loopContents = tree.getChildren().get(1);
+			generateIRCodeForNode(loopContents, codeOut);
+
+			//	end label
+			codeOut.add(new ICStatement(endLabelName));
+
+			return null;
 		} else {
 			throw new RuntimeException("Don't know how to generate IR for node type: " + parentSymbol);
 		}
