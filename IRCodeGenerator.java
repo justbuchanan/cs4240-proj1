@@ -273,10 +273,10 @@ public class IRCodeGenerator {
 
 			return resultVar;
 		} else if (parentSymbol.equals(State.OR)) {
-			String endLabel = unique_label("or_and");
+			String endLabel = unique_label("end_or");
 
 			//	starts out as true
-			String resultVar = unique_var("andResult");
+			String resultVar = unique_var("orResult");
 			codeOut.add(new ICStatement("assign", resultVar, "1", ""));
 
 			//	evaluate the left arg and skip the right arg if left is true
