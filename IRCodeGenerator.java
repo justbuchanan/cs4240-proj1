@@ -63,6 +63,11 @@ public class IRCodeGenerator {
 				State.MINUS,
 				State.MULT,
 				State.DIV,
+			})
+		);
+
+		ArrayList<Enum> compareOps = new ArrayList<Enum>(
+			Arrays.asList(new Enum[]{
 				State.EQ,
 				State.NEQ,
 				State.GREATER,
@@ -187,6 +192,7 @@ public class IRCodeGenerator {
 
 			FuncSymbolEntry funcEntry = symbolTable.getFunc(funcName);
 
+			codeOut.add(new ICStatement());	//	newline
 			codeOut.add(new ICStatement(labelName));
 
 			//	statement sequence is the last node
@@ -211,7 +217,7 @@ public class IRCodeGenerator {
 			else if (parentSymbol.equals(State.AND)) opCode = "and";
 			else if (parentSymbol.equals(State.OR)) opCode = "or";
 			else {
-				//	FIXME: implement comparison operators
+				//	just to make sure I didn't miss any...
 				throw new RuntimeException("Don't know how to make opcode for: " + parentSymbol);
 			}
 
@@ -221,6 +227,45 @@ public class IRCodeGenerator {
 
 			//	add the code for this operation
 			codeOut.add(new ICStatement(opCode, resultVar, leftArgVar, rightArgVar));
+
+			return resultVar;
+		} else if (compareOps.contains(parentSymbol)) {
+			String resultVar = unique_var("t");
+			
+			//	evaluate subexpressions
+			String leftArgVar = generateIRCodeForNode(tree.getChildren().get(0), codeOut);
+			String rightArgVar = generateIRCodeForNode(tree.getChildren().get(1), codeOut);
+
+			if (parentSymbol.equals(State.LESSER)) {
+				codeOut.add(new ICStatement("slt", resultVar, leftArgVar, rightArgVar));
+			} else if (parentSymbol.equals(State.GREATER)) {
+				codeOut.add(new ICStatement("slt", resultVar, rightArgVar, leftArgVar));
+			} else if (parentSymbol.equals(State.LESSEREQ)) {
+				//	(a <= b) == !(b < a)
+				codeOut.add(new ICStatement("slt", resultVar, rightArgVar, leftArgVar));
+				codeOut.add(new ICStatement("sub", resultVar, resultVar, "1"));
+			} else if (parentSymbol.equals(State.GREATEREQ)) {
+				//	(a >= b) == !(a < b)
+				codeOut.add(new ICStatement("slt", resultVar, leftArgVar, rightArgVar));
+				codeOut.add(new ICStatement("sub", resultVar, resultVar, "1"));
+			} else if (parentSymbol.equals(State.EQ)) {
+				String afterEqLabel = unique_label("after_eq");
+
+				codeOut.add(new ICStatement("assign", resultVar, "1", ""));
+				codeOut.add(new ICStatement("breq", leftArgVar, rightArgVar, afterEqLabel));
+				codeOut.add(new ICStatement("assign", resultVar, "0", ""));
+				codeOut.add(new ICStatement(afterEqLabel));
+			} else if (parentSymbol.equals(State.NEQ)) {
+				String afterNeqLabel = unique_label("after_neq");
+
+				codeOut.add(new ICStatement("assign", resultVar, "1", ""));
+				codeOut.add(new ICStatement("brneq", leftArgVar, rightArgVar, afterNeqLabel));
+				codeOut.add(new ICStatement("assign", resultVar, "0", ""));
+				codeOut.add(new ICStatement(afterNeqLabel));
+			} else {
+				//	make sure I didn't forget any...
+				throw new RuntimeException("Comparison operator '" + parentSymbol + "' not implemented");
+			}
 
 			return resultVar;
 		} else if (parentSymbol.equals(State.ID)) {
@@ -313,7 +358,6 @@ public class IRCodeGenerator {
 
 			return null;
 		} else if (parentSymbol.equals(State.WHILE)) {
-
 			//	label that goes after the contents of the loop
 			String endLabelName = unique_label("while_loop_end");
 
@@ -326,7 +370,7 @@ public class IRCodeGenerator {
 			String loopVar = generateIRCodeForNode(loopExprNode, codeOut);
 
 			//	check condition, jump to end if we're done
-			codeOut.add(new ICStatement("brneq", loopVar, "0", endLabelName));
+			codeOut.add(new ICStatement("breq", loopVar, "0", endLabelName));
 
 			//	loop contents
 			TreeNode loopContents = tree.getChildren().get(1);
