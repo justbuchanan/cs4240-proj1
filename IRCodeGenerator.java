@@ -380,6 +380,32 @@ public class IRCodeGenerator {
 			codeOut.add(new ICStatement(endLabelName));
 
 			return null;
+		} else if (parentSymbol.equals(State.IF)) {
+			boolean hasElseClause = tree.getChildren().size() == 3;
+			String elseLabel = unique_label("else");
+			String endIfLabel = unique_label("end_if");
+
+			//	evaluate condition
+			String conditionVar = generateIRCodeForNode(tree.getChildren().get(0), codeOut);
+			String jumpTo = hasElseClause ? elseLabel : endIfLabel;
+			codeOut.add(new ICStatement("breq", conditionVar, "0", jumpTo));
+
+			//	THEN clause
+			generateIRCodeForNode(tree.getChildren().get(1), codeOut);
+
+			if (hasElseClause) {
+				//	skip over ELSE clause at the end of the THEN clause
+				codeOut.add(new ICStatement("goto", endIfLabel, "", ""));
+
+				//	ELSE
+				codeOut.add(new ICStatement(elseLabel));
+				generateIRCodeForNode(tree.getChildren().get(2), codeOut);
+			}
+
+			//	end label
+			codeOut.add(new ICStatement(endIfLabel));
+
+			return null;
 		} else if (parentSymbol.equals(State.RETURN)) {
 			String returnExprVar = generateIRCodeForNode(tree.getChildren().get(0), codeOut);
 			codeOut.add(new ICStatement("return", returnExprVar, "", ""));
