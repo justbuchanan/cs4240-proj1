@@ -72,21 +72,36 @@ public class IRCodeGenerator {
 			})
 		);
 
-		//	TODO: handle the rest of the necessary parent symbols below
 
 		if (parentSymbol.equals(NonTerminals.TIGER_PROGRAM)) {
 			//	declaration segment
-			generateIRCodeForNode(tree.getChildren().get(0), codeOut);
+			TreeNode declSeg = tree.getChildren().get(0);
+
+			TreeNode varDeclList = null;
+			TreeNode funcDeclList = null;
+			for (TreeNode declList : declSeg.getChildren()) {
+				if (declList.getSymbol().equals(new NonTerminalParserSymbol(NonTerminals.VAR_DECLARATION_LIST))) {
+					varDeclList = declList;
+				} else if (declList.getSymbol().equals(new NonTerminalParserSymbol(NonTerminals.FUNCT_DECLARATION_LIST))) {
+					funcDeclList = declList;
+				}
+			}
+
+			//	do function declarations first
+			if (funcDeclList != null) generateIRCodeForNode(funcDeclList, codeOut);
+
+			//	add a main label to start the program
+			String mainLabel = unique_label("main");
+			if (!mainLabel.equals("main")) {
+				throw new RuntimeException("Unable to allocate label 'main'");
+			}
+			codeOut.add(new ICStatement(mainLabel));
+
+			//	variable declarations
+			if (varDeclList != null) generateIRCodeForNode(varDeclList, codeOut);
 
 			//	see if there's a STAT_SEQ
 			if (tree.getChildren().size() > 1) {
-				//	add a main label to start the program
-				String mainLabel = unique_label("main");
-				if (!mainLabel.equals("main")) {
-					throw new RuntimeException("Unable to allocate label 'main'");
-				}
-				codeOut.add(new ICStatement(mainLabel));
-
 				//	code for STAT_SEQ
 				generateIRCodeForNode(tree.getChildren().get(1), codeOut);
 			}
@@ -161,6 +176,24 @@ public class IRCodeGenerator {
 			for (TreeNode funcDecl : tree.getChildren()) {
 				generateIRCodeForNode(funcDecl, codeOut);
 			}
+			return null;
+		} else if (parentSymbol.equals(NonTerminals.FUNCT_DECLARATION)) {
+			String funcName = ((Token)tree.getChildren().get(0).getSymbol()).value();
+			String labelName = unique_label("func_" + funcName);
+
+			FuncSymbolEntry funcEntry = symbolTable.getFunc(funcName);
+
+			codeOut.add(new ICStatement(labelName));
+
+			//	statement sequence is the last node
+			TreeNode statSeqNode = tree.getChildren().get(tree.getChildren().size() - 1);
+			generateIRCodeForNode(statSeqNode, codeOut);
+
+			//	add a return stmt if it's a void function
+			if (funcEntry.isVoid()) {
+				codeOut.add(new ICStatement("return", "", "", ""));	//	FIXME: is this the right format?
+			}
+
 			return null;
 		} else if (binaryOps.contains(parentSymbol)) {
 			String resultVar = unique_var("t");
