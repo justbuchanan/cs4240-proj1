@@ -272,6 +272,50 @@ public class IRCodeGenerator {
 			}
 
 			return resultVar;
+		} else if (parentSymbol.equals(State.OR)) {
+			String endLabel = unique_label("or_and");
+
+			//	starts out as true
+			String resultVar = unique_var("andResult");
+			codeOut.add(new ICStatement("assign", resultVar, "1", ""));
+
+			//	evaluate the left arg and skip the right arg if left is true
+			String leftArgVar = generateIRCodeForNode(tree.getChildren().get(0), codeOut);
+			codeOut.add(new ICStatement("brneq", leftArgVar, "0", endLabel));
+
+			//	evaluate the right arg
+			String rightArgVar = generateIRCodeForNode(tree.getChildren().get(1), codeOut);
+			codeOut.add(new ICStatement("brneq", rightArgVar, "0", endLabel));
+
+			//	if rightArgVar was zero, set result to false
+			codeOut.add(new ICStatement("assign", resultVar, "0", ""));
+
+			//	end label
+			codeOut.add(new ICStatement(endLabel));
+
+			return resultVar;
+		} else if (parentSymbol.equals(State.AND)) {
+			String endLabel = unique_label("end_and");
+
+			//	starts out as false
+			String resultVar = unique_var("andResult");
+			codeOut.add(new ICStatement("assign", resultVar, "0", ""));
+
+			//	evaluate the left arg and skip the right arg if left is false
+			String leftArgVar = generateIRCodeForNode(tree.getChildren().get(0), codeOut);
+			codeOut.add(new ICStatement("breq", leftArgVar, "0", endLabel));
+
+			//	evaluate the right arg
+			String rightArgVar = generateIRCodeForNode(tree.getChildren().get(1), codeOut);
+			codeOut.add(new ICStatement("breq", rightArgVar, "0", endLabel));
+
+			//	if rightArgVar was nonzero, set result to true
+			codeOut.add(new ICStatement("assign", resultVar, "1", ""));
+
+			//	end label
+			codeOut.add(new ICStatement(endLabel));
+
+			return resultVar;
 		} else if (parentSymbol.equals(State.ID)) {
 			//	return the variable name
 			return ((Token)tree.getSymbol()).value();
