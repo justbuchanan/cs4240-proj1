@@ -502,6 +502,8 @@ public class Parser{
 				} else {
 					return getTypeOfNode(treeNode.getChildren().get(0));	//	return left operand for binary op nodes
 				}
+			} else if (type.equals(State.NIL)) {
+				return null;
 			} else {
 				throw new IllegalArgumentException("Type doesn't make sense for the given tree: " + treeNode);
 			}
