@@ -32,7 +32,11 @@ public class IRCodeGenerator {
 
 	private IRCodeGenerator(SymbolTable symbolTable) {
 		labels = new HashSet<String>();
+
+		//	build unique var name set, taking into account what variables already exist
 		variables = new HashSet<String>();
+		variables.addAll(symbolTable.getAllVarNames());
+
 		this.symbolTable = symbolTable;
 	}
 
@@ -122,7 +126,9 @@ public class IRCodeGenerator {
 			if (tree.getChildren().size() == 3) {
 				//	the value to set the variable(s) to
 				TreeNode constExpr = tree.getChildren().get(2);
+				String constExprVar = generateIRCodeForNode(constExpr, codeOut);
 
+				//	initialize each variable in the list
 				TreeNode idListNode = tree.getChildren().get(0);
 				idListNode.assertNodeType(NonTerminals.ID_LIST);
 				for (TreeNode idNode : idListNode.getChildren()) {
@@ -132,8 +138,20 @@ public class IRCodeGenerator {
 					VarSymbolEntry varEntry = symbolTable.getVar(varName);
 					TypeSymbolEntry varType = varEntry.getType();
 
-					//	TODO: initialize the variable
-					//	TODO: it'll be different for arrays and for strings
+					//	see if it's an array
+					if (varType.getArrDims() != null && varType.getArrDims().size() > 0) {
+						//	array initialization
+
+						int arrSize = 1;
+						for (Integer dim : varType.getArrDims()) {
+							arrSize *= dim;
+						}
+
+						codeOut.add(new ICStatement("assign", varName, Integer.toString(arrSize), constExprVar));
+					} else {
+						//	value initialization
+						codeOut.add(new ICStatement("assign", varName, constExprVar, ""));
+					}
 				}
 			}
 
@@ -175,25 +193,37 @@ public class IRCodeGenerator {
 			TreeNode lvalue = tree.getChildren().get(0);
 			TreeNode rvalue = tree.getChildren().get(1);
 
+			//	calculate the value of the right hand side
 			String valueVariable = generateIRCodeForNode(rvalue, codeOut);
 
-			//	depends on what type of lvalue we have
+			//	do the assignment.  depends on what type of lvalue we have
 			if (lvalue.isNodeType(State.ID)) {
 				//	assignment to a named variable
 				String lvalueVarName = ((Token)lvalue.getSymbol()).value();
 				codeOut.add(new ICStatement("assign", lvalueVarName, valueVariable, ""));
 			} else if (lvalue.isNodeType(NonTerminals.ARRAY_LOOKUP)) {
-				//	FIXME: handle array case
-				throw new RuntimeException("Unhandled case in ASSIGN code generator");
+				//	assignment to an index into an array
+				String linearizedIndex = generateIRCodeForArrayOffset(lvalue, codeOut);
+				String arrName = ((Token)lvalue.getChildren().get(0).getSymbol()).value();
+				codeOut.add(new ICStatement("array_store", arrName, linearizedIndex, valueVariable));
 			} else {
+				//	this shouldn't ever happen, it's just here to make sure I didn't miss something
 				throw new RuntimeException("Unhandled case in ASSIGN code generator");
 			}
 
 			//	assignment operation evaluates to the value that was assigned
 			return valueVariable;
+		} else if (parentSymbol.equals(NonTerminals.ARRAY_LOOKUP)) {
+			//	extract a value from an array
+			String linearizedIndex = generateIRCodeForArrayOffset(tree, codeOut);
+			String arrName = ((Token)tree.getChildren().get(0).getSymbol()).value();
+			String outputVar = unique_var("arrLookup");
+			codeOut.add(new ICStatement("array_load", outputVar, arrName, linearizedIndex));
+			return outputVar;
 		} else if (parentSymbol.equals(State.STRLIT)) {
-			//	FIXME: does this work?
 			return ((Token)tree.getSymbol()).value();
+		} else if (parentSymbol.equals(State.INTLIT)) {
+			return ((Token)tree.getSymbol()).value();	//	just return the value straight up
 		} else if (parentSymbol.equals(NonTerminals.FUNCTION_CALL)) {
 			String funcName = ((Token)tree.getChildren().get(0).getSymbol()).value();
 
@@ -215,6 +245,29 @@ public class IRCodeGenerator {
 			}
 		} else {
 			throw new RuntimeException("Don't know how to generate IR for node type: " + parentSymbol);
+		}
+	}
+
+	private String generateIRCodeForArrayOffset(TreeNode arrayLookupNode, ArrayList<ICStatement> codeOut) {
+		arrayLookupNode.assertNodeType(NonTerminals.ARRAY_LOOKUP);
+
+		//	get type info on the array
+		String arrayName = ((Token)arrayLookupNode.getChildren().get(0).getSymbol()).value();
+		ArrayList<Integer> arrDims = symbolTable.getVar(arrayName).getType().getArrDims();
+
+		if (arrDims.size() == 1) {
+			return generateIRCodeForNode(arrayLookupNode.getChildren().get(0), codeOut);
+		} else {
+			String offsetVarName = unique_var("arrOffset");
+			String tmpVarName = unique_var("arrOffsetTmp");
+
+			for (int i = 1; i < arrayLookupNode.getChildren().size(); i++) {
+				String idxExprResult = generateIRCodeForNode(arrayLookupNode.getChildren().get(i), codeOut);
+				codeOut.add(new ICStatement("mult", tmpVarName, idxExprResult, arrDims.get(i-1).toString()));
+				codeOut.add(new ICStatement("add", offsetVarName, offsetVarName, tmpVarName));
+			}
+
+			return offsetVarName;
 		}
 	}
 

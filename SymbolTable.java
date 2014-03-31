@@ -1,6 +1,7 @@
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Set;
 
 
 public class SymbolTable {
@@ -48,6 +49,10 @@ public class SymbolTable {
 			return false;
 		}
 		return vars.get(name).get(0) != null;
+	}
+
+	public Set<String> getAllVarNames() {
+		return vars.keySet();
 	}
 
 	public VarSymbolEntry getVar(String varName){

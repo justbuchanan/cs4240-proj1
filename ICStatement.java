@@ -46,7 +46,7 @@ public class ICStatement {
 
 	public String toString() {
 		if (isLabel()) {
-			return "label: " + labelName;
+			return labelName + ":";
 		} else {
 			String str = "";
 			for (String arg : components) {
