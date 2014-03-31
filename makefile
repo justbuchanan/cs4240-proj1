@@ -41,6 +41,9 @@ ex2: all
 ex3: all
 	java $(DRIVER) test-input-ver-2/ex3.tiger &> ex3.log
 
+ex6: all
+	java $(DRIVER) test-input-ver-2/ex6.tiger &> ex6.log
+
 debug: all
 	jdb -cp $(CLASSPATH) $(DRIVER)
 

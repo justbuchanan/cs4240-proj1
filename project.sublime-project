@@ -26,6 +26,11 @@
 			"name": "Parse ex5.tiger",
 			"cmd": ["make", "ex5"],
 			"working_dir": "${project_path}"
+		},
+		{
+			"name": "Parse ex6.tiger",
+			"cmd": ["make", "ex6"],
+			"working_dir": "${project_path}"
 		}
 	]
 }
