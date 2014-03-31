@@ -2,6 +2,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.Arrays;
+import java.util.Stack;
 
 /**
  * Used to create intermediate representation code for a given program
@@ -11,6 +12,7 @@ public class IRCodeGenerator {
 	private Set<String> labels;
 	private Set<String> variables;
 	private SymbolTable symbolTable;
+	private Stack<String> enclosingLoopEnds;	//	keeps track of where to go if we hit a BREAK
 
 	/** 
 	 * Generates the entire IR code for the program represented by @ast.  Modifies @symbolTable
@@ -36,6 +38,8 @@ public class IRCodeGenerator {
 		//	build unique var name set, taking into account what variables already exist
 		variables = new HashSet<String>();
 		variables.addAll(symbolTable.getAllVarNames());
+
+		this.enclosingLoopEnds = new Stack<>();
 
 		this.symbolTable = symbolTable;
 	}
@@ -331,53 +335,57 @@ public class IRCodeGenerator {
 			//	label that goes after the contents of the loop
 			String endLabelName = unique_label("for_loop_end");
 
-			//	loop variable
-			String loopVarName = ((Token)tree.getChildren().get(0).getSymbol()).value();
-			String loopVarInitial = ((Token)tree.getChildren().get(1).getSymbol()).value();
-			String loopVarFinal = ((Token)tree.getChildren().get(2).getSymbol()).value();
+			enclosingLoopEnds.push(endLabelName); {
+				//	loop variable
+				String loopVarName = ((Token)tree.getChildren().get(0).getSymbol()).value();
+				String loopVarInitial = ((Token)tree.getChildren().get(1).getSymbol()).value();
+				String loopVarFinal = ((Token)tree.getChildren().get(2).getSymbol()).value();
 
-			//	init loop variable
-			codeOut.add(new ICStatement("assign", loopVarName, loopVarInitial, ""));
+				//	init loop variable
+				codeOut.add(new ICStatement("assign", loopVarName, loopVarInitial, ""));
 
-			//	label for the top of the loop
-			String labelName = unique_label("for_loop");
-			codeOut.add(new ICStatement(labelName));
+				//	label for the top of the loop
+				String labelName = unique_label("for_loop");
+				codeOut.add(new ICStatement(labelName));
 
-			//	check condition, jump to end label if we're done
-			codeOut.add(new ICStatement("breq", loopVarName, loopVarFinal, endLabelName));
+				//	check condition, jump to end label if we're done
+				codeOut.add(new ICStatement("breq", loopVarName, loopVarFinal, endLabelName));
 
-			//	loop content
-			TreeNode loopStatements = tree.getChildren().get(3);
-			generateIRCodeForNode(loopStatements, codeOut);
+				//	loop content
+				TreeNode loopStatements = tree.getChildren().get(3);
+				generateIRCodeForNode(loopStatements, codeOut);
 
-			//	increment loop variable
-			codeOut.add(new ICStatement("add", loopVarName, loopVarName, "1"));
+				//	increment loop variable
+				codeOut.add(new ICStatement("add", loopVarName, loopVarName, "1"));
 
-			//	loop end label
-			codeOut.add(new ICStatement(endLabelName));
+				//	loop end label
+				codeOut.add(new ICStatement(endLabelName));
+			} enclosingLoopEnds.pop();
 
 			return null;
 		} else if (parentSymbol.equals(State.WHILE)) {
 			//	label that goes after the contents of the loop
 			String endLabelName = unique_label("while_loop_end");
 
-			//	label for the top of the loop
-			String labelName = unique_label("while_loop");
-			codeOut.add(new ICStatement(labelName));
+			enclosingLoopEnds.push(endLabelName); {
+				//	label for the top of the loop
+				String labelName = unique_label("while_loop");
+				codeOut.add(new ICStatement(labelName));
 
-			// //	evaluate loop expr
-			TreeNode loopExprNode = tree.getChildren().get(0);
-			String loopVar = generateIRCodeForNode(loopExprNode, codeOut);
+				// //	evaluate loop expr
+				TreeNode loopExprNode = tree.getChildren().get(0);
+				String loopVar = generateIRCodeForNode(loopExprNode, codeOut);
 
-			//	check condition, jump to end if we're done
-			codeOut.add(new ICStatement("breq", loopVar, "0", endLabelName));
+				//	check condition, jump to end if we're done
+				codeOut.add(new ICStatement("breq", loopVar, "0", endLabelName));
 
-			//	loop contents
-			TreeNode loopContents = tree.getChildren().get(1);
-			generateIRCodeForNode(loopContents, codeOut);
+				//	loop contents
+				TreeNode loopContents = tree.getChildren().get(1);
+				generateIRCodeForNode(loopContents, codeOut);
 
-			//	end label
-			codeOut.add(new ICStatement(endLabelName));
+				//	end label
+				codeOut.add(new ICStatement(endLabelName));
+			} enclosingLoopEnds.pop();
 
 			return null;
 		} else if (parentSymbol.equals(State.IF)) {
@@ -409,6 +417,10 @@ public class IRCodeGenerator {
 		} else if (parentSymbol.equals(State.RETURN)) {
 			String returnExprVar = generateIRCodeForNode(tree.getChildren().get(0), codeOut);
 			codeOut.add(new ICStatement("return", returnExprVar, "", ""));
+			return null;
+		} else if (parentSymbol.equals(State.BREAK)) {
+			String jumpTo = enclosingLoopEnds.peek();
+			codeOut.add(new ICStatement("goto", jumpTo, "", ""));
 			return null;
 		} else {
 			throw new RuntimeException("Don't know how to generate IR for node type: " + parentSymbol);
