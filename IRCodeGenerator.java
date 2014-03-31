@@ -95,10 +95,14 @@ public class IRCodeGenerator {
 			if (!mainLabel.equals("main")) {
 				throw new RuntimeException("Unable to allocate label 'main'");
 			}
+			codeOut.add(new ICStatement());
 			codeOut.add(new ICStatement(mainLabel));
 
 			//	variable declarations
-			if (varDeclList != null) generateIRCodeForNode(varDeclList, codeOut);
+			if (varDeclList != null) {
+				generateIRCodeForNode(varDeclList, codeOut);
+				codeOut.add(new ICStatement());	//	newline
+			}
 
 			//	see if there's a STAT_SEQ
 			if (tree.getChildren().size() > 1) {
@@ -276,6 +280,38 @@ public class IRCodeGenerator {
 				codeOut.add(new ICStatement(funcName, retValVar, params));
 				return retValVar;
 			}
+		} else if (parentSymbol.equals(State.FOR)) {
+			//	children: ID, expr, expr, STAT_SEQ
+
+			//	label that goes after the contents of the loop
+			String endLabelName = unique_label("for_loop_end");
+
+			//	loop variable
+			String loopVarName = ((Token)tree.getChildren().get(0).getSymbol()).value();
+			String loopVarInitial = ((Token)tree.getChildren().get(1).getSymbol()).value();
+			String loopVarFinal = ((Token)tree.getChildren().get(2).getSymbol()).value();
+
+			//	init loop variable
+			codeOut.add(new ICStatement("assign", loopVarName, loopVarInitial, ""));
+
+			//	label for the top of the loop
+			String labelName = unique_label("for_loop");
+			codeOut.add(new ICStatement(labelName));
+
+			//	check condition, jump to end label if we're done
+			codeOut.add(new ICStatement("breq", loopVarName, loopVarFinal, endLabelName));
+
+			//	loop content
+			TreeNode loopStatements = tree.getChildren().get(3);
+			generateIRCodeForNode(loopStatements, codeOut);
+
+			//	increment loop variable
+			codeOut.add(new ICStatement("add", loopVarName, loopVarName, "1"));
+
+			//	loop end label
+			codeOut.add(new ICStatement(endLabelName));
+
+			return null;
 		} else {
 			throw new RuntimeException("Don't know how to generate IR for node type: " + parentSymbol);
 		}
@@ -289,7 +325,7 @@ public class IRCodeGenerator {
 		ArrayList<Integer> arrDims = symbolTable.getVar(arrayName).getType().getArrDims();
 
 		if (arrDims.size() == 1) {
-			return generateIRCodeForNode(arrayLookupNode.getChildren().get(0), codeOut);
+			return generateIRCodeForNode(arrayLookupNode.getChildren().get(1), codeOut);
 		} else {
 			String offsetVarName = unique_var("arrOffset");
 			String tmpVarName = unique_var("arrOffsetTmp");

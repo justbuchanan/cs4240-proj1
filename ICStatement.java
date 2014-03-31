@@ -13,6 +13,11 @@ public class ICStatement {
 		return labelName != null;
 	}
 
+	//	empty line
+	public ICStatement() {
+		components = new ArrayList<>();
+	}
+
 	//	label
 	public ICStatement(String labelName) {
 		this.labelName = labelName;
