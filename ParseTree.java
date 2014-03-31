@@ -299,6 +299,8 @@ public class ParseTree {
 			State.LESSER,
 			State.GREATEREQ,
 			State.LESSEREQ,
+			State.AND,
+			State.OR,
 			State.ASSIGN};
 		for (State infixOp : infixOps) {
 			applyTransformer(null, new Token(infixOp), false,
