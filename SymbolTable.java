@@ -105,7 +105,7 @@ public class SymbolTable {
 			System.out.println("TYPE: " + type.toString());
 		}
 		System.out.println("== END TYPES ==");
-		System.out.println("::::    END PRINT SYMBOL TABLE    :::::");
+		System.out.println("::::    END PRINT SYMBOL TABLE    :::::\n");
 	}
 	
 }

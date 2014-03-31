@@ -13,10 +13,12 @@ public class ICStatement {
 		return labelName != null;
 	}
 
+	//	label
 	public ICStatement(String labelName) {
 		this.labelName = labelName;
 	}
 
+	//	4-address code
 	public ICStatement(String op, String outReg, String operand1Reg, String operand2Reg) {
 		components = new ArrayList<>();
 		components.add(op);
@@ -25,11 +27,32 @@ public class ICStatement {
 		components.add(operand2Reg);
 	}
 
+	//	function call w/return value
+	public ICStatement(String funcName, String retValVar, ArrayList<String> params) {
+		components = new ArrayList<>();
+		components.add("callr");
+		components.add(retValVar);
+		components.add(funcName);
+		components.addAll(params);
+	}
+
+	//	function call w/out return value
+	public ICStatement(String funcName, ArrayList<String> params) {
+		components = new ArrayList<>();
+		components.add("call");
+		components.add(funcName);
+		components.addAll(params);
+	}
+
 	public String toString() {
 		if (isLabel()) {
 			return "label: " + labelName;
 		} else {
-			return getOperator() + " " + getOutputRegister() + ", " + getLeftOperand() + ", " + getRightOperand();
+			String str = "";
+			for (String arg : components) {
+				str += arg + ", ";
+			}
+			return str;
 		}
 	}
 

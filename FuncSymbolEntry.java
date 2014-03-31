@@ -24,6 +24,10 @@ public class FuncSymbolEntry extends SymbolTableEntry{
 		return returnType;
 	}
 
+	public boolean isVoid() {
+		return getReturnType() == null;
+	}
+
 	public String toString(){
 		String baseStr =  "(" + this.getName() + " | params: ";
 		for(VarSymbolEntry param : params){

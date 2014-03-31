@@ -1,6 +1,7 @@
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.Arrays;
 
 /**
  * Used to create intermediate representation code for a given program
@@ -9,17 +10,18 @@ public class IRCodeGenerator {
 	//	track allocated names so we don't have any collisions
 	private Set<String> labels;
 	private Set<String> variables;
+	private SymbolTable symbolTable;
 
 	/** 
-	 * Generates the entire IR code for the program represented by @ast.  Modifies @symTab
+	 * Generates the entire IR code for the program represented by @ast.  Modifies @symbolTable
 	 * to add temporary variables, etc.
 	 */
-	public static ArrayList<ICStatement> generateIRCode(ParseTree ast, SymbolTable symTab) {
-		IRCodeGenerator generator = new IRCodeGenerator();
+	public static ArrayList<ICStatement> generateIRCode(ParseTree ast, SymbolTable symbolTable) {
+		IRCodeGenerator generator = new IRCodeGenerator(symbolTable);
 
 		ArrayList<ICStatement> allCode = new ArrayList<>();
 		try {
-			generator.generateIRCodeForNode(ast.getRoot(), symTab, allCode);
+			generator.generateIRCodeForNode(ast.getRoot(), allCode);
 		}
 		catch (RuntimeException exc) {
 			System.out.println("IR Code gen ERROR: " + exc);
@@ -28,17 +30,18 @@ public class IRCodeGenerator {
 		return allCode;
 	}
 
-	private IRCodeGenerator() {
+	private IRCodeGenerator(SymbolTable symbolTable) {
 		labels = new HashSet<String>();
 		variables = new HashSet<String>();
+		this.symbolTable = symbolTable;
 	}
 
 	/**
 	 * Generates ICStatements and adds them in order to @codeOut.  This is meant to be used recursively.
 	 * @return the name of the register where the resulting value is placed.  may be null
 	 */
-	private String generateIRCodeForNode(TreeNode tree, SymbolTable symTab, ArrayList<ICStatement> codeOut) {
-		if (tree == null || symTab == null || codeOut == null) {
+	private String generateIRCodeForNode(TreeNode tree, ArrayList<ICStatement> codeOut) {
+		if (tree == null || symbolTable == null || codeOut == null) {
 			throw new IllegalArgumentException("generateIRCodeForNode() doesn't like null args");
 		}
 
@@ -50,11 +53,26 @@ public class IRCodeGenerator {
 			parentSymbol = ((NonTerminalParserSymbol)tree.getSymbol()).getNonTerminal();
 		}
 
+		ArrayList<Enum> binaryOps = new ArrayList<Enum>(
+			Arrays.asList(new Enum[]{
+				State.PLUS,
+				State.MINUS,
+				State.MULT,
+				State.DIV,
+				State.EQ,
+				State.NEQ,
+				State.GREATER,
+				State.LESSER,
+				State.GREATEREQ,
+				State.LESSEREQ
+			})
+		);
+
 		//	TODO: handle the rest of the necessary parent symbols below
 
 		if (parentSymbol.equals(NonTerminals.TIGER_PROGRAM)) {
 			//	declaration segment
-			generateIRCodeForNode(tree.getChildren().get(0), symTab, codeOut);
+			generateIRCodeForNode(tree.getChildren().get(0), codeOut);
 
 			//	see if there's a STAT_SEQ
 			if (tree.getChildren().size() > 1) {
@@ -66,14 +84,14 @@ public class IRCodeGenerator {
 				codeOut.add(new ICStatement(mainLabel));
 
 				//	code for STAT_SEQ
-				generateIRCodeForNode(tree.getChildren().get(1), symTab, codeOut);
+				generateIRCodeForNode(tree.getChildren().get(1), codeOut);
 			}
 
 			return null;
 		} else if (parentSymbol.equals(NonTerminals.STAT_SEQ)) {
 			//	generate code for each statement in series
 			for (TreeNode statement : tree.getChildren()) {
-				generateIRCodeForNode(statement, symTab, codeOut);
+				generateIRCodeForNode(statement, codeOut);
 			}
 			return null;
 		} else if (parentSymbol.equals(NonTerminals.DECLARATION_SEGMENT)) {
@@ -82,7 +100,7 @@ public class IRCodeGenerator {
 
 			//	may have TYPE_DECLARATION_LIST, VAR_DECLARATION_LIST, FUNCT_DECLARATION_LIST
 			for (TreeNode subtree : tree.getChildren()) {
-				generateIRCodeForNode(subtree, symTab, codeOut);
+				generateIRCodeForNode(subtree, codeOut);
 			}
 
 			return null;
@@ -91,7 +109,7 @@ public class IRCodeGenerator {
 			return null;
 		} else if (parentSymbol.equals(NonTerminals.VAR_DECLARATION_LIST)) {
 			for (TreeNode varDecl : tree.getChildren()) {
-				generateIRCodeForNode(varDecl, symTab, codeOut);
+				generateIRCodeForNode(varDecl, codeOut);
 			}
 			return null;
 		} else if (parentSymbol.equals(NonTerminals.VAR_DECLARATION)) {
@@ -101,21 +119,100 @@ public class IRCodeGenerator {
 			//	initialization is optional, so we only have to generate IR if there are 3 children
 			//	(the third being the value to set the variables to)
 
-			//	TODO: implement.  remember that array initialization needs to be handled separately
-			// if (tree.getChildren().size() == 3) {
-			// 	//	the value to set the variable(s) to
-			// 	TreeNode constExpr = tree.getChildren().get(2);
+			if (tree.getChildren().size() == 3) {
+				//	the value to set the variable(s) to
+				TreeNode constExpr = tree.getChildren().get(2);
 
-			// 	TreeNode idListNode = tree.getChildren().get(0);
-			// }
+				TreeNode idListNode = tree.getChildren().get(0);
+				idListNode.assertNodeType(NonTerminals.ID_LIST);
+				for (TreeNode idNode : idListNode.getChildren()) {
+					idNode.assertNodeType(State.ID);
+					String varName = ((Token)idNode.getSymbol()).value();
+
+					VarSymbolEntry varEntry = symbolTable.getVar(varName);
+					TypeSymbolEntry varType = varEntry.getType();
+
+					//	TODO: initialize the variable
+					//	TODO: it'll be different for arrays and for strings
+				}
+			}
 
 			return null;
 		} else if (parentSymbol.equals(NonTerminals.FUNCT_DECLARATION_LIST)) {
 			//	generate code for each function
 			for (TreeNode funcDecl : tree.getChildren()) {
-				generateIRCodeForNode(funcDecl, symTab, codeOut);
+				generateIRCodeForNode(funcDecl, codeOut);
 			}
 			return null;
+		} else if (binaryOps.contains(parentSymbol)) {
+			String resultVar = unique_var("t");
+
+			//	get the op code for this operator
+			String opCode = null;
+			if (parentSymbol.equals(State.PLUS)) opCode = "add";
+			else if (parentSymbol.equals(State.MINUS)) opCode = "sub";
+			else if (parentSymbol.equals(State.MULT)) opCode = "mult";
+			else if (parentSymbol.equals(State.DIV)) opCode = "div";
+			else if (parentSymbol.equals(State.AND)) opCode = "and";
+			else if (parentSymbol.equals(State.OR)) opCode = "or";
+			else {
+				//	FIXME: implement comparison operators
+				throw new RuntimeException("Don't know how to make opcode for: " + parentSymbol);
+			}
+
+			//	evaluate subexpressions
+			String leftArgVar = generateIRCodeForNode(tree.getChildren().get(0), codeOut);
+			String rightArgVar = generateIRCodeForNode(tree.getChildren().get(1), codeOut);
+
+			//	add the code for this operation
+			codeOut.add(new ICStatement(opCode, resultVar, leftArgVar, rightArgVar));
+
+			return resultVar;
+		} else if (parentSymbol.equals(State.ID)) {
+			//	return the variable name
+			return ((Token)tree.getSymbol()).value();
+		} else if (parentSymbol.equals(State.ASSIGN)) {
+			TreeNode lvalue = tree.getChildren().get(0);
+			TreeNode rvalue = tree.getChildren().get(1);
+
+			String valueVariable = generateIRCodeForNode(rvalue, codeOut);
+
+			//	depends on what type of lvalue we have
+			if (lvalue.isNodeType(State.ID)) {
+				//	assignment to a named variable
+				String lvalueVarName = ((Token)lvalue.getSymbol()).value();
+				codeOut.add(new ICStatement("assign", lvalueVarName, valueVariable, ""));
+			} else if (lvalue.isNodeType(NonTerminals.ARRAY_LOOKUP)) {
+				//	FIXME: handle array case
+				throw new RuntimeException("Unhandled case in ASSIGN code generator");
+			} else {
+				throw new RuntimeException("Unhandled case in ASSIGN code generator");
+			}
+
+			//	assignment operation evaluates to the value that was assigned
+			return valueVariable;
+		} else if (parentSymbol.equals(State.STRLIT)) {
+			//	FIXME: does this work?
+			return ((Token)tree.getSymbol()).value();
+		} else if (parentSymbol.equals(NonTerminals.FUNCTION_CALL)) {
+			String funcName = ((Token)tree.getChildren().get(0).getSymbol()).value();
+
+			//	build param list
+			ArrayList<String> params = new ArrayList<>();
+			for (int i = 1; i < tree.getChildren().size(); i++) {
+				String param = generateIRCodeForNode(tree.getChildren().get(i), codeOut);
+				params.add(param);
+			}
+
+			FuncSymbolEntry funcEntry = symbolTable.getFunc(funcName);
+			if (funcEntry.isVoid()) {
+				codeOut.add(new ICStatement(funcName, params));
+				return null;
+			} else {
+				String retValVar = unique_var("retVal");
+				codeOut.add(new ICStatement(funcName, retValVar, params));
+				return retValVar;
+			}
 		} else {
 			throw new RuntimeException("Don't know how to generate IR for node type: " + parentSymbol);
 		}
@@ -124,9 +221,12 @@ public class IRCodeGenerator {
 	/**
 	 * Allocates and returns a new variable with the given prefix.
 	 * Appends something to the end to make sure it's unique (if necessary)
+	 * Also adds the variable to the symbol table as an "int"
 	 */
 	private String unique_var(String prefix) {
-		return allocate_name(variables, prefix);
+		String varName = allocate_name(variables, prefix);
+		symbolTable.addVar(varName, "int");
+		return varName;
 	}
 
 	/**
