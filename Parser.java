@@ -340,9 +340,9 @@ public class Parser{
 		for (TreeNode treeNode : treeNodeParam.getChildren()) {
 			if (treeNode.getSymbol().isTerminal() && ((Token) treeNode.getSymbol()).ordinal() == State.ASSIGN.ordinal()) {
 				TreeNode assignTo = treeNode.getChildren().get(0);
-				pass = checkBinaryOperands(treeNode, symbolTable.getVar(((Token) assignTo.getSymbol()).value()).getType().getName());
+				if ( !checkBinaryOperands(treeNode, symbolTable.getVar(((Token) assignTo.getSymbol()).value()).getType().getName() )) pass = false;
 			}
-			findAssignmentStatement(treeNode);
+			if( !findAssignmentStatement(treeNode)) pass = false;
 		}
 
 		return pass;
