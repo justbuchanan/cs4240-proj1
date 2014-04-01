@@ -18,7 +18,7 @@ OBJ_DOT=$(patsubst %.dot, %.png, $(SRC_DOT))
 
 # This list of files is included in the pkg.zip output for uploading to T-Square
 # If you want to upload more than just the .java files, add them here
-PKG_FILES=Scanner.java State.java Token.java Driver.java tiger_dfa.dot tiger_dfa.png
+PKG_FILES=$(wildcard *.java) README.md $(wildcard *.png) $(wildcard test-input-ver-2/*) makefile
 
 # class path
 # CLASSPATH="junit-4.11.jar:hamcrest-core-1.3.jar:."
