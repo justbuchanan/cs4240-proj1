@@ -483,7 +483,10 @@ public class Parser{
 					}
 					boolean varMatched = false;
 					for(VarSymbolEntry var : symbolTable.getVarList(token.value())){
-						if(var.getScope().getFuncName().equals(realFuncName)) varMatched = true;
+						if(var.getName().equals("ASCII_NUMERIC_OFFSET")){
+							System.out.println();
+						}
+						if(var.getScope().getFuncName().equals(realFuncName) || var.getScope().getLevel() == 0) varMatched = true;
 					}
 					if (!varMatched) {
 						System.out.println("ERROR: variable " + variableName + " AT LINE: " + token.lineNumber + " NOT IN SCOPE");
