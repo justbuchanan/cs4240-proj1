@@ -28,8 +28,6 @@ public class TypeSymbolEntry extends SymbolTableEntry{
 		}
 
 		//	canonicalTypeString
-		System.out.println("THIS: " + this);
-		System.out.println("LOOKUP: " + symbolTable.getType(eltType));
 		//	traverse until we hit a base type
 		TypeSymbolEntry ancestor = this;
 		while (ancestor != null && !ancestor.getName().equals("int") && !ancestor.getName().equals("string")) {

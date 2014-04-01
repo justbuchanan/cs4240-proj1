@@ -371,7 +371,7 @@ public class Parser{
 
 		for (TreeNode treeNode : treeNodeParam.getChildren()) {	
 			if (intOperators.contains(treeNode.getSymbol())) {
-				System.out.println("FOUND int-only operator (MULT, LESSER, etc)... Checking operands");
+				// System.out.println("FOUND int-only operator (MULT, LESSER, etc)... Checking operands");
 				ArrayList<TreeNode> operatorChildren = treeNode.getChildren();
 				if (operatorChildren.size() != 2) {
 					System.out.println("ERROR: WRONG NUMBER OF OPERANDS FOR PLUS/SUB/MULT/DIV");
@@ -397,7 +397,7 @@ public class Parser{
 						pass = false;
 					}
 					if (pass == true) {
-						System.out.println("OPERANDS CORRECT!!!");
+						// System.out.println("OPERANDS CORRECT!!!");
 					}
 				}
 			}
@@ -488,7 +488,7 @@ public class Parser{
 					if (!varMatched) {
 						System.out.println("ERROR: variable " + variableName + " AT LINE: " + token.lineNumber + " NOT IN SCOPE");
 					} else {
-						System.out.println("SCOPE CORRECT");
+						// System.out.println("SCOPE CORRECT");
 					}
 					return symbolTable.getVar(token.value()).getType().typeString();
 				} else if (symbolTable.getType(token.value()) != null) {
