@@ -558,30 +558,52 @@ public class Parser{
 					ArrayList<VarSymbolEntry> tableFuncParams = tableFunc.getParams();
 					// check params
 					for(int i = 1; i < funcASTRow.size(); i++){			
-						String paramName = ((Token)funcASTRow.get(i).getSymbol()).value();
 						if(tableFuncParams.size() >= (i - 1)){ // make sure param is in func sig
 							TypeSymbolEntry tableFuncParamType = tableFuncParams.get(i-1).getType();
-							TypeSymbolEntry passedParamType = symbolTable.getVar(((Token)funcASTRow.get(i).getSymbol()).value()).getType();
-							if(((Token)funcASTRow.get(i).getSymbol()).type() == State.INTLIT || 
-								((Token)funcASTRow.get(i).getSymbol()).type() == State.STRLIT){
-								if(tableFuncParamType.equals(passedParamType)){
-									continue;
-								}
-								else{
-									System.out.println("Passed wrong type!!!!!");
-									return false;
-								}
+							if(!funcASTRow.get(i).getSymbol().isTerminal()){
+								System.out.println();
 							}
-							else if(((Token)funcASTRow.get(i).getSymbol()).type() == State.ID){
-								// check if var is initialized
-								if(symbolTable.containsVar(paramName)){
-									TypeSymbolEntry varType = symbolTable.getVar(paramName).getType();
-									if(varType.equals(tableFuncParamType)) continue;
-									else{
-										System.out.println("PASSED VARIABLE OF WRONG TYPE!!!");
-										return false;
-									}
+							
+							TypeSymbolEntry passedParamType = null;
+							if(funcASTRow.get(i).getSymbol().isTerminal()){
+								Token tokFuncParam = (Token)funcASTRow.get(i).getSymbol();
+								if(tokFuncParam.type().equals(State.INTLIT)){
+									passedParamType = symbolTable.getType("int");
 								}
+								else if (tokFuncParam.type().equals(State.STRLIT)){
+									passedParamType = symbolTable.getType("string");
+								}
+								else if (tokFuncParam.type().equals(State.ID)){
+									if(symbolTable.getVar(tokFuncParam.value() ) == null){
+										System.out.println();
+									}
+									passedParamType = symbolTable.getVar(tokFuncParam.value()).getType();
+								}
+								if(tokFuncParam.type() == State.INTLIT || 
+										tokFuncParam.type() == State.STRLIT){
+										if(tableFuncParamType.equals(passedParamType)){
+											continue;
+										}
+										else{
+											System.out.println("Passed wrong type!!!!!");
+											return false;
+										}
+									}
+									else if(((Token)funcASTRow.get(i).getSymbol()).type() == State.ID){
+										String paramName = ((Token)funcASTRow.get(i).getSymbol()).value();
+										// check if var is initialized
+										if(symbolTable.containsVar(paramName)){
+											TypeSymbolEntry varType = symbolTable.getVar(paramName).getType();
+											if(varType.equals(tableFuncParamType)) continue;
+											else{
+												System.out.println("PASSED VARIABLE OF WRONG TYPE!!!");
+												return false;
+											}
+										}
+									}
+							}
+							else{
+								
 							}
 						}
 						else{
