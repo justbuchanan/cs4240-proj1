@@ -407,6 +407,9 @@ public class IRCodeGenerator {
 				//	increment loop variable
 				emit(new ICStatement("add", loopVarName, loopVarName, "1"));
 
+				//	jump to top of loop
+				emit(new ICStatement("goto", labelName, "", ""));
+				
 				//	loop end label
 				emit(new ICStatement(endLabelName));
 			} enclosingLoopEnds.pop();
@@ -431,6 +434,9 @@ public class IRCodeGenerator {
 				//	loop contents
 				TreeNode loopContents = tree.getChildren().get(1);
 				generateIRCodeForNode(loopContents);
+
+				//	jump to top of loop
+				emit(new ICStatement("goto", labelName, "", ""));
 
 				//	end label
 				emit(new ICStatement(endLabelName));
