@@ -231,8 +231,8 @@ public class Parser{
 							//	add each param to the symbol table
 							for (TreeNode param : secondChild.getChildren()) {
 								String paramName = ((Token)param.getChildren().get(0).getSymbol()).value();
-								String paramType = getTypeOfNode(param.getChildren().get(1).getChildren().get(0));
-
+								TreeNode idNode = param.getChildren().get(1).getChildren().get(0);
+								String paramType = getTypeOfNode(idNode);
 								symbolTable.addVar(paramName, paramType);
 							}
 						}
@@ -492,7 +492,7 @@ public class Parser{
 					}
 					return symbolTable.getVar(token.value()).getType().typeString();
 				} else if (symbolTable.getType(token.value()) != null) {
-					return symbolTable.getType(token.value()).typeString();
+					return token.value();
 				} else {
 					//	couldn't find the ID
 					System.out.println("ERROR: Unknown ID: " + token.value());
@@ -530,6 +530,9 @@ public class Parser{
 					System.out.println("ERROR: Unknown array: " + arrayName);
 					return null;
 				}
+			} else if (nonterminal.equals(NonTerminals.TYPE_ID)) {
+				System.out.println("GET TYPE OF TYPE_ID NODE: " + treeNode);
+				return getTypeOfNode(treeNode.getChildren().get(0));
 			} else {
 				throw new IllegalArgumentException("Type doesn't make sense for the given tree: " + treeNode);
 			}
