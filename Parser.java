@@ -325,8 +325,8 @@ public class Parser{
 		for (TreeNode treeNode : treeNodeParam.getChildren()) {
 			if (treeNode.getSymbol().isTerminal() && ((Token) treeNode.getSymbol()).ordinal() == State.ASSIGN.ordinal()) {
 				TreeNode assignTo = treeNode.getChildren().get(0);
-				if (assignTo == null || !symbolTable.containsVar(((Token) assignTo.getSymbol()).value())) {
-					System.out.println("ERROR: VARIABLE " + ((Token) assignTo.getSymbol()).value() + " IS NOT DEFINED");
+				if (assignTo == null || !symbolTable.containsVar(((Token) assignTo.getSymbol()).value()) && ((Token) assignTo.getSymbol()).ordinal() != State.INTLIT.ordinal() && ((Token) assignTo.getSymbol()).ordinal() != State.MINUS.ordinal() && ((Token) assignTo.getSymbol()).ordinal() != State.PLUS.ordinal()) {
+					System.out.println("ERROR: VARIABLE " + ((Token) assignTo.getSymbol()).value() + " AT LINE " + ((Token) assignTo.getSymbol()).lineNumber + " IS NOT DEFINED");
 				}
 			}
 			checkInitialization(treeNode);	
@@ -338,9 +338,11 @@ public class Parser{
 	public boolean findAssignmentStatement(TreeNode treeNodeParam) {
 		boolean pass = true;
 		for (TreeNode treeNode : treeNodeParam.getChildren()) {
-			if (treeNode.getSymbol().isTerminal() && ((Token) treeNode.getSymbol()).ordinal() == State.ASSIGN.ordinal()) {
+			if (treeNode.getSymbol().isTerminal() && ((Token) treeNode.getSymbol()).ordinal() == State.ASSIGN.ordinal() && treeNode.getChildren().size() > 0) {
 				TreeNode assignTo = treeNode.getChildren().get(0);
-				if ( !checkBinaryOperands(treeNode, symbolTable.getVar(((Token) assignTo.getSymbol()).value()).getType().getName() )) pass = false;
+				if (symbolTable.containsVar(((Token) assignTo.getSymbol()).value())) {
+					if ( !checkBinaryOperands(treeNode, symbolTable.getVar(((Token) assignTo.getSymbol()).value()).getType().getName() )) pass = false;
+				}
 			}
 			if( !findAssignmentStatement(treeNode)) pass = false;
 		}
