@@ -384,7 +384,7 @@ public class Parser{
 						if (symbolTable.containsVar(((Token) left.getSymbol()).value())) {
 							System.out.println("ERROR: Variable " + symbolTable.getVar(((Token) left.getSymbol()).value()) + " at line number " + ((Token) left.getSymbol()).lineNumber + " needs to be " + type);
 						} else {
-							System.out.println("ERROR: Variable at line number " + ((Token) left.getSymbol()).lineNumber + " needs to be " + type);
+							System.out.println("ERROR: Variable " + ((Token)left.getSymbol()).value() + " at line number " + ((Token) left.getSymbol()).lineNumber + " needs to be " + type);
 						}
 						pass = false;
 					}
@@ -392,7 +392,7 @@ public class Parser{
 						if (symbolTable.containsVar(((Token) right.getSymbol()).value())) {
 							System.out.println("ERROR: Variable " + symbolTable.getVar(((Token) right.getSymbol()).value()) + " at line number " + ((Token) left.getSymbol()).lineNumber + " needs to be " + type);
 						} else {
-							System.out.println("ERROR: Variable at line number needs to be " + type);
+							System.out.println("ERROR: Variable " + ((Token)right.getSymbol()).value() + " at line number " + ((Token) right.getSymbol()).lineNumber +" needs to be " + type);
 						}
 						pass = false;
 					}
