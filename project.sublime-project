@@ -31,6 +31,11 @@
 			"name": "Parse ex6.tiger",
 			"cmd": ["make", "ex6"],
 			"working_dir": "${project_path}"
+		},
+		{
+			"name": "Parse tictactoe.tiger",
+			"cmd": ["make", "tictactoe"],
+			"working_dir": "${project_path}"
 		}
 	]
 }

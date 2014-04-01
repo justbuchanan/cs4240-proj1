@@ -44,6 +44,9 @@ ex3: all
 ex6: all
 	java $(DRIVER) test-input-ver-2/ex6.tiger &> ex6.log
 
+tictactoe: all
+	java $(DRIVER) test-input-ver-2/tictactoe.tiger &> tictactoe.log
+
 debug: all
 	jdb -cp $(CLASSPATH) $(DRIVER)
 
