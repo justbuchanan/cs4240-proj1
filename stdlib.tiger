@@ -4,17 +4,17 @@
 let
 /* Print the string on the standard output. */
 function print(s : string) begin
-	print("IMPLEMENT ME!");
+	break;
 end;
 
 /*Print the integer on the standard output */
 function printi(i : int) begin
-	print("IMPLEMENT ME!");
+	break;
 end;
 
 /* Flush the standard output buffer. */
 function flush() begin
-	print ("IMPLEMENT ME!");
+	break;
 end;
 
 /* Read and return a character from standard input; return an empty string at end-of-file */
@@ -55,7 +55,7 @@ end;
 
 /* Terminate execution of the program with code i. */
 function exit(i : int) begin 
-	print("IMPLEMENT ME!");
+	break;
 end;
 
 in
