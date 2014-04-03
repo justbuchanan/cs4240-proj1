@@ -3,17 +3,17 @@
 
 let
 /* Print the string on the standard output. */
-function print(s : string) : string begin
+function print(s : string) begin
 	return(s);
 end;
 
 /*Print the integer on the standard output */
-function printi(i : int) : int begin
+function printi(i : int) begin
 	return(i);
 end;
 
 /* Flush the standard output buffer. */
-function flush() : int begin
+function flush() begin
 	return(nil);
 end;
 
@@ -54,7 +54,7 @@ function not(i : int) : int begin
 end;
 
 /* Terminate execution of the program with code i. */
-function exit(i : int) : int begin 
+function exit(i : int) begin 
 	return(i);
 end;
 
