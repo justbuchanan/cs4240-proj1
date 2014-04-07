@@ -55,8 +55,16 @@ public class CodeStatement {
 		} else {
 			String str = "";
 			for (String arg : components) {
-				str += arg + ", ";
+				str += arg;
+				if (arg.length() > 0) {
+					str += ", ";
+				}
 			}
+
+			if(str.length() > 0) {
+				str = str.substring(0, str.length() - 2);
+			}
+
 			return str;
 		}
 	}
