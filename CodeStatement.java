@@ -59,8 +59,23 @@ public class CodeStatement {
 		} else {
 			String str = "";
 			for (String arg : components) {
-				str += arg + ", ";
+				str += arg;
+				if (arg.length() > 0) {
+					str += ", ";
+				}
 			}
+
+			if(str.length() > 0) {
+				str = str.substring(0, str.length() - 2);
+				int i;
+				for (i = 0; i < str.length(); i++) {
+					if (str.substring(i, i + 1).equals(",")) {
+						break;
+					}
+				}
+				str = str.substring(0, i) + str.substring(i + 1, str.length());
+			}
+
 			return str;
 		}
 	}
