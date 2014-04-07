@@ -63,6 +63,13 @@ public class CodeStatement {
 
 			if(str.length() > 0) {
 				str = str.substring(0, str.length() - 2);
+				int i;
+				for (i = 0; i < str.length(); i++) {
+					if (str.substring(i, i + 1).equals(",")) {
+						break;
+					}
+				}
+				str = str.substring(0, i) + str.substring(i + 1, str.length());
 			}
 
 			return str;

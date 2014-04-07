@@ -42,7 +42,8 @@ public class Driver {
 			}
 			
 			MIPSGenerator mipsGenerator = new MIPSGenerator(irCode);
-			mipsGenerator.generateMips();
+			mipsGenerator.generateMips();		
+			System.out.println("\n\nMIPS:\n\n" + mipsGenerator.toString());
 		}
 
 		//	write debug files
