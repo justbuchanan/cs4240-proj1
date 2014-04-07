@@ -5,7 +5,7 @@ import java.util.ArrayList;
  * Can be an operation: op, y, z, x
  * OR a label
  */
-public class ICStatement {
+public class CodeStatement {
 	private ArrayList<String> components;
 	private String labelName;
 
@@ -14,17 +14,17 @@ public class ICStatement {
 	}
 
 	//	empty line
-	public ICStatement() {
+	public CodeStatement() {
 		components = new ArrayList<>();
 	}
 
 	//	label
-	public ICStatement(String labelName) {
+	public CodeStatement(String labelName) {
 		this.labelName = labelName;
 	}
 
 	//	4-address code
-	public ICStatement(String op, String outReg, String operand1Reg, String operand2Reg) {
+	public CodeStatement(String op, String outReg, String operand1Reg, String operand2Reg) {
 		components = new ArrayList<>();
 		components.add(op);
 		components.add(outReg);
@@ -33,7 +33,7 @@ public class ICStatement {
 	}
 
 	//	function call w/return value
-	public ICStatement(String funcName, String retValVar, ArrayList<String> params) {
+	public CodeStatement(String funcName, String retValVar, ArrayList<String> params) {
 		components = new ArrayList<>();
 		components.add("callr");
 		components.add(retValVar);
@@ -42,7 +42,7 @@ public class ICStatement {
 	}
 
 	//	function call w/out return value
-	public ICStatement(String funcName, ArrayList<String> params) {
+	public CodeStatement(String funcName, ArrayList<String> params) {
 		components = new ArrayList<>();
 		components.add("call");
 		components.add(funcName);

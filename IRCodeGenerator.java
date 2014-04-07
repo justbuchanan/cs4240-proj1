@@ -13,13 +13,13 @@ public class IRCodeGenerator {
 	private Set<String> variables;
 	private SymbolTable symbolTable;
 	private Stack<String> enclosingLoopEnds;	//	keeps track of where to go if we hit a BREAK
-	private ArrayList<ICStatement> intermediateCode;
+	private ArrayList<CodeStatement> intermediateCode;
 
 	/** 
 	 * Generates the entire IR code for the program represented by @ast.  Modifies @symbolTable
 	 * to add temporary variables, etc.
 	 */
-	public static ArrayList<ICStatement> generateIRCode(ParseTree ast, SymbolTable symbolTable) {
+	public static ArrayList<CodeStatement> generateIRCode(ParseTree ast, SymbolTable symbolTable) {
 		IRCodeGenerator generator = new IRCodeGenerator(symbolTable);
 		try {
 			generator.generateIRCodeForNode(ast.getRoot());
@@ -45,12 +45,12 @@ public class IRCodeGenerator {
 		this.symbolTable = symbolTable;
 	}
 
-	private void emit(ICStatement stmt) {
+	private void emit(CodeStatement stmt) {
 		intermediateCode.add(stmt);
 	}
 
 	/**
-	 * Generates ICStatements and adds them in order to @codeOut.  This is meant to be used recursively.
+	 * Generates CodeStatements and adds them in order to @codeOut.  This is meant to be used recursively.
 	 * @return the name of the register where the resulting value is placed.  may be null
 	 */
 	private String generateIRCodeForNode(TreeNode tree) {
@@ -109,13 +109,13 @@ public class IRCodeGenerator {
 			if (!mainLabel.equals("main")) {
 				throw new RuntimeException("Unable to allocate label 'main'");
 			}
-			emit(new ICStatement());
-			emit(new ICStatement(mainLabel));
+			emit(new CodeStatement());
+			emit(new CodeStatement(mainLabel));
 
 			//	variable declarations
 			if (varDeclList != null) {
 				generateIRCodeForNode(varDeclList);
-				emit(new ICStatement());	//	newline
+				emit(new CodeStatement());	//	newline
 			}
 
 			//	see if there's a STAT_SEQ
@@ -180,10 +180,10 @@ public class IRCodeGenerator {
 							arrSize *= dim;
 						}
 
-						emit(new ICStatement("assign", varName, Integer.toString(arrSize), constExprVar));
+						emit(new CodeStatement("assign", varName, Integer.toString(arrSize), constExprVar));
 					} else {
 						//	value initialization
-						emit(new ICStatement("assign", varName, constExprVar, ""));
+						emit(new CodeStatement("assign", varName, constExprVar, ""));
 					}
 				}
 			}
@@ -201,8 +201,8 @@ public class IRCodeGenerator {
 
 			FuncSymbolEntry funcEntry = symbolTable.getFunc(funcName);
 
-			emit(new ICStatement());	//	newline
-			emit(new ICStatement(labelName));
+			emit(new CodeStatement());	//	newline
+			emit(new CodeStatement(labelName));
 
 			//	statement sequence is the last node
 			TreeNode statSeqNode = tree.getChildren().get(tree.getChildren().size() - 1);
@@ -210,7 +210,7 @@ public class IRCodeGenerator {
 
 			//	add a return stmt if it's a void function
 			if (funcEntry.isVoid()) {
-				emit(new ICStatement("return", "", "", ""));	//	FIXME: is this the right format?
+				emit(new CodeStatement("return", "", "", ""));	//	FIXME: is this the right format?
 			}
 
 			return null;
@@ -235,7 +235,7 @@ public class IRCodeGenerator {
 			String rightArgVar = generateIRCodeForNode(tree.getChildren().get(1));
 
 			//	add the code for this operation
-			emit(new ICStatement(opCode, resultVar, leftArgVar, rightArgVar));
+			emit(new CodeStatement(opCode, resultVar, leftArgVar, rightArgVar));
 
 			return resultVar;
 		} else if (compareOps.contains(parentSymbol)) {
@@ -246,31 +246,31 @@ public class IRCodeGenerator {
 			String rightArgVar = generateIRCodeForNode(tree.getChildren().get(1));
 
 			if (parentSymbol.equals(State.LESSER)) {
-				emit(new ICStatement("slt", resultVar, leftArgVar, rightArgVar));
+				emit(new CodeStatement("slt", resultVar, leftArgVar, rightArgVar));
 			} else if (parentSymbol.equals(State.GREATER)) {
-				emit(new ICStatement("slt", resultVar, rightArgVar, leftArgVar));
+				emit(new CodeStatement("slt", resultVar, rightArgVar, leftArgVar));
 			} else if (parentSymbol.equals(State.LESSEREQ)) {
 				//	(a <= b) == !(b < a)
-				emit(new ICStatement("slt", resultVar, rightArgVar, leftArgVar));
-				emit(new ICStatement("sub", resultVar, resultVar, "1"));
+				emit(new CodeStatement("slt", resultVar, rightArgVar, leftArgVar));
+				emit(new CodeStatement("sub", resultVar, resultVar, "1"));
 			} else if (parentSymbol.equals(State.GREATEREQ)) {
 				//	(a >= b) == !(a < b)
-				emit(new ICStatement("slt", resultVar, leftArgVar, rightArgVar));
-				emit(new ICStatement("sub", resultVar, resultVar, "1"));
+				emit(new CodeStatement("slt", resultVar, leftArgVar, rightArgVar));
+				emit(new CodeStatement("sub", resultVar, resultVar, "1"));
 			} else if (parentSymbol.equals(State.EQ)) {
 				String afterEqLabel = unique_label("after_eq");
 
-				emit(new ICStatement("assign", resultVar, "1", ""));
-				emit(new ICStatement("breq", leftArgVar, rightArgVar, afterEqLabel));
-				emit(new ICStatement("assign", resultVar, "0", ""));
-				emit(new ICStatement(afterEqLabel));
+				emit(new CodeStatement("assign", resultVar, "1", ""));
+				emit(new CodeStatement("breq", leftArgVar, rightArgVar, afterEqLabel));
+				emit(new CodeStatement("assign", resultVar, "0", ""));
+				emit(new CodeStatement(afterEqLabel));
 			} else if (parentSymbol.equals(State.NEQ)) {
 				String afterNeqLabel = unique_label("after_neq");
 
-				emit(new ICStatement("assign", resultVar, "1", ""));
-				emit(new ICStatement("brneq", leftArgVar, rightArgVar, afterNeqLabel));
-				emit(new ICStatement("assign", resultVar, "0", ""));
-				emit(new ICStatement(afterNeqLabel));
+				emit(new CodeStatement("assign", resultVar, "1", ""));
+				emit(new CodeStatement("brneq", leftArgVar, rightArgVar, afterNeqLabel));
+				emit(new CodeStatement("assign", resultVar, "0", ""));
+				emit(new CodeStatement(afterNeqLabel));
 			} else {
 				//	make sure I didn't forget any...
 				throw new RuntimeException("Comparison operator '" + parentSymbol + "' not implemented");
@@ -282,21 +282,21 @@ public class IRCodeGenerator {
 
 			//	starts out as true
 			String resultVar = unique_var("orResult");
-			emit(new ICStatement("assign", resultVar, "1", ""));
+			emit(new CodeStatement("assign", resultVar, "1", ""));
 
 			//	evaluate the left arg and skip the right arg if left is true
 			String leftArgVar = generateIRCodeForNode(tree.getChildren().get(0));
-			emit(new ICStatement("brneq", leftArgVar, "0", endLabel));
+			emit(new CodeStatement("brneq", leftArgVar, "0", endLabel));
 
 			//	evaluate the right arg
 			String rightArgVar = generateIRCodeForNode(tree.getChildren().get(1));
-			emit(new ICStatement("brneq", rightArgVar, "0", endLabel));
+			emit(new CodeStatement("brneq", rightArgVar, "0", endLabel));
 
 			//	if rightArgVar was zero, set result to false
-			emit(new ICStatement("assign", resultVar, "0", ""));
+			emit(new CodeStatement("assign", resultVar, "0", ""));
 
 			//	end label
-			emit(new ICStatement(endLabel));
+			emit(new CodeStatement(endLabel));
 
 			return resultVar;
 		} else if (parentSymbol.equals(State.AND)) {
@@ -304,21 +304,21 @@ public class IRCodeGenerator {
 
 			//	starts out as false
 			String resultVar = unique_var("andResult");
-			emit(new ICStatement("assign", resultVar, "0", ""));
+			emit(new CodeStatement("assign", resultVar, "0", ""));
 
 			//	evaluate the left arg and skip the right arg if left is false
 			String leftArgVar = generateIRCodeForNode(tree.getChildren().get(0));
-			emit(new ICStatement("breq", leftArgVar, "0", endLabel));
+			emit(new CodeStatement("breq", leftArgVar, "0", endLabel));
 
 			//	evaluate the right arg
 			String rightArgVar = generateIRCodeForNode(tree.getChildren().get(1));
-			emit(new ICStatement("breq", rightArgVar, "0", endLabel));
+			emit(new CodeStatement("breq", rightArgVar, "0", endLabel));
 
 			//	if rightArgVar was nonzero, set result to true
-			emit(new ICStatement("assign", resultVar, "1", ""));
+			emit(new CodeStatement("assign", resultVar, "1", ""));
 
 			//	end label
-			emit(new ICStatement(endLabel));
+			emit(new CodeStatement(endLabel));
 
 			return resultVar;
 		} else if (parentSymbol.equals(State.ID)) {
@@ -335,12 +335,12 @@ public class IRCodeGenerator {
 			if (lvalue.isNodeType(State.ID)) {
 				//	assignment to a named variable
 				String lvalueVarName = ((Token)lvalue.getSymbol()).value();
-				emit(new ICStatement("assign", lvalueVarName, valueVariable, ""));
+				emit(new CodeStatement("assign", lvalueVarName, valueVariable, ""));
 			} else if (lvalue.isNodeType(NonTerminals.ARRAY_LOOKUP)) {
 				//	assignment to an index into an array
 				String linearizedIndex = generateIRCodeForArrayOffset(lvalue);
 				String arrName = ((Token)lvalue.getChildren().get(0).getSymbol()).value();
-				emit(new ICStatement("array_store", arrName, linearizedIndex, valueVariable));
+				emit(new CodeStatement("array_store", arrName, linearizedIndex, valueVariable));
 			} else {
 				//	this shouldn't ever happen, it's just here to make sure I didn't miss something
 				throw new RuntimeException("Unhandled case in ASSIGN code generator");
@@ -353,7 +353,7 @@ public class IRCodeGenerator {
 			String linearizedIndex = generateIRCodeForArrayOffset(tree);
 			String arrName = ((Token)tree.getChildren().get(0).getSymbol()).value();
 			String outputVar = unique_var("arrLookup");
-			emit(new ICStatement("array_load", outputVar, arrName, linearizedIndex));
+			emit(new CodeStatement("array_load", outputVar, arrName, linearizedIndex));
 			return outputVar;
 		} else if (parentSymbol.equals(State.STRLIT)) {
 			return ((Token)tree.getSymbol()).value();
@@ -371,11 +371,11 @@ public class IRCodeGenerator {
 
 			FuncSymbolEntry funcEntry = symbolTable.getFunc(funcName);
 			if (funcEntry.isVoid()) {
-				emit(new ICStatement(funcName, params));
+				emit(new CodeStatement(funcName, params));
 				return null;
 			} else {
 				String retValVar = unique_var("retVal");
-				emit(new ICStatement(funcName, retValVar, params));
+				emit(new CodeStatement(funcName, retValVar, params));
 				return retValVar;
 			}
 		} else if (parentSymbol.equals(State.FOR)) {
@@ -391,27 +391,27 @@ public class IRCodeGenerator {
 				String loopVarFinal = ((Token)tree.getChildren().get(2).getSymbol()).value();
 
 				//	init loop variable
-				emit(new ICStatement("assign", loopVarName, loopVarInitial, ""));
+				emit(new CodeStatement("assign", loopVarName, loopVarInitial, ""));
 
 				//	label for the top of the loop
 				String labelName = unique_label("for_loop");
-				emit(new ICStatement(labelName));
+				emit(new CodeStatement(labelName));
 
 				//	check condition, jump to end label if we're done
-				emit(new ICStatement("breq", loopVarName, loopVarFinal, endLabelName));
+				emit(new CodeStatement("breq", loopVarName, loopVarFinal, endLabelName));
 
 				//	loop content
 				TreeNode loopStatements = tree.getChildren().get(3);
 				generateIRCodeForNode(loopStatements);
 
 				//	increment loop variable
-				emit(new ICStatement("add", loopVarName, loopVarName, "1"));
+				emit(new CodeStatement("add", loopVarName, loopVarName, "1"));
 
 				//	jump to top of loop
-				emit(new ICStatement("goto", labelName, "", ""));
+				emit(new CodeStatement("goto", labelName, "", ""));
 				
 				//	loop end label
-				emit(new ICStatement(endLabelName));
+				emit(new CodeStatement(endLabelName));
 			} enclosingLoopEnds.pop();
 
 			return null;
@@ -422,24 +422,24 @@ public class IRCodeGenerator {
 			enclosingLoopEnds.push(endLabelName); {
 				//	label for the top of the loop
 				String labelName = unique_label("while_loop");
-				emit(new ICStatement(labelName));
+				emit(new CodeStatement(labelName));
 
 				// //	evaluate loop expr
 				TreeNode loopExprNode = tree.getChildren().get(0);
 				String loopVar = generateIRCodeForNode(loopExprNode);
 
 				//	check condition, jump to end if we're done
-				emit(new ICStatement("breq", loopVar, "0", endLabelName));
+				emit(new CodeStatement("breq", loopVar, "0", endLabelName));
 
 				//	loop contents
 				TreeNode loopContents = tree.getChildren().get(1);
 				generateIRCodeForNode(loopContents);
 
 				//	jump to top of loop
-				emit(new ICStatement("goto", labelName, "", ""));
+				emit(new CodeStatement("goto", labelName, "", ""));
 
 				//	end label
-				emit(new ICStatement(endLabelName));
+				emit(new CodeStatement(endLabelName));
 			} enclosingLoopEnds.pop();
 
 			return null;
@@ -451,31 +451,31 @@ public class IRCodeGenerator {
 			//	evaluate condition
 			String conditionVar = generateIRCodeForNode(tree.getChildren().get(0));
 			String jumpTo = hasElseClause ? elseLabel : endIfLabel;
-			emit(new ICStatement("breq", conditionVar, "0", jumpTo));
+			emit(new CodeStatement("breq", conditionVar, "0", jumpTo));
 
 			//	THEN clause
 			generateIRCodeForNode(tree.getChildren().get(1));
 
 			if (hasElseClause) {
 				//	skip over ELSE clause at the end of the THEN clause
-				emit(new ICStatement("goto", endIfLabel, "", ""));
+				emit(new CodeStatement("goto", endIfLabel, "", ""));
 
 				//	ELSE
-				emit(new ICStatement(elseLabel));
+				emit(new CodeStatement(elseLabel));
 				generateIRCodeForNode(tree.getChildren().get(2));
 			}
 
 			//	end label
-			emit(new ICStatement(endIfLabel));
+			emit(new CodeStatement(endIfLabel));
 
 			return null;
 		} else if (parentSymbol.equals(State.RETURN)) {
 			String returnExprVar = generateIRCodeForNode(tree.getChildren().get(0));
-			emit(new ICStatement("return", returnExprVar, "", ""));
+			emit(new CodeStatement("return", returnExprVar, "", ""));
 			return null;
 		} else if (parentSymbol.equals(State.BREAK)) {
 			String jumpTo = enclosingLoopEnds.peek();
-			emit(new ICStatement("goto", jumpTo, "", ""));
+			emit(new CodeStatement("goto", jumpTo, "", ""));
 			return null;
 		} else {
 			throw new RuntimeException("Don't know how to generate IR for node type: " + parentSymbol);
@@ -497,8 +497,8 @@ public class IRCodeGenerator {
 
 			for (int i = 1; i < arrayLookupNode.getChildren().size(); i++) {
 				String idxExprResult = generateIRCodeForNode(arrayLookupNode.getChildren().get(i));
-				emit(new ICStatement("mult", tmpVarName, idxExprResult, arrDims.get(i-1).toString()));
-				emit(new ICStatement("add", offsetVarName, offsetVarName, tmpVarName));
+				emit(new CodeStatement("mult", tmpVarName, idxExprResult, arrDims.get(i-1).toString()));
+				emit(new CodeStatement("add", offsetVarName, offsetVarName, tmpVarName));
 			}
 
 			return offsetVarName;
