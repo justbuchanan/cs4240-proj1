@@ -13,6 +13,10 @@ public class CodeStatement {
 		return labelName != null;
 	}
 
+	public boolean isEmpty() {
+		return (components == null || components.size() == 0) && !isLabel();
+	}
+
 	//	empty line
 	public CodeStatement() {
 		components = new ArrayList<>();
