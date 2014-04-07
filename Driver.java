@@ -34,10 +34,10 @@ public class Driver {
 		//	IR Code
 		if (parseSuccess) {
 			System.out.println("\nGenerating IR code...\n");
-			ArrayList<ICStatement> irCode = IRCodeGenerator.generateIRCode(parser.getAST(), parser.getSymbolTable());
+			ArrayList<CodeStatement> irCode = IRCodeGenerator.generateIRCode(parser.getAST(), parser.getSymbolTable());
 			System.out.println("\nIR Code:");
 
-			for (ICStatement stmt : irCode) {
+			for (CodeStatement stmt : irCode) {
 				System.out.println("> " + stmt);
 			}
 		}
