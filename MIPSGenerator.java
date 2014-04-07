@@ -9,16 +9,16 @@ import java.util.Stack;
  */
 public class MIPSGenerator {
 
-	private ArrayList<ICStatement> irCode;
-	private ArrayList<ICStatement> mipsCode;
+	private ArrayList<CodeStatement> irCode;
+	private ArrayList<CodeStatement> mipsCode;
 
-	public MIPSGenerator(ArrayList<ICStatement> irCode) {
+	public MIPSGenerator(ArrayList<CodeStatement> irCode) {
 		this.irCode = irCode;
  	}
 
 	public void generateMips() {
-		for (ICStatement icStatement : irCode) {
-			System.out.println(icStatement.toString());
+		for (CodeStatement codeStatement : irCode) {
+			System.out.println(codeStatement.toString());
 		}
 	}
 }
