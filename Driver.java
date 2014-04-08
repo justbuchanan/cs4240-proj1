@@ -41,7 +41,7 @@ public class Driver {
 				System.out.println("> " + stmt);
 			}
 			
-			MIPSGenerator mipsGenerator = new MIPSGenerator(irCode);
+			MIPSGenerator mipsGenerator = new MIPSGenerator(irCode, parser.getSymbolTable());
 			mipsGenerator.generateMips();		
 			System.out.println("\n\nMIPS:\n\n" + mipsGenerator.toString());
 		}
