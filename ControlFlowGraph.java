@@ -10,7 +10,7 @@ public class ControlFlowGraph {
 	private static Set<String> branchInstructions;
 	private static Set<String> conditionalBranchInstructions;
 	private ArrayList<BasicBlock> basicBlocks;
-	private ArrayList<CFGEdge> basicBlockEdges;
+	private Set<CFGEdge> basicBlockEdges;
 
 
 	private class CFGEdge {
@@ -24,6 +24,16 @@ public class ControlFlowGraph {
 
 		public String toString() {
 			return from + " <--> " + to;
+		}
+
+		public boolean equals(Object obj) {
+			if (obj == null || !(obj instanceof CFGEdge)) return false;
+			CFGEdge other = (CFGEdge) obj;
+			return other.from == from && other.to == to;
+		}
+
+		public int hashCode() {
+			return from + to;
 		}
 	}
 
@@ -55,7 +65,7 @@ public class ControlFlowGraph {
 
 	public ControlFlowGraph(ArrayList<CodeStatement> irCode) {
 		this.basicBlocks = new ArrayList<>();
-		this.basicBlockEdges = new ArrayList<>();
+		this.basicBlockEdges = new HashSet<>();
 
 		//	contaions both conditional and non-conditional branches
 		Map<Integer, String> branches = new HashMap<>();
@@ -108,7 +118,7 @@ public class ControlFlowGraph {
 			if (branchTargets.contains(new Integer(i))) {
 				if (blockStartIndex != i) {
 					//	make a block
-					List<CodeStatement> code = irCode.subList(blockStartIndex, i - 1);
+					List<CodeStatement> code = irCode.subList(blockStartIndex, i);
 					BasicBlock block = new BasicBlock(blockStartIndex, code);
 					this.basicBlocks.add(block);
 
@@ -116,7 +126,7 @@ public class ControlFlowGraph {
 				}
 			} else if (branches.containsKey(new Integer(i))) {
 				//	make a block
-				List<CodeStatement> code = irCode.subList(blockStartIndex, i);
+				List<CodeStatement> code = irCode.subList(blockStartIndex, i + 1);
 				BasicBlock block = new BasicBlock(blockStartIndex, code);
 				this.basicBlocks.add(block);
 
@@ -144,6 +154,15 @@ public class ControlFlowGraph {
 				basicBlockEdges.add(new CFGEdge(
 					basicBlockIndexForLineIndex(lineIndex),
 					basicBlockIndexForLineIndex(lineIndex + 1)));
+			}
+		}
+
+		//	add edges between chunks in sequence
+		for (int i = 0; i < basicBlocks.size() - 1; i++) {
+			List<CodeStatement> codeBlock = basicBlocks.get(i).getCode();
+			CodeStatement lastStmt = codeBlock.get(codeBlock.size() - 1);
+			if (!branchInstructions().contains(lastStmt) && !conditionalBranchInstructions().contains(lastStmt)) {
+				basicBlockEdges.add(new CFGEdge(i, i + 1));
 			}
 		}
 	}
