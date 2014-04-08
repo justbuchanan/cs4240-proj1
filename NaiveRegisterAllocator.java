@@ -1,15 +1,13 @@
 import java.util.ArrayList;
 
 public class NaiveRegisterAllocator implements IRegisterAllocator{
-	private ArrayList<CodeStatement> finalCode;
 
-	public static ArrayList<CodeStatement> allocRegisters(ArrayList<CodeStatement> origMips){
+	public  ArrayList<CodeStatement> allocRegisters(ArrayList<CodeStatement> origMips){
 		int currReg = 0; 
-
-		String[] threeRegInstr = {"ADD", ""}
+		ArrayList<CodeStatement> finalCode = new ArrayList();
 		
 		for(CodeStatement stmt : origMips){
-			if(stmt.getOperator().equals()){ // TODO: make this any 4-address instuction
+			if(stmt.getOperator().equals("")){ // TODO: make this any 4-address instuction
 
 				// ld operands
 				finalCode.add(new CodeStatement("LW" , "$t0", stmt.getLeftOperand()));
@@ -21,7 +19,8 @@ public class NaiveRegisterAllocator implements IRegisterAllocator{
 				// store result
 				finalCode.add(new CodeStatement("SW", "$t2", stmt.getOutputRegister()));
 
-			}else if(stmt.getOperator().equal(""))
+			}
 		}
+		return finalCode;
 	}
 }

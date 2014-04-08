@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+
 public interface IRegisterAllocator{
-	public static ArrayList<CodeStatement> allocRegisters(ArrayList<CodeStatement> origMips);
+	public ArrayList<CodeStatement> allocRegisters(ArrayList<CodeStatement> origMips);
 }
