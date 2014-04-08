@@ -23,6 +23,14 @@ public class CodeStatement {
 		this.labelName = labelName;
 	}
 
+	// 3-address code
+	public CodeStatement(String op, String op1, String op2){
+		components = new ArrayList<>();
+		components.add(op);
+		components.add(op1);
+		components.add(op2);
+	}
+
 	//	4-address code
 	public CodeStatement(String op, String outReg, String operand1Reg, String operand2Reg) {
 		components = new ArrayList<>();
