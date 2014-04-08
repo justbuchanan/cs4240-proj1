@@ -44,14 +44,6 @@ public class CodeStatement {
 		components.add(operand2Reg);
 	}
 
-	//	3-address code
-	public CodeStatement(String op, String outReg, String operand1Reg) {
-		components = new ArrayList<>();
-		components.add(op);
-		components.add(outReg);
-		components.add(operand1Reg);
-	}
-
 	//	function call w/return value
 	public CodeStatement(String funcName, String retValVar, ArrayList<String> params) {
 		components = new ArrayList<>();
