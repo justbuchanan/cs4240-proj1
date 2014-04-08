@@ -55,6 +55,11 @@ public class Driver {
 			//	MIPS generation
 			mipsGenerator.generateMips();		
 			System.out.println("\n\nMIPS:\n\n" + mipsGenerator.toString());
+			
+			System.out.println("NAIVE REGISTER ALLOCATION: ");
+			NaiveRegisterAllocator regAlloc = new NaiveRegisterAllocator(mipsGenerator.mipsCode);
+			regAlloc.allocRegisters();
+			regAlloc.printCode();
 		}
 
 		//	write debug files

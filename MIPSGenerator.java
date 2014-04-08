@@ -7,7 +7,8 @@ import java.util.Stack;
 public class MIPSGenerator {
 
 	private ArrayList<CodeStatement> irCode;
-	private ArrayList<CodeStatement> mipsCode;
+	public ArrayList<CodeStatement> mipsCode; //TODO: MADE PUBLIC FOR DEBUGGING, FIND BETTER WAY
+											// TO INCORPORATE REGISTER ALLOCATION
 	private Set<String> variables;
 	private SymbolTable symbolTable;
 
@@ -58,7 +59,6 @@ public class MIPSGenerator {
 
 	public void generateMips() {
 		for (CodeStatement codeStatement : irCode) {
-			System.out.println(codeStatement.toString());
 			if (codeStatement.isLabel()) {
 				mipsCode.add(new CodeStatement(codeStatement.getLabelName()));
 			} else if (codeStatement.toString().length() > 0) {
@@ -111,7 +111,7 @@ public class MIPSGenerator {
 			}
 		}
 	}
-
+	
 	public String toString() {
 		String returnString = "";
 

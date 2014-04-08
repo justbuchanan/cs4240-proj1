@@ -3,9 +3,15 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class NaiveRegisterAllocator implements IRegisterAllocator{
-	public  ArrayList<CodeStatement> allocRegisters(ArrayList<CodeStatement> origMips){
+	private ArrayList<CodeStatement> finalCode;
+	private ArrayList<CodeStatement> origMips;
+	
+	public NaiveRegisterAllocator(ArrayList<CodeStatement> origMips){
+		this.origMips = origMips;
+	}
+	public  void allocRegisters(){
 		int currReg = 0; 
-		ArrayList<CodeStatement> finalCode = new ArrayList();
+		finalCode = new ArrayList();
 		Set<String> threeRegInstr = new HashSet();
 		//div is speciail case?
 		threeRegInstr.add("add");
@@ -38,6 +44,11 @@ public class NaiveRegisterAllocator implements IRegisterAllocator{
 				finalCode.add(stmt); //TODO: IMPLEMENT!
 			}
 		}
-		return finalCode;
+	}
+	
+	public void printCode(){
+		for(CodeStatement stmt : finalCode){
+			System.out.println(stmt.toString());
+		}
 	}
 }
