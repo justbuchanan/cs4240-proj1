@@ -40,9 +40,21 @@ public class Driver {
 			for (CodeStatement stmt : irCode) {
 				System.out.println("> " + stmt);
 			}
+
+			//	create the cfg and save a png of the graph
+			ControlFlowGraph cfg = new ControlFlowGraph(irCode);
+			writeFile("cfg.dot", cfg.toGraphviz());
+			try {
+				Runtime.getRuntime().exec("dot -Tpng -o cfg.png cfg.dot");
+			}
+			catch (IOException exc) {
+				System.err.println("Oops... got an exception: " + exc);
+			}
 			
+			//	MIPS generation
 			MIPSGenerator mipsGenerator = new MIPSGenerator(irCode);
-			mipsGenerator.generateMips();
+			mipsGenerator.generateMips();		
+			System.out.println("\n\nMIPS:\n\n" + mipsGenerator.toString());
 		}
 
 		//	write debug files

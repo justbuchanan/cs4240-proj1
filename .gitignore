@@ -1,4 +1,4 @@
-# don't track graphviz output
+# don't track output
 *.png
 *.class
 .classpath
@@ -7,6 +7,7 @@ pkg.zip
 .metadata
 .DS_Store
 *.sublime-workspace
+cfg.dot
 
 # ignore generated files
 first_sets.txt

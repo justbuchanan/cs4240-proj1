@@ -13,6 +13,10 @@ public class CodeStatement {
 		return labelName != null;
 	}
 
+	public boolean isEmpty() {
+		return (components == null || components.size() == 0) && !isLabel();
+	}
+
 	//	empty line
 	public CodeStatement() {
 		components = new ArrayList<>();
@@ -71,6 +75,13 @@ public class CodeStatement {
 
 			if(str.length() > 0) {
 				str = str.substring(0, str.length() - 2);
+				int i;
+				for (i = 0; i < str.length(); i++) {
+					if (str.substring(i, i + 1).equals(",")) {
+						break;
+					}
+				}
+				str = str.substring(0, i) + str.substring(i + 1, str.length());
 			}
 
 			return str;
