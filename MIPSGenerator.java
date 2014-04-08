@@ -56,8 +56,22 @@ public class MIPSGenerator {
                 }
 	}
 
+	private void generateDataSegment() {
+		for (CodeStatement codeStatement : irCode) {
+			if (!codeStatement.isLabel() && codeStatement.toString().length() > 0 && codeStatement.getOperator().equals("assign") && codeStatement.getRightOperand().length() > 0) {
+				ArrayList<String> valueList = new ArrayList<>();
+				for (int i = 0; i < (Integer.parseInt(codeStatement.getLeftOperand()) - 1); i++) {
+					valueList.add(codeStatement.getRightOperand());
+				}
+				mipsCode.add(new CodeStatement(codeStatement.getOutputRegister() + ":", ".word", codeStatement.getRightOperand(), valueList));
+			}
+		}
+	}
 
 	public void generateMips() {
+		mipsCode.add(new CodeStatement(".data"));
+		generateDataSegment();
+		mipsCode.add(new CodeStatement(".text"));
 		for (CodeStatement codeStatement : irCode) {
 			if (codeStatement.isLabel()) {
 				mipsCode.add(new CodeStatement(codeStatement.getLabelName()));
@@ -76,8 +90,9 @@ public class MIPSGenerator {
 						if (isInteger(codeStatement.getRightOperand())) {
 							mipsCode.add(new CodeStatement("addi", codeStatement.getOutputRegister(), codeStatement.getLeftOperand(), "-" + codeStatement.getRightOperand()));
 						} else if(isInteger(codeStatement.getLeftOperand())) {
-							
-							// TODO:
+							String newVar = unique_var(codeStatement.getRightOperand());
+							mipsCode.add(new CodeStatement("addi", newVar, codeStatement.getLeftOperand(), "0"));
+							mipsCode.add(new CodeStatement(codeStatement.getOperator(), codeStatement.getOutputRegister(), newVar, codeStatement.getRightOperand()));	
 						} else {
 							mipsCode.add(new CodeStatement(codeStatement.getOperator(), codeStatement.getOutputRegister(), codeStatement.getLeftOperand(), codeStatement.getRightOperand()));
 						}
@@ -86,25 +101,44 @@ public class MIPSGenerator {
 						if (isInteger(codeStatement.getRightOperand())) {
 							String newVar = unique_var(codeStatement.getLeftOperand());
 							mipsCode.add(new CodeStatement("addi", newVar, codeStatement.getRightOperand(), "0"));
-							String newVar2 = unique_var(codeStatement.getLeftOperand());
-							mipsCode.add(new CodeStatement("addi", newVar2, codeStatement.getLeftOperand(), "0"));
 							mipsCode.add(new CodeStatement(codeStatement.getOperator(), codeStatement.getLeftOperand(), newVar));
-							mipsCode.add(new CodeStatement("addi", codeStatement.getOutputRegister(), codeStatement.getLeftOperand(), "0"));
-							mipsCode.add(new CodeStatement("addi", codeStatement.getLeftOperand(), newVar2, "0"));
 						} else if (isInteger(codeStatement.getLeftOperand())) {
 						 	String newVar = unique_var(codeStatement.getRightOperand());
 							mipsCode.add(new CodeStatement("addi", newVar, codeStatement.getLeftOperand(), "0"));
-							String newVar2 = unique_var(codeStatement.getRightOperand());
-							mipsCode.add(new CodeStatement("addi", newVar2, codeStatement.getRightOperand(), "0"));
-							mipsCode.add(new CodeStatement(codeStatement.getOperator(), codeStatement.getRightOperand(), newVar));
-							mipsCode.add(new CodeStatement("addi", codeStatement.getOutputRegister(), codeStatement.getRightOperand(), "0"));
-							mipsCode.add(new CodeStatement("addi", codeStatement.getRightOperand(), newVar2, "0"));	
+							mipsCode.add(new CodeStatement(codeStatement.getOperator(), newVar, codeStatement.getRightOperand()));
 						} else {
-							String newVar = unique_var(codeStatement.getLeftOperand());
-							mipsCode.add(new CodeStatement("addi", newVar, codeStatement.getLeftOperand(), "0"));
 							mipsCode.add(new CodeStatement(codeStatement.getOperator(), codeStatement.getLeftOperand(), codeStatement.getRightOperand()));
-							mipsCode.add(new CodeStatement("addi", codeStatement.getOutputRegister(), codeStatement.getLeftOperand(), "0"));
-							mipsCode.add(new CodeStatement("addi", codeStatement.getLeftOperand(), newVar, "0"));
+						}
+						break;
+					case "div":
+						if (isInteger(codeStatement.getRightOperand())) {
+							String newVar = unique_var(codeStatement.getLeftOperand());
+							mipsCode.add(new CodeStatement("addi", newVar, codeStatement.getRightOperand(), "0"));
+							mipsCode.add(new CodeStatement(codeStatement.getOperator(), codeStatement.getLeftOperand(), newVar));
+						} else if (isInteger(codeStatement.getLeftOperand())) {
+						 	String newVar = unique_var(codeStatement.getRightOperand());
+							mipsCode.add(new CodeStatement("addi", newVar, codeStatement.getLeftOperand(), "0"));
+							mipsCode.add(new CodeStatement(codeStatement.getOperator(), newVar, codeStatement.getRightOperand()));
+						} else {
+							mipsCode.add(new CodeStatement(codeStatement.getOperator(), codeStatement.getLeftOperand(), codeStatement.getRightOperand()));
+						}
+						break;
+					case "or":
+						mipsCode.add(new CodeStatement(codeStatement.getOperator(), codeStatement.getOutputRegister(), codeStatement.getLeftOperand(), codeStatement.getRightOperand()));
+						break;
+					case "and":
+						mipsCode.add(new CodeStatement(codeStatement.getOperator(), codeStatement.getOutputRegister(), codeStatement.getLeftOperand(), codeStatement.getRightOperand()));
+						break;
+					case "goto":
+						mipsCode.add(new CodeStatement("j", codeStatement.getOutputRegister()));
+						break;
+					case "assign":
+						if (codeStatement.getRightOperand().length() == 0) {
+							if (isInteger(codeStatement.getLeftOperand())) {
+								mipsCode.add(new CodeStatement("addi", codeStatement.getOutputRegister(), "$0", codeStatement.getLeftOperand()));
+							} else {
+								mipsCode.add(new CodeStatement("addi", codeStatement.getOutputRegister(), codeStatement.getLeftOperand(), "0"));
+							}
 						}
 						break;
 				}

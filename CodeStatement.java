@@ -28,6 +28,12 @@ public class CodeStatement {
 		this.labelName = labelName;
 	}
 
+	public CodeStatement(String op, String op1) {
+		components = new ArrayList<>();
+		components.add(op);
+		components.add(op1);
+	}
+
 	// 3-address code
 	public CodeStatement(String op, String op1, String op2){
 		components = new ArrayList<>();
@@ -43,6 +49,14 @@ public class CodeStatement {
 		components.add(outReg);
 		components.add(operand1Reg);
 		components.add(operand2Reg);
+	}
+
+	public CodeStatement(String name, String word, String firstValue, ArrayList<String> values) {
+		components = new ArrayList<>();
+		components.add(name);
+		components.add(word);
+		components.add(firstValue);
+		components.addAll(values);
 	}
 
 	//	function call w/return value
@@ -62,6 +76,16 @@ public class CodeStatement {
 		components.addAll(params);
 	}
 
+	//	Returns values in array
+	public ArrayList<String> getArrayValues() {
+		ArrayList<String> returnList = new ArrayList<>();
+		for (int i = 2; i < components.size(); i++) {
+			returnList.add(components.get(i));
+		}
+
+		return returnList;
+	}
+
 	public String toString() {
 		if (isLabel()) {
 			return labelName + ":";
@@ -74,7 +98,7 @@ public class CodeStatement {
 				}
 			}
 
-			if(str.length() > 0) {
+			if (str.length() > 0) {
 				str = str.substring(0, str.length() - 2);
 				int i;
 				for (i = 0; i < str.length(); i++) {
@@ -83,7 +107,11 @@ public class CodeStatement {
 					}
 				}
 				str = str.substring(0, i) + str.substring(i + 1, str.length());
+				if (getOutputRegister().equals(".word")) {
+					str = str.substring(0, str.indexOf(".word") + 5) + str.substring(str.indexOf(".word") + 6, str.length());
+				}
 			}
+
 
 			return str;
 		}
