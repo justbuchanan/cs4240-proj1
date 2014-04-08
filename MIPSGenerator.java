@@ -151,6 +151,19 @@ public class MIPSGenerator {
 						}
 						mipsCode.add(new CodeStatement("lw", codeStatement.getOutputRegister(), newVar));
 						break;
+					case "breq":
+						mipsCode.add(new CodeStatement("beq", codeStatement.getOutputRegister(), codeStatement.getLeftOperand(), codeStatement.getRightOperand()));
+						break;
+					case "brneq":
+						mipsCode.add(new CodeStatement("bne", codeStatement.getOutputRegister(), codeStatement.getLeftOperand(), codeStatement.getRightOperand()));
+					case "brlt":
+						mipsCode.add(new CodeStatement("bltz", codeStatement.getOutputRegister(), codeStatement.getLeftOperand(), codeStatement.getRightOperand()));
+					case "brgt":
+						mipsCode.add(new CodeStatement("bgtz", codeStatement.getOutputRegister(), codeStatement.getLeftOperand(), codeStatement.getRightOperand()));
+					case "brleq":
+						mipsCode.add(new CodeStatement("blez", codeStatement.getOutputRegister(), codeStatement.getLeftOperand(), codeStatement.getRightOperand()));
+					case "brgeq":
+						mipsCode.add(new CodeStatement("bgez", codeStatement.getOutputRegister(), codeStatement.getLeftOperand(), codeStatement.getRightOperand()));
 				}
 			}
 		}
