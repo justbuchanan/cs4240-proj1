@@ -141,6 +141,16 @@ public class MIPSGenerator {
 							}
 						}
 						break;
+					case "array_load":
+						String newVar = unique_var(codeStatement.getLeftOperand());
+						mipsCode.add(new CodeStatement("lw", newVar, codeStatement.getLeftOperand()));
+						if (isInteger(codeStatement.getRightOperand())) {
+							mipsCode.add(new CodeStatement("addi", newVar, newVar, codeStatement.getRightOperand()));
+						} else {
+							mipsCode.add(new CodeStatement("add", newVar, newVar, codeStatement.getRightOperand()));
+						}
+						mipsCode.add(new CodeStatement("lw", codeStatement.getOutputRegister(), newVar));
+						break;
 				}
 			}
 		}
