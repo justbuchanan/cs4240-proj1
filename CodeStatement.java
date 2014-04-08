@@ -8,6 +8,7 @@ import java.util.ArrayList;
 public class CodeStatement {
 	private ArrayList<String> components;
 	private String labelName;
+	private int numbAddr;
 
 	public boolean isLabel() {
 		return labelName != null;
@@ -86,6 +87,10 @@ public class CodeStatement {
 
 			return str;
 		}
+	}
+	
+	public int getNumAddr(){
+		return components.size();
 	}
 
 
