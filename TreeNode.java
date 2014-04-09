@@ -45,10 +45,15 @@ public class TreeNode {
 	}
 
 	public boolean isNodeType(Enum type) {
-		if (type instanceof State) {
-			return ((Token)getSymbol()).type().equals((State)type);
-		} else {
-			return ((NonTerminalParserSymbol)getSymbol()).getNonTerminal().equals((NonTerminals)type);
+		try {
+			if (type instanceof State) {
+				return ((Token)getSymbol()).type().equals((State)type);
+			} else {
+				return ((NonTerminalParserSymbol)getSymbol()).getNonTerminal().equals((NonTerminals)type);
+			}
+		}
+		catch (ClassCastException exc) {
+			return false;
 		}
 	}
 
