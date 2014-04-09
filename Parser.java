@@ -474,8 +474,6 @@ public class Parser{
 			Token token = (Token)topLevelSymbol;
 			State type = token.type();
 			
-			System.out.println(type);
-
 			if (type.equals(State.INTLIT)) {
 				return "int";
 			} else if (type.equals(State.ID)) {
