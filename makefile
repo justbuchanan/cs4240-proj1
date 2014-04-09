@@ -9,7 +9,7 @@ SRC=$(wildcard *.java)
 OBJ=$(patsubst %.java, %.class, $(SRC))
 
 # make the graph pngs
-SRC_DOT=$(wildcard *.dot)
+SRC_DOT=tiger_dfa.dot
 OBJ_DOT=$(patsubst %.dot, %.png, $(SRC_DOT))
 
 %.png: %.dot
