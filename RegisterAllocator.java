@@ -1,6 +1,6 @@
 import java.util.ArrayList;
 
-public interface IRegisterAllocator{
+public interface RegisterAllocator{
 	public void allocRegisters();
 	public void printCode();
 }

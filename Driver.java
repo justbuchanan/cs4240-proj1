@@ -57,7 +57,7 @@ public class Driver {
 			System.out.println("\n\nMIPS:\n\n" + mipsGenerator.toString());
 			
 			System.out.println("NAIVE REGISTER ALLOCATION: ");
-			NaiveRegisterAllocator regAlloc = new NaiveRegisterAllocator(mipsGenerator.mipsCode);
+			NaiveRegisterAllocator regAlloc = new NaiveRegisterAllocator(mipsGenerator.mipsCode, new MIPSLanguage());
 			regAlloc.allocRegisters();
 			regAlloc.printCode();
 		}
