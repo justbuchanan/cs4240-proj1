@@ -93,6 +93,7 @@ public class ParseTree {
 			NonTerminals.TYPE_DECLARATION_LIST,
 			NonTerminals.VAR_DECLARATION_LIST,
 			NonTerminals.FUNCT_DECLARATION_LIST,
+			NonTerminals.LVALUE_TAIL
 		};
 		for (NonTerminals nonterminal : toFlatten) {
 			applyTransformer(new NonTerminalParserSymbol(nonterminal), new NonTerminalParserSymbol(nonterminal), false,
@@ -229,36 +230,52 @@ public class ParseTree {
 
 
 		//	ARRAY_LOOKUP
-		removeNonTerminal(NonTerminals.LVALUE_TAIL);
-		applyTransformer(new NonTerminalParserSymbol(NonTerminals.LVALUE), null, false,
+		removeNonTerminal(NonTerminals.LVALUE);
+		removeTerminal(State.RBRACK);
+		removeTerminal(State.LBRACK);
+		applyTransformer(null, new NonTerminalParserSymbol(NonTerminals.LVALUE_TAIL), false,
 			new TreeTransformer() {
 				public TreeNode transform(ParserSymbol parentSymbol,
 					ArrayList<TreeNode> left,
 					TreeNode subSymbolTree,
 					ArrayList<TreeNode> right) {
 
-
-					if (left.size() == 1) {
-						//	there's only one child, so it's just an ID
-						return left.get(0);	//	return the ID
+					//	LVALUE_TAIL is null, delete it from the tree
+					if (subSymbolTree.getChildren().size() == 0) {
+						TreeNode newTree = new TreeNode(null, parentSymbol);
+						ArrayList<TreeNode> children = new ArrayList<>();
+						children.addAll(left);
+						children.addAll(right);
+						newTree.setChildren(children);
+						return newTree;
 					} else {
-						// 	there are multiple children, so it's an array lookup (possibly multidimensional)
-						TreeNode newTree = new TreeNode(null, new NonTerminalParserSymbol(NonTerminals.ARRAY_LOOKUP));
+						if (left.size() == 0) {
+							throw new RuntimeException("LVALUE_TAIL should have ID on the left side");
+						}
 
-						//	take all the children of the LVALUE
-						//	it will contain an ID
-						//	and one or more [expr] sequences
-						//	we really only want the expr parts, but it's easier if we take the brackets now and remove them later because I'm lazy
-						newTree.setChildren(left);
+						TreeNode arrayID = left.get(left.size() - 1);
+						arrayID.assertNodeType(State.ID);
+
+						TreeNode arrLookupTree = new TreeNode(null, new NonTerminalParserSymbol(NonTerminals.ARRAY_LOOKUP));
+						ArrayList<TreeNode> arrLookupChildren = new ArrayList<>();
+						arrLookupChildren.add(arrayID);
+						arrLookupChildren.addAll(subSymbolTree.getChildren());	//	array indices
+						arrLookupTree.setChildren(arrLookupChildren);
+
+						TreeNode newTree = new TreeNode(null, parentSymbol);
+						ArrayList<TreeNode> children = new ArrayList<>();
+						for (int i = 0; i < left.size() - 1; i++) {
+							children.add(left.get(i));
+						}
+						children.add(arrLookupTree);
+						children.addAll(right);
+
+						newTree.setChildren(children);
 
 						return newTree;
 					}
 				}
 			});
-		removeTerminal(State.RBRACK);
-		removeTerminal(State.LBRACK);
-
-
 
 
 
