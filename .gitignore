@@ -8,7 +8,7 @@ pkg.zip
 .DS_Store
 *.sublime-workspace
 cfg.dot
-
+*.s
 # ignore generated files
 first_sets.txt
 follow_sets.txt
