@@ -4,19 +4,17 @@ import java.util.Set;
 
 public class NaiveRegisterAllocator implements RegisterAllocator{
 	private ArrayList<CodeStatement> finalCode;
-	private ArrayList<CodeStatement> origMips;
 	Language lang;
 	
-	public NaiveRegisterAllocator(ArrayList<CodeStatement> origMips, Language lang){
+	public NaiveRegisterAllocator(Language lang){
 		this.lang = lang;
-		this.origMips = origMips;
 	}
-	public  void allocRegisters(){
+	public  ArrayList<CodeStatement> allocRegisters(ArrayList<CodeStatement> origMips){
 		finalCode = new ArrayList();
 		
 		for(CodeStatement stmt : origMips){
 			//TODO: REMOVE FOR DEBUGGING 
-			finalCode.add(new CodeStatement(";;;;;;;;; " + stmt.toString() + " ;;;;;;;"));
+			finalCode.add(new CodeStatement("######## " + stmt.toString() + " #########"));
 			if(stmt.isLabel()){
 				finalCode.add(stmt);
 				continue;
@@ -36,6 +34,7 @@ public class NaiveRegisterAllocator implements RegisterAllocator{
 					finalCode.add(stmt);
 			}
 		}
+		return finalCode;
 	}
 	
 	private void allocateThreeRegInstr(CodeStatement stmt){

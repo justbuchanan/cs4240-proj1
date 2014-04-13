@@ -1,6 +1,6 @@
 import java.util.ArrayList;
 
 public interface RegisterAllocator{
-	public void allocRegisters();
+	public ArrayList<CodeStatement> allocRegisters(ArrayList<CodeStatement> origMips);
 	public void printCode();
 }

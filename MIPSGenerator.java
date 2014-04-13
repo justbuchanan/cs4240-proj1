@@ -11,14 +11,16 @@ public class MIPSGenerator {
 											// TO INCORPORATE REGISTER ALLOCATION
 	private Set<String> variables;
 	private SymbolTable symbolTable;
+	private RegisterAllocator alloc;
 
-	public MIPSGenerator(ArrayList<CodeStatement> irCode, SymbolTable symbolTable) {
+	public MIPSGenerator(ArrayList<CodeStatement> irCode, SymbolTable symbolTable, RegisterAllocator alloc) {
 		this.irCode = irCode;
 		mipsCode = new ArrayList<CodeStatement>();
 
 		variables = new HashSet<String>();
                 variables.addAll(symbolTable.getAllVarNames());
 		this.symbolTable = symbolTable;
+		this.alloc = alloc;
  	}
 
 	private static boolean isInteger(String string) {
@@ -189,6 +191,10 @@ public class MIPSGenerator {
 				}
 			}
 		}
+	}
+	
+	public void allocRegisters(){
+		mipsCode = alloc.allocRegisters(mipsCode);
 	}
 	
 	public String toString() {
