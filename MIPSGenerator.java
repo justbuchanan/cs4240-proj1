@@ -17,7 +17,8 @@ public class MIPSGenerator {
 		mipsCode = new ArrayList<CodeStatement>();
 
 		variables = new HashSet<String>();
-                variables.addAll(symbolTable.getAllVarNames());
+        variables.addAll(symbolTable.getAllVarNames());
+		
 		this.symbolTable = symbolTable;
  	}
 
@@ -57,14 +58,19 @@ public class MIPSGenerator {
 	}
 
 	private void generateDataSegment() {
+		Set<String> set = new HashSet<String>();
 		for (CodeStatement codeStatement : irCode) {
-			if (!codeStatement.isLabel() && codeStatement.toString().length() > 0 && codeStatement.getOperator().equals("assign") && codeStatement.getRightOperand().length() > 0) {
+			if (!codeStatement.isLabel() && codeStatement.toString().length() > 0 && codeStatement.getOperator().equals("assign") && codeStatement.getRightOperand().length() > 0 && !set.contains(codeStatement.getOutputRegister())) {
 				ArrayList<String> valueList = new ArrayList<>();
 				for (int i = 0; i < (Integer.parseInt(codeStatement.getLeftOperand()) - 1); i++) {
 					valueList.add(codeStatement.getRightOperand());
 				}
 				mipsCode.add(new CodeStatement(codeStatement.getOutputRegister() + ":", ".word", codeStatement.getRightOperand(), valueList));
-			}
+				set.add(codeStatement.getOutputRegister());
+			} else if (!codeStatement.isLabel() && codeStatement.toString().length() > 0 && codeStatement.getOperator().equals("assign") && !set.contains(codeStatement.getOutputRegister())) {
+				mipsCode.add(new CodeStatement(codeStatement.getOutputRegister() + ":", ".word", codeStatement.getLeftOperand()));
+				set.add(codeStatement.getOutputRegister());
+			}		
 		}
 	}
 
