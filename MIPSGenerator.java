@@ -166,13 +166,14 @@ public class MIPSGenerator {
 						break;
 					case "array_load":
 						String newVar = unique_var(codeStatement.getLeftOperand());
+						String newVar4 = unique_var(codeStatement.getRightOperand());
 						symbolTable.addVar(newVar, "int");
+						symbolTable.addVar(newVar4, "int");
 						mipsCode.add(new CodeStatement("la", newVar, codeStatement.getLeftOperand()));
-						if (isInteger(codeStatement.getRightOperand())) {
-							mipsCode.add(new CodeStatement("addi", newVar, newVar, codeStatement.getRightOperand()));
-						} else {
-							mipsCode.add(new CodeStatement("add", newVar, newVar, codeStatement.getRightOperand()));
-						}
+						mipsCode.add(new CodeStatement("addi", newVar4, "$0", "4"));
+						mipsCode.add(new CodeStatement("mult", newVar4, codeStatement.getRightOperand()));
+						mipsCode.add(new CodeStatement("addi", newVar4, "$LO", "0"));
+						mipsCode.add(new CodeStatement("add", newVar, newVar, newVar4));
 						mipsCode.add(new CodeStatement("lw", codeStatement.getOutputRegister(), "0(" + newVar + ")"));
 						break;
 					case "array_store":
