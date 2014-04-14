@@ -195,18 +195,54 @@ public class MIPSGenerator {
 						}
 						break;
 					case "breq":
-						mipsCode.add(new CodeStatement("beq", codeStatement.getOutputRegister(), codeStatement.getLeftOperand(), codeStatement.getRightOperand()));
+						if (isInteger(codeStatement.getLeftOperand())) {
+							String newVar5 = unique_var(codeStatement.getOutputRegister());
+							mipsCode.add(new CodeStatement("addi", newVar5, "$0", codeStatement.getLeftOperand()));
+							mipsCode.add(new CodeStatement("beq", codeStatement.getOutputRegister(), newVar5, codeStatement.getRightOperand()));
+						} else {
+							mipsCode.add(new CodeStatement("beq", codeStatement.getOutputRegister(), codeStatement.getLeftOperand(), codeStatement.getRightOperand()));
+						}
 						break;
 					case "brneq":
-						mipsCode.add(new CodeStatement("bne", codeStatement.getOutputRegister(), codeStatement.getLeftOperand(), codeStatement.getRightOperand()));
+						if (isInteger(codeStatement.getLeftOperand())) {
+							String newVar5 = unique_var(codeStatement.getOutputRegister());
+							mipsCode.add(new CodeStatement("addi", newVar5, "$0", codeStatement.getLeftOperand()));
+							mipsCode.add(new CodeStatement("bne", codeStatement.getOutputRegister(), newVar5, codeStatement.getRightOperand()));
+						} else {
+							mipsCode.add(new CodeStatement("bne", codeStatement.getOutputRegister(), codeStatement.getLeftOperand(), codeStatement.getRightOperand()));
+						}
 					case "brlt":
-						mipsCode.add(new CodeStatement("bltz", codeStatement.getOutputRegister(), codeStatement.getLeftOperand(), codeStatement.getRightOperand()));
+						if (isInteger(codeStatement.getLeftOperand())) {
+							String newVar5 = unique_var(codeStatement.getOutputRegister());
+							mipsCode.add(new CodeStatement("addi", newVar5, "$0", codeStatement.getLeftOperand()));
+							mipsCode.add(new CodeStatement("bltz", codeStatement.getOutputRegister(), newVar5, codeStatement.getRightOperand()));
+						} else {
+							mipsCode.add(new CodeStatement("bltz", codeStatement.getOutputRegister(), codeStatement.getLeftOperand(), codeStatement.getRightOperand()));
+						}
 					case "brgt":
-						mipsCode.add(new CodeStatement("bgtz", codeStatement.getOutputRegister(), codeStatement.getLeftOperand(), codeStatement.getRightOperand()));
+						if (isInteger(codeStatement.getLeftOperand())) {
+							String newVar5 = unique_var(codeStatement.getOutputRegister());
+							mipsCode.add(new CodeStatement("addi", newVar5, "$0", codeStatement.getLeftOperand()));
+							mipsCode.add(new CodeStatement("bgtz", codeStatement.getOutputRegister(), newVar5, codeStatement.getRightOperand()));
+						} else {
+							mipsCode.add(new CodeStatement("bgtz", codeStatement.getOutputRegister(), codeStatement.getLeftOperand(), codeStatement.getRightOperand()));
+						}
 					case "brleq":
-						mipsCode.add(new CodeStatement("blez", codeStatement.getOutputRegister(), codeStatement.getLeftOperand(), codeStatement.getRightOperand()));
+						if (isInteger(codeStatement.getLeftOperand())) {
+							String newVar5 = unique_var(codeStatement.getOutputRegister());
+							mipsCode.add(new CodeStatement("addi", newVar5, "$0", codeStatement.getLeftOperand()));
+							mipsCode.add(new CodeStatement("blez", codeStatement.getOutputRegister(), newVar5, codeStatement.getRightOperand()));
+						} else {
+							mipsCode.add(new CodeStatement("blez", codeStatement.getOutputRegister(), codeStatement.getLeftOperand(), codeStatement.getRightOperand()));
+						}
 					case "brgeq":
-						mipsCode.add(new CodeStatement("bgez", codeStatement.getOutputRegister(), codeStatement.getLeftOperand(), codeStatement.getRightOperand()));
+						if (isInteger(codeStatement.getLeftOperand())) {
+							String newVar5 = unique_var(codeStatement.getOutputRegister());
+							mipsCode.add(new CodeStatement("addi", newVar5, "$0", codeStatement.getLeftOperand()));
+							mipsCode.add(new CodeStatement("bgez", codeStatement.getOutputRegister(), newVar5, codeStatement.getRightOperand()));
+						} else {
+							mipsCode.add(new CodeStatement("bgez", codeStatement.getOutputRegister(), codeStatement.getLeftOperand(), codeStatement.getRightOperand()));
+						}
 				}
 			}
 		}
@@ -215,6 +251,7 @@ public class MIPSGenerator {
 	
 	public void allocRegisters(){
 		mipsCode = alloc.allocRegisters(mipsCode);
+		mipsCode.add(new CodeStatement("jr", "$ra"));
 	}
 	
 	public String toString() {
