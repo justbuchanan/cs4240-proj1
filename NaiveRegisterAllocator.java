@@ -19,6 +19,29 @@ public class NaiveRegisterAllocator implements RegisterAllocator{
 				finalCode.add(stmt);
 				continue;
 			}
+			
+			if(stmt.getOperator().equals("lw") || stmt.getOperator().equals("sw")){
+				String op = stmt.getLeftOperand();
+				String base = op.substring(0, op.indexOf('('));
+				// check for array indexing i.e. lw array, 0(x)
+				String offset = op.substring(base.length() + 1, op.length() - 1); // don't include last paren
+				// load offset if it's a variable
+				if(offset.charAt(0) != '$'){
+					// load offset
+					finalCode.add(lang.load("$t0", offset));
+					offset = "$t0";
+				}
+				
+				// execute command
+				finalCode.add(new CodeStatement(stmt.getOperator(), "$t1", base + "(" + offset + ")"));
+				
+				// store result
+				finalCode.add(lang.store("$t1", stmt.getOutputRegister()));
+				continue;
+				
+			}
+			
+			
 			int numReg = lang.numRegInstr(stmt.getOperator());
 			switch(numReg){
 				case 3: // i.e. op DR, SR1, SR2
@@ -68,8 +91,15 @@ public class NaiveRegisterAllocator implements RegisterAllocator{
 		// load needed operands
 		if(lang.resultStored(operator) && !lang.storesToLo(operator)){
 			r1 = "$t0";
-		}else if(op1.charAt(0) == '$'){
-			r1 = op1;
+		}else if(op1.charAt(0) == '$'){ // it's a hard coded register so use it?
+			if(op1.equals("$LO")){ // need to get value from $lo into useable register
+				finalCode.add(new CodeStatement("mflo", "$t3"));
+				r1 = "$t3";
+			}
+			else{
+				r1 = op1;
+			}
+
 		} else{
 			// must load
 			r1 = "$t0";
@@ -77,7 +107,14 @@ public class NaiveRegisterAllocator implements RegisterAllocator{
 		}
 		
 		if(op2.charAt(0) == '$'){
-			r2 = op2;
+			if(op2.equals("$LO")){ // need to get value from $lo into useable register
+				finalCode.add(new CodeStatement("mflo", "$t3"));
+				r2 = "$t3";
+			}
+			else{
+				r2 = op2;
+			}
+
 		} else if(op2.charAt(0) == '0'){
 			r2 = "$0";
 		} else{
