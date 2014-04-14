@@ -113,13 +113,11 @@ public class MIPSGenerator {
 					case "mult":
 						if (isInteger(codeStatement.getRightOperand())) {
 							String newVar = unique_var(codeStatement.getLeftOperand());
-							symbolTable.addVar(newVar, "int");
 							mipsCode.add(new CodeStatement("addi", newVar, codeStatement.getRightOperand(), "0"));
 							mipsCode.add(new CodeStatement(codeStatement.getOperator(), codeStatement.getLeftOperand(), newVar));
 							mipsCode.add(new CodeStatement("addi", codeStatement.getOutputRegister(), "$LO", "0"));
 						} else if (isInteger(codeStatement.getLeftOperand())) {
 						 	String newVar = unique_var(codeStatement.getRightOperand());
-							symbolTable.addVar(newVar, "int");
 							mipsCode.add(new CodeStatement("addi", newVar, codeStatement.getLeftOperand(), "0"));
 							mipsCode.add(new CodeStatement(codeStatement.getOperator(), newVar, codeStatement.getRightOperand()));
 							mipsCode.add(new CodeStatement("addi", codeStatement.getOutputRegister(), "$LO", "0"));
@@ -131,13 +129,11 @@ public class MIPSGenerator {
 					case "div":
 						if (isInteger(codeStatement.getRightOperand())) {
 							String newVar = unique_var(codeStatement.getLeftOperand());
-							symbolTable.addVar(newVar, "int");
 							mipsCode.add(new CodeStatement("addi", newVar, codeStatement.getRightOperand(), "0"));
 							mipsCode.add(new CodeStatement(codeStatement.getOperator(), codeStatement.getLeftOperand(), newVar));
 							mipsCode.add(new CodeStatement("addi", codeStatement.getOutputRegister(), "$LO", "0"));
 						} else if (isInteger(codeStatement.getLeftOperand())) {
 						 	String newVar = unique_var(codeStatement.getRightOperand());
-							symbolTable.addVar(newVar, "int");
 							mipsCode.add(new CodeStatement("addi", newVar, codeStatement.getLeftOperand(), "0"));
 							mipsCode.add(new CodeStatement(codeStatement.getOperator(), newVar, codeStatement.getRightOperand()));
 							mipsCode.add(new CodeStatement("addi", codeStatement.getOutputRegister(), "$LO", "0"));
@@ -167,8 +163,6 @@ public class MIPSGenerator {
 					case "array_load":
 						String newVar = unique_var(codeStatement.getLeftOperand());
 						String newVar4 = unique_var(codeStatement.getRightOperand());
-						symbolTable.addVar(newVar, "int");
-						symbolTable.addVar(newVar4, "int");
 						mipsCode.add(new CodeStatement("la", newVar, codeStatement.getLeftOperand()));
 						mipsCode.add(new CodeStatement("addi", newVar4, "$0", "4"));
 						mipsCode.add(new CodeStatement("mult", newVar4, codeStatement.getRightOperand()));
@@ -178,7 +172,6 @@ public class MIPSGenerator {
 						break;
 					case "array_store":
 						String newVar2 = unique_var(codeStatement.getOutputRegister());
-						symbolTable.addVar(newVar2, "int");
 						mipsCode.add(new CodeStatement("la", newVar2, codeStatement.getOutputRegister()));
 						if (isInteger(codeStatement.getLeftOperand())) {
 							mipsCode.add(new CodeStatement("addi", newVar2, newVar2, codeStatement.getLeftOperand()));
@@ -186,7 +179,6 @@ public class MIPSGenerator {
 							mipsCode.add(new CodeStatement("add", newVar2, newVar2, codeStatement.getLeftOperand()));
 						}
 						String newVar3 = unique_var(codeStatement.getOutputRegister());
-						symbolTable.addVar(newVar3, "int");
 						if (isInteger(codeStatement.getRightOperand())) {
 							mipsCode.add(new CodeStatement("addi", newVar3, "$0", codeStatement.getRightOperand()));
 							mipsCode.add(new CodeStatement("sw", newVar3, "0(" + newVar2 + ")"));
