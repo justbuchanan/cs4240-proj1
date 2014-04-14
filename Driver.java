@@ -51,15 +51,18 @@ public class Driver {
 				System.err.println("Oops... got an exception: " + exc);
 			}
 			
-			MIPSGenerator mipsGenerator = new MIPSGenerator(irCode, parser.getSymbolTable());
+			MIPSGenerator mipsGenerator = new MIPSGenerator(irCode, parser.getSymbolTable(), new NaiveRegisterAllocator(new MIPSLanguage()));
 			//	MIPS generation
 			mipsGenerator.generateMips();		
 			System.out.println("\n\nMIPS:\n\n" + mipsGenerator.toString());
 			
 			System.out.println("NAIVE REGISTER ALLOCATION: ");
-			NaiveRegisterAllocator regAlloc = new NaiveRegisterAllocator(mipsGenerator.mipsCode, new MIPSLanguage());
-			regAlloc.allocRegisters();
-			regAlloc.printCode();
+			mipsGenerator.allocRegisters();
+			System.out.println(mipsGenerator.toString());
+			
+			// write output file from final code
+			writeFile(fileName.replace(".tiger", ".s"), mipsGenerator.toString());
+			
 		}
 
 		//	write debug files

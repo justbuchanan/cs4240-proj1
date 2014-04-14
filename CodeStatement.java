@@ -88,6 +88,9 @@ public class CodeStatement {
 
 	public String toString() {
 		if (isLabel()) {
+			if(labelName.equals(".data") || labelName.equals(".text")){
+				return labelName;
+			}
 			return labelName + ":";
 		} else {
 			String str = "";

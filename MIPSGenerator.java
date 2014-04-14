@@ -11,14 +11,17 @@ public class MIPSGenerator {
 											// TO INCORPORATE REGISTER ALLOCATION
 	private Set<String> variables;
 	private SymbolTable symbolTable;
+	private RegisterAllocator alloc;
 
-	public MIPSGenerator(ArrayList<CodeStatement> irCode, SymbolTable symbolTable) {
+	public MIPSGenerator(ArrayList<CodeStatement> irCode, SymbolTable symbolTable, RegisterAllocator alloc) {
 		this.irCode = irCode;
 		mipsCode = new ArrayList<CodeStatement>();
 
 		variables = new HashSet<String>();
-                variables.addAll(symbolTable.getAllVarNames());
+        variables.addAll(symbolTable.getAllVarNames());
+		
 		this.symbolTable = symbolTable;
+		this.alloc = alloc;
  	}
 
 	private static boolean isInteger(String string) {
@@ -57,13 +60,24 @@ public class MIPSGenerator {
 	}
 
 	private void generateDataSegment() {
+		Set<String> set = new HashSet<String>();
 		for (CodeStatement codeStatement : irCode) {
-			if (!codeStatement.isLabel() && codeStatement.toString().length() > 0 && codeStatement.getOperator().equals("assign") && codeStatement.getRightOperand().length() > 0) {
+			if (!codeStatement.isLabel() && codeStatement.toString().length() > 0 && codeStatement.getOperator().equals("assign") && codeStatement.getRightOperand().length() > 0 && !set.contains(codeStatement.getOutputRegister())) {
 				ArrayList<String> valueList = new ArrayList<>();
 				for (int i = 0; i < (Integer.parseInt(codeStatement.getLeftOperand()) - 1); i++) {
 					valueList.add(codeStatement.getRightOperand());
 				}
 				mipsCode.add(new CodeStatement(codeStatement.getOutputRegister() + ":", ".word", codeStatement.getRightOperand(), valueList));
+				set.add(codeStatement.getOutputRegister());
+			} else if (!codeStatement.isLabel() && codeStatement.toString().length() > 0 && codeStatement.getOperator().equals("assign") && !set.contains(codeStatement.getOutputRegister())) {
+				mipsCode.add(new CodeStatement(codeStatement.getOutputRegister() + ":", ".word", codeStatement.getLeftOperand()));
+				set.add(codeStatement.getOutputRegister());
+			}		
+		}
+
+		for (String var : symbolTable.getAllVarNames()) {
+			if (!set.contains(var)) {
+				mipsCode.add(new CodeStatement(var + ":", ".word", "0"));
 			}
 		}
 	}
@@ -189,6 +203,10 @@ public class MIPSGenerator {
 				}
 			}
 		}
+	}
+	
+	public void allocRegisters(){
+		mipsCode = alloc.allocRegisters(mipsCode);
 	}
 	
 	public String toString() {
