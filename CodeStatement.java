@@ -109,7 +109,9 @@ public class CodeStatement {
 						break;
 					}
 				}
-				str = str.substring(0, i) + str.substring(i + 1, str.length());
+				if (str.contains(",")) {
+					str = str.substring(0, i) + str.substring(i + 1, str.length());
+				}
 				if (getOutputRegister().equals(".word")) {
 					str = str.substring(0, str.indexOf(".word") + 5) + str.substring(str.indexOf(".word") + 6, str.length());
 				}
