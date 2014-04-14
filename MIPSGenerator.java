@@ -74,6 +74,12 @@ public class MIPSGenerator {
 				set.add(codeStatement.getOutputRegister());
 			}		
 		}
+
+		for (String var : symbolTable.getAllVarNames()) {
+			if (!set.contains(var)) {
+				mipsCode.add(new CodeStatement(var + ":", ".word", "0"));
+			}
+		}
 	}
 
 	public void generateMips() {
