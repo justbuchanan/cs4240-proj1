@@ -10,6 +10,7 @@ public class ControlFlowGraph {
 	private static Set<String> branchInstructions;
 	private static Set<String> conditionalBranchInstructions;
 	private ArrayList<BasicBlock> basicBlocks;
+	private ArrayList<ExtendedBasicBlock> extendedBasicBlocks;
 	private Set<CFGEdge> basicBlockEdges;
 
 
@@ -66,6 +67,7 @@ public class ControlFlowGraph {
 	public ControlFlowGraph(ArrayList<CodeStatement> irCode) {
 		this.basicBlocks = new ArrayList<>();
 		this.basicBlockEdges = new HashSet<>();
+		this.extendedBasicBlocks = new ArrayList<>();
 
 		//	contaions both conditional and non-conditional branches
 		Map<Integer, String> branches = new HashMap<>();
@@ -165,6 +167,56 @@ public class ControlFlowGraph {
 				basicBlockEdges.add(new CFGEdge(i, i + 1));
 			}
 		}
+
+
+		//	Build extended basic blocks
+
+		//	if it's got more than one edge leading into it, it has to be an ebb root
+		Set<BasicBlock> unclaimedBlocks = new HashSet<>();
+		unclaimedBlocks.addAll(this.basicBlocks);
+		// ArrayList<BasicBlock> ebbRoots = new ArrayList<>();
+		
+		for (BasicBlock bb : basicBlocks) {
+			int count = entryEdgeCount(bb);
+			if ((count > 1 || count == 0) && unclaimedBlocks.contains(bb)) {
+				//	the leading block or a block with multiple inputs
+				unclaimedBlocks.remove(bb);
+				buildEbb(bb, unclaimedBlocks);
+			}
+		}
+	}
+
+	//	count the number of edges that point into @bb
+	int entryEdgeCount(BasicBlock bb) {
+		int count = 0;
+		for (CFGEdge edge : basicBlockEdges) {
+			if (basicBlocks.get(edge.to) == bb) {
+				count++;
+			}
+		}
+		return count;
+	}
+
+	//	builds an extended basic block from the given root block
+	//	adds the final EBB to the extendedBasicBlocks list
+	//	removes any blocks  it uses form the unclaimed blocks set
+	private ExtendedBasicBlock buildEbb(BasicBlock root, Set<BasicBlock> unclaimedBlocks) {
+		ArrayList<BasicBlock> bbs = new ArrayList<>();
+		bbs.add(root);
+
+		for (CFGEdge edge : basicBlockEdges) {
+			BasicBlock bb = basicBlocks.get(edge.to);
+			if (bbs.contains(basicBlocks.get(edge.from)) && unclaimedBlocks.contains(bb)) {
+				if (entryEdgeCount(bb) == 1) {
+					bbs.add(bb);
+					unclaimedBlocks.remove(bb);
+				}
+			}
+		}
+
+		ExtendedBasicBlock ebb = new ExtendedBasicBlock(bbs);
+		extendedBasicBlocks.add(ebb);
+		return ebb;
 	}
 
 	private String targetLabelForBranchStatement(CodeStatement stmt) {
@@ -196,9 +248,22 @@ public class ControlFlowGraph {
 
 		// gv += "\tlabel=\"Control Flow Graph\";\n";
 
+		int clusterNumber = 0;
+		for (ExtendedBasicBlock ebb : extendedBasicBlocks) {
+			gv += "\tsubgraph cluster" + (clusterNumber++) + "{\n";
+			gv += "\tstyle=dashed;\n";
+
+			for (BasicBlock bb : ebb.getBasicBlocks()) {
+				gv += "\t\t " + bb.toGraphviz() + "\n";
+			}
+
+			gv += "\t}\n";
+		}
+
+
 		//	nodes
 		for (BasicBlock block : basicBlocks) {
-			gv += block.toGraphviz() + "\n";
+			gv += "\t" + block.toGraphviz() + "\n";
 		}
 
 		gv += "\n";
@@ -237,9 +302,9 @@ public class ControlFlowGraph {
 			return startLineIndex;
 		}
 
-		//	outputs a node indented by a tab
+		//	outputs a node (note: doesn't indent at all)
 		public String toGraphviz() {
-			String gv = "\t" + graphvizNodeName();
+			String gv = graphvizNodeName();
 
 			gv += " [shape=record label=\"";
 
@@ -254,6 +319,22 @@ public class ControlFlowGraph {
 
 		public String graphvizNodeName() {
 			return "block" + getStartLineIndex();
+		}
+	}
+
+	private class ExtendedBasicBlock {
+		private List<BasicBlock> basicBlocks;
+
+		ExtendedBasicBlock(List<BasicBlock> basicBlocks) {
+			this.basicBlocks = basicBlocks;
+		}
+
+		ExtendedBasicBlock() {
+			this(new ArrayList<BasicBlock>());
+		}
+
+		public List<BasicBlock> getBasicBlocks() {
+			return basicBlocks;
 		}
 	}
 }
