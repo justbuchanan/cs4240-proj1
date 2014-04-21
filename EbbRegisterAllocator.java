@@ -9,19 +9,23 @@ public class EbbRegisterAllocator implements RegisterAllocator {
 	
 	public EbbRegisterAllocator(Language lang){
 		this.lang = lang;
-		this.registerCount = 5;	//	FIXME: set registerCount
+		this.registerCount = 30;	//	FIXME: set registerCount
 	}
 
 	public ArrayList<CodeStatement> allocRegisters(ArrayList<CodeStatement> origMips) {
 		ControlFlowGraph cfg = new ControlFlowGraph(origMips);
 
 		for (ExtendedBasicBlock ebb : cfg.getExtendedBasicBlocks()) {
+			//	FIXME: def-use chains
+
 			for (BasicBlock bb : ebb.getBasicBlocks()) {
 				//	TODO
 			}
 		}
 
 		//	TODO
+
+		return finalCode;
 	}
 
 	public void printCode() {
