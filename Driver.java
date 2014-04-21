@@ -54,7 +54,7 @@ public class Driver {
 			MIPSGenerator mipsGenerator = new MIPSGenerator(
 				irCode,
 				parser.getSymbolTable(),
-				new EbbRegisterAllocator(new MIPSLanguage()));
+				new EbbRegisterAllocator());
 			//	MIPS generation
 			mipsGenerator.generateMips();		
 			System.out.println("\n\nMIPS:\n\n" + mipsGenerator.toString());

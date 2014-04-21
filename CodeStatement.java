@@ -76,14 +76,21 @@ public class CodeStatement {
 		components.addAll(params);
 	}
 
-	//	Returns values in array
-	public ArrayList<String> getArrayValues() {
-		ArrayList<String> returnList = new ArrayList<>();
-		for (int i = 2; i < components.size(); i++) {
-			returnList.add(components.get(i));
+	public ArrayList<String> getFuncParams() {
+		int i;
+		if (getOperator().equals("call")) {
+			i = 1;
+		} else if (getOperator().equals("callr")) {
+			i = 2;
+		} else {
+			throw new RuntimeException("Non-function code statement asked for function parameters");
 		}
 
-		return returnList;
+		ArrayList<String> params = new ArrayList<>();
+		for (; i < components.size(); i++) {
+			params.add(components.get(i));
+		}
+		return params;
 	}
 
 	public String toString() {

@@ -14,7 +14,7 @@ public class ControlFlowGraph {
 	private Set<CFGEdge> basicBlockEdges;
 
 
-	private class CFGEdge {
+	public class CFGEdge {
 		public int from;
 		public int to;
 
@@ -293,7 +293,7 @@ public class ControlFlowGraph {
 	 * Only the last statement of a basic block can be a branch statement
 	 * and only the first statement of a basic block can be a target of a branch.
 	 */
-	private class BasicBlock {
+	public class BasicBlock {
 		private List<CodeStatement> code;
 		private int startLineIndex;
 
@@ -330,7 +330,7 @@ public class ControlFlowGraph {
 		}
 	}
 
-	private class ExtendedBasicBlock {
+	public class ExtendedBasicBlock {
 		private List<BasicBlock> basicBlocks;
 
 		ExtendedBasicBlock(List<BasicBlock> basicBlocks) {
