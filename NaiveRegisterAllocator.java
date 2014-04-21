@@ -13,7 +13,7 @@ public class NaiveRegisterAllocator implements RegisterAllocator{
 		finalCode = new ArrayList();
 		
 		for(CodeStatement stmt : origMips){
-			//TODO: REMOVE FOR DEBUGGING 
+			//TODO: REMOVE FOR DEBUGGING
 			finalCode.add(new CodeStatement("######## " + stmt.toString() + " #########"));
 			if(stmt.isLabel()){
 				finalCode.add(stmt);

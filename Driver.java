@@ -51,7 +51,10 @@ public class Driver {
 				System.err.println("Oops... got an exception: " + exc);
 			}
 			
-			MIPSGenerator mipsGenerator = new MIPSGenerator(irCode, parser.getSymbolTable(), new NaiveRegisterAllocator(new MIPSLanguage()));
+			MIPSGenerator mipsGenerator = new MIPSGenerator(
+				irCode,
+				parser.getSymbolTable(),
+				new EbbRegisterAllocator(new MIPSLanguage()));
 			//	MIPS generation
 			mipsGenerator.generateMips();		
 			System.out.println("\n\nMIPS:\n\n" + mipsGenerator.toString());

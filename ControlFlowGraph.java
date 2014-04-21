@@ -242,6 +242,14 @@ public class ControlFlowGraph {
 		return basicBlocks.size() - 1;
 	}
 
+	public ArrayList<ExtendedBasicBlock> getExtendedBasicBlocks() {
+		return extendedBasicBlocks;
+	}
+
+	public Set<CFGEdge> getEdges() {
+		return basicBlockEdges;
+	}
+
 
 	public String toGraphviz() {
 		String gv = "digraph ControlFlow {\n";
