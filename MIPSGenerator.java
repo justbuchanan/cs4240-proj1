@@ -12,8 +12,9 @@ public class MIPSGenerator {
 	private Set<String> variables;
 	private SymbolTable symbolTable;
 	private RegisterAllocator alloc;
+	private ControlFlowGraph cfg;
 
-	public MIPSGenerator(ArrayList<CodeStatement> irCode, SymbolTable symbolTable, RegisterAllocator alloc) {
+	public MIPSGenerator(ArrayList<CodeStatement> irCode, SymbolTable symbolTable, RegisterAllocator alloc, ControlFlowGraph cfg) {
 		this.irCode = irCode;
 		mipsCode = new ArrayList<CodeStatement>();
 
@@ -22,6 +23,7 @@ public class MIPSGenerator {
 		
 		this.symbolTable = symbolTable;
 		this.alloc = alloc;
+		this.cfg = cfg;
  	}
 
 	private static boolean isInteger(String string) {
@@ -242,7 +244,7 @@ public class MIPSGenerator {
 	}
 	
 	public void allocRegisters(){
-		mipsCode = alloc.allocRegisters(mipsCode);
+		mipsCode = alloc.allocRegisters(mipsCode, cfg);
 		mipsCode.add(new CodeStatement("jr", "$ra"));
 	}
 	

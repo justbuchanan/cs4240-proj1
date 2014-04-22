@@ -9,7 +9,7 @@ public class NaiveRegisterAllocator implements RegisterAllocator{
 	public NaiveRegisterAllocator(Language lang){
 		this.lang = lang;
 	}
-	public  ArrayList<CodeStatement> allocRegisters(ArrayList<CodeStatement> origMips){
+	public  ArrayList<CodeStatement> allocRegisters(ArrayList<CodeStatement> origMips, ControlFlowGraph cfg){
 		finalCode = new ArrayList();
 		
 		for(CodeStatement stmt : origMips){
