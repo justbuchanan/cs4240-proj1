@@ -173,8 +173,14 @@ public class IntraBbRegisterAllocator implements RegisterAllocator {
 
 			//	merge the loads, old code, and stores into a new array
 			ArrayList<CodeStatement> newCode = new ArrayList();
-			newCode.addAll(loads);
 			newCode.addAll(bb.getCode());
+
+			if (newCode.get(0).isLabel()) {
+				newCode.addAll(1, loads);
+			} else {
+				newCode.addAll(0, loads);
+			}
+
 			int lastIdx = bb.getCode().size() - 1;
 			if (cfg.statementIsBranch(bb.getCode().get(lastIdx))) {
 				newCode.addAll(lastIdx, stores);	//	add @stores right before the branch statement
@@ -182,12 +188,20 @@ public class IntraBbRegisterAllocator implements RegisterAllocator {
 				newCode.addAll(stores);				//	add @stores to the end
 			}
 			bb.setCode(newCode);
+
+			// System.out.println("LOADS: " + loads.size());
 		}
 
 		//	squash the blocks back together into linear code
 		for (BasicBlock bb : cfg.getBasicBlocks()) {
 			finalCode.addAll(bb.getCode());
 		}
+
+
+		// for (CodeStatement stmt : finalCode) {
+		// 	System.out.println("CODE: " + stmt);
+		// }
+
 
 		return finalCode;
 	}
