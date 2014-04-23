@@ -33,28 +33,28 @@ public class MIPSGenerator {
 	}
 
 	private String unique_var(String prefix) {
-        	String varName = allocate_name(variables, prefix);
-                symbolTable.addVar(varName, "int");
-                return varName;
+    	String varName = allocate_name(variables, prefix);
+        symbolTable.addVar(varName, "int");
+        return varName;
+    }
+ 
+    private String allocate_name(Set<String> names, String prefix) {
+    	//      use just the prefix if possible
+        if (!names.contains(prefix)) {
+        	names.add(prefix);
+         	return prefix;
         }
- 
-        private String allocate_name(Set<String> names, String prefix) {
-        	//      use just the prefix if possible
-                if (!names.contains(prefix)) {
-                	names.add(prefix);
-                        return prefix;
-                }
- 
-                //      append a number to @prefix to make it unique
-                int suffix = 1;
-                while (true) {
-                        String newName = prefix + suffix;
-                        if (!names.contains(newName)) {
-                                names.add(newName);
-                                return newName;
-                        }
-                        suffix++;
-                }
+
+        //      append a number to @prefix to make it unique
+        int suffix = 1;
+        while (true) {
+            String newName = prefix + suffix;
+            if (!names.contains(newName)) {
+                    names.add(newName);
+                    return newName;
+            }
+            suffix++;
+        }
 	}
 
 	private void generateDataSegment() {
