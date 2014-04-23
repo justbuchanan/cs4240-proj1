@@ -10,7 +10,7 @@ public class IntraBbRegisterAllocator implements RegisterAllocator {
 	private ArrayList<CodeStatement> finalCode;
 
 	public IntraBbRegisterAllocator() {
-		this.registerCount = 29;
+		this.registerCount = 28;
 		this.spillRegister = 31;
 		this.finalCode = new ArrayList<>();
 	}
