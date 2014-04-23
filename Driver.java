@@ -58,8 +58,8 @@ public class Driver {
 			
 			//	MIPS generation
 			MIPSGenerator mipsGenerator = new MIPSGenerator(irCode, parser.getSymbolTable());
-			mipsGenerator.generateMips();		
-			System.out.println("\n\nMIPS:\n\n" + mipsGenerator.toString());
+			mipsGenerator.generateMips();
+			System.out.println("\n\nMIPS\n==================================================\n\n" + mipsGenerator.toString());
 			System.out.println(mipsGenerator.toString());
 			
 			// write output file from final code
