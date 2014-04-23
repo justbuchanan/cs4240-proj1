@@ -50,22 +50,20 @@ public class Driver {
 			catch (IOException exc) {
 				System.err.println("Oops... got an exception: " + exc);
 			}
+
+			//	register allocation
+			System.out.println("\n\nRegister Allocation\n==================================================");
+			RegisterAllocator allocator = new EbbRegisterAllocator();
+			irCode = allocator.allocRegisters(irCode);
 			
-			MIPSGenerator mipsGenerator = new MIPSGenerator(
-				irCode,
-				parser.getSymbolTable(),
-				new EbbRegisterAllocator());
 			//	MIPS generation
+			MIPSGenerator mipsGenerator = new MIPSGenerator(irCode, parser.getSymbolTable());
 			mipsGenerator.generateMips();		
 			System.out.println("\n\nMIPS:\n\n" + mipsGenerator.toString());
-			
-			System.out.println("NAIVE REGISTER ALLOCATION: ");
-			mipsGenerator.allocRegisters();
 			System.out.println(mipsGenerator.toString());
 			
 			// write output file from final code
 			writeFile(fileName.replace(".tiger", ".s"), mipsGenerator.toString());
-			
 		}
 
 		//	write debug files

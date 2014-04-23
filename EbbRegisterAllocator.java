@@ -17,84 +17,49 @@ public class EbbRegisterAllocator implements RegisterAllocator {
 	
 	public EbbRegisterAllocator() {
 		this.registerCount = 30;	//	FIXME: set registerCount
+		this.finalCode = new ArrayList<>();
 	}
 
 	public ArrayList<CodeStatement> allocRegisters(ArrayList<CodeStatement> irCode) {
+		boolean debug = true;
+
 		ControlFlowGraph cfg = new ControlFlowGraph(irCode);
 
+		//	defs and uses indexed by BB index
+		ArrayList<Set<String>> bbDefs = new ArrayList<>();
+		ArrayList<Set<String>> bbUses = new ArrayList<>();
 
-		// ArrayList<VarUsageWeb> webs = new ArrayList<>();
+		//	find defs and uses for all the basic blocks
+		for (int i = 0; i < cfg.getBasicBlocks().size(); i++) {
+			Set<String> defs = new HashSet<>();
+			Set<String> uses = new HashSet<>();
 
+			BasicBlock bb = cfg.getBasicBlocks().get(i);
 
-		// //	loop over all BasicBlocks
-		// //	for each def-ed variable, we add the start of a web to @webs
-		// for (ControlFlowGraph.ExtendedBasicBlock ebb : cfg.getExtendedBasicBlocks()) {
-		// 	for (ControlFlowGraph.BasicBlock bb : ebb.getBasicBlocks()) {
+			for (CodeStatement stmt : bb.getCode()) {
+				getVariableDefsAndUses(stmt, defs, uses);
+			}
 
-		// 		for (int i = 0; i < bb.getCode().size(); i++) {
-		// 			CodeStatement stmt = bb.getCode().get(i);
-		// 			Set<String> defs = new HashSet<>();
-		// 			Set<String> uses = new HashSet<>();
-		// 			getVariableDefsAndUses(stmt, defs, uses);
-
-
-		// 			for (String deffedVar : defs) {
-		// 				VarUsageWeb webStart = new VarUsageWeb(deffedVar, bb, i);
-		// 				webs.add(webStart);
-		// 			}
+			bbDefs.add(defs);
+			bbUses.add(uses);
+		}
 
 
+		//	debug print defs and uses
+		if (debug) {
+			for (int i = 0; i < bbDefs.size(); i++) {
+				System.out.println("BasicBlock" + i + ": defs=" + bbDefs.get(i) + "; uses=" + bbUses.get(i));
+			}
+			System.out.println();
+		}
 
-		// 			//	note: only the first basic block in the EBB can have more than one predecessor
 
 
-		// 			//	FIXME: use the defs and uses
-		// 		}
 
-		// 	}
-		// }
 
-		//	TODO
 
 		return finalCode;
 	}
-
-
-	// private class VarUsageWeb {
-
-	// 	/**
-	// 	 * Create a web beginning with a def at the given location
-	// 	 */
-	// 	public VarUsageWeb(String varName, BasicBlock bb, int lineNumber) {
-
-	// 	}
-
-	// 	public void addUse(BasicBlock bb, int lineNumber) {
-
-	// 	}
-
-
-	// 	// public VarUsageNode addNode(String varName, int liveRangeIndex) {
-
-
-	// 	// }
-
-	// 	// public VarUsageEdge connect(VarUsageNode node1, VarUsageNode node2);
-
-
-	// 	// public class VarUsageEdge {
-
-	// 	// }
-
-	// 	// public class VarUsageNode {
-	// 	// 	public int basicBlockIndex;
-	// 	// 	public int lineIndex;		//	index into the basic blocks
-	// 	// }
-	// }
-
-
-
-
 
 
 	/**
@@ -162,9 +127,13 @@ public class EbbRegisterAllocator implements RegisterAllocator {
 			Iterator<String> itr = useOut.iterator();
 			while (itr.hasNext()) {
 				String var = itr.next();
-				char firstChar = var.charAt(0);
-				if ('0' <= firstChar && firstChar <= '9') {
+				if (var.length() == 0) {
 					itr.remove();
+				} else {
+					char firstChar = var.charAt(0);
+					if ('0' <= firstChar && firstChar <= '9') {
+						itr.remove();
+					}
 				}
 			}
 		}
