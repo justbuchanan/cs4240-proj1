@@ -19,7 +19,7 @@ public class BasicTests {
 
 
 		stmt = new CodeStatement("add", "outReg", "var1", "var2");
-		ebbAlloc.getVariableDefsAndUses(stmt, def, use);
+		stmt.getVariableDefsAndUses(def, use);
 		assertThat(use, hasItem("var1"));
 		assertThat(use, hasItem("var2"));
 		assertThat(def, hasItem("outReg"));

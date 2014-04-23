@@ -58,25 +58,23 @@ public class MIPSGenerator {
 	}
 
 	private void generateDataSegment() {
-		Set<String> set = new HashSet<String>();
-		for (CodeStatement codeStatement : irCode) {
-			if (!codeStatement.isLabel() && codeStatement.toString().length() > 0 && codeStatement.getOperator().equals("assign") && codeStatement.getRightOperand().length() > 0 && !set.contains(codeStatement.getOutputRegister())) {
-				ArrayList<String> valueList = new ArrayList<>();
-				for (int i = 0; i < (Integer.parseInt(codeStatement.getLeftOperand()) - 1); i++) {
-					valueList.add(codeStatement.getRightOperand());
-				}
-				mipsCode.add(0, new CodeStatement(codeStatement.getOutputRegister() + ":", ".word", codeStatement.getRightOperand(), valueList));
-				set.add(codeStatement.getOutputRegister());
-			} else if (!codeStatement.isLabel() && codeStatement.toString().length() > 0 && codeStatement.getOperator().equals("assign") && !set.contains(codeStatement.getOutputRegister())) {
-				mipsCode.add(0, new CodeStatement(codeStatement.getOutputRegister() + ":", ".word", codeStatement.getLeftOperand()));
-				set.add(codeStatement.getOutputRegister());
-			}		
-		}
+		for (String varName : symbolTable.getAllVarNames()) {
+			VarSymbolEntry var = symbolTable.getVar(varName);
+			TypeSymbolEntry type = var.getType();
 
-		for (String var : symbolTable.getAllVarNames()) {
-			if (!set.contains(var)) {
-				mipsCode.add(0, new CodeStatement(var + ":", ".word", "0"));
+			int numWords = 1;
+			if (type.getArrDims() != null) {
+				for (Integer dim : type.getArrDims()) {
+					numWords *= dim;
+				}
 			}
+
+			String staticData = "0";
+			for (int i = 1; i < numWords; i++) {
+				staticData += ", 0";
+			}
+
+			mipsCode.add(0, new CodeStatement(varName + ":", ".word", staticData));
 		}
 		mipsCode.add(0, new CodeStatement(".data"));
 	}
