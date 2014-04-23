@@ -42,6 +42,13 @@
 			"cmd": ["make", "tictactoe"],
 			"working_dir": "${project_path}",
 		    "file_regex": "^(...*?):([0-9]*):?([0-9]*)"
+		},
+
+		{
+			"name": "Parse ex-regalloc.tiger",
+			"cmd": ["make", "ex-regalloc"],
+			"working_dir": "${project_path}",
+		    "file_regex": "^(...*?):([0-9]*):?([0-9]*)"
 		}
 	]
 }
