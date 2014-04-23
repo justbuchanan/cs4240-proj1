@@ -2,6 +2,7 @@ import java.util.ArrayList;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.HashMap;
 
 public class IntraBbRegisterAllocator implements RegisterAllocator {
 	private int registerCount;
@@ -95,35 +96,50 @@ public class IntraBbRegisterAllocator implements RegisterAllocator {
 
 		//	build an interference graph for each block and assign registers
 		for (int bbIdx = 0; bbIdx < cfg.getBasicBlocks().size(); bbIdx++) {
-			InterferenceGraph<String> ifg = new InterferenceGraph<>();
 
-			//	build a set of all the variables in use in this block
-			Set<String> allBlockVars = new HashSet<>();
-			ArrayList<Set<String>> blockLiveIns = allLiveIns.get(bbIdx);
-			for (Set<String> vars : blockLiveIns) {
-				allBlockVars.addAll(vars);
-			}
+			ArrayList<String> spilledVars = new ArrayList();
+			Map<String, String> registerAllocations = new HashMap();
 
-			//	add all of these vars to the ifg
-			for (String var : allBlockVars) {
-				ifg.addNode(var);
-			}
+			while (true) {
+				InterferenceGraph<String> ifg = new InterferenceGraph<>();
 
-			//	add edges between vars that are alive at the same time
-			ArrayList<String> allBlockVarsList = new ArrayList<>(allBlockVars);
-			for (int i = 0; i < allBlockVarsList.size() - 1; i++) {
-				for (int j = i + 1; j < allBlockVarsList.size(); j++) {
-					ifg.addEdge(allBlockVarsList.get(i), allBlockVarsList.get(j));
+				//	build a set of all the variables in use in this block
+				Set<String> allBlockVars = new HashSet<>();
+				ArrayList<Set<String>> blockLiveIns = allLiveIns.get(bbIdx);
+				for (Set<String> vars : blockLiveIns) {
+					allBlockVars.addAll(vars);
+				}
+
+				//	remove spilled vars from this set
+				allBlockVars.removeAll(spilledVars);
+
+				//	add all of these vars to the ifg
+				for (String var : allBlockVars) {
+					ifg.addNode(var);
+				}
+
+				//	add edges between vars that are alive at the same time
+				ArrayList<String> allBlockVarsList = new ArrayList<>(allBlockVars);
+				for (int i = 0; i < allBlockVarsList.size() - 1; i++) {
+					for (int j = i + 1; j < allBlockVarsList.size(); j++) {
+						ifg.addEdge(allBlockVarsList.get(i), allBlockVarsList.get(j));
+					}
+				}
+
+				//	allocate registers
+				try {
+					registerAllocations = ifg.color(availableRegisters);
+					break;
+				}
+				catch (TooFewColorsException exc) {
+					//	spill a variable and run the loop again!
+					String varToSpill = ifg.getNodeWithMostNeighbors();
+					spilledVars.add(varToSpill);
 				}
 			}
+			
 
-			//	allocate registers
-			Map<String, String> registerAllocations = ifg.color(availableRegisters);
-
-
-
-			//	FIXME: spilling
-
+			//	FIXME: handle load / store for spilled variables!!!
 
 
 			BasicBlock bb = cfg.getBasicBlocks().get(bbIdx);

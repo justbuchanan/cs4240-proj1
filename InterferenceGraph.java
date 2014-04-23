@@ -6,8 +6,13 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.Stack;
 import java.util.Collection;
+import java.lang.Exception;
 
 public class InterferenceGraph<T> {
+
+	
+
+
 	private ArrayList<T> nodes;
 
 	//	an edge is a Set containing two nodes
@@ -47,7 +52,7 @@ public class InterferenceGraph<T> {
 		this.edges = new HashSet<>();
 	}
 
-	public Map<T, String> color(ArrayList<String> colors) {
+	public Map<T, String> color(ArrayList<String> colors) throws TooFewColorsException {
 		Stack<T> stack = new Stack<>();
 		Set<T> unhandledNodes = new HashSet<>(nodes);
 		Map<T, String> assignments = new HashMap<>();
@@ -67,8 +72,7 @@ public class InterferenceGraph<T> {
 		}
 
 		if (unhandledNodes.size() > 0) {
-			//	TODO: implement splitting or spilling here
-			throw new RuntimeException("The allocator doesn't yet handle splitting...");
+			throw new TooFewColorsException("The allocator doesn't yet handle splitting...");
 		}
 
 		//	remove nodes from the stack, assigning colors as we go
@@ -93,6 +97,22 @@ public class InterferenceGraph<T> {
 		}
 
 		return assignments;
+	}
+
+	//	there may be many with the same # of neighbors, this just returns one of them
+	public T getNodeWithMostNeighbors() {
+		int maxNeighbors = -1;
+		int nodeIndex = -1;
+
+		for (int i = 0; i < nodes.size(); i++) {
+			int neighborCount = getNeighbors(i).size();
+			if (neighborCount > maxNeighbors) {
+				maxNeighbors = neighborCount;
+				nodeIndex = i;
+			}
+		}
+
+		return nodeIndex != -1 ? nodes.get(nodeIndex) : null;
 	}
 
 	public Set<T> getNeighbors(int nodeNum) {
