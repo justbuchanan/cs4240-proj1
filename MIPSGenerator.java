@@ -33,6 +33,10 @@ public class MIPSGenerator {
 	}
 
 	private String unique_var(String prefix) {
+		if (prefix.startsWith("$")) {
+			prefix = "tmp";
+		}
+
     	String varName = allocate_name(variables, prefix);
         symbolTable.addVar(varName, "int");
         return varName;
