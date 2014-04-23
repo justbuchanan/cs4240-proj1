@@ -1,6 +1,7 @@
 import java.util.ArrayList;
 import java.util.Set;
 import java.util.HashSet;
+import java.util.Map;
 
 public class IntraBbRegisterAllocator implements RegisterAllocator {
 	private int registerCount;
@@ -62,7 +63,7 @@ public class IntraBbRegisterAllocator implements RegisterAllocator {
 
 				int newCount = deepCount(liveInsForBlock) + deepCount(liveOutsForBlock);
 				if (newCount == prevCount) {
-					break;
+					break;	//	when we've gone an iteration w/out changing, we're done
 				}
 				prevCount = newCount;
 			}
@@ -83,13 +84,68 @@ public class IntraBbRegisterAllocator implements RegisterAllocator {
 			}
 		}
 
+		//	["$r1", "$r2"...]
+		Set<String> availableRegisters = new HashSet<>();
+		for (int i = 1; i <= registerCount; i++) {
+			availableRegisters.add("$r" + i);
+		}
+
+
+		//	build an interference graph for each block and assign registers
+		for (int bbIdx = 0; bbIdx < cfg.getBasicBlocks().size(); bbIdx++) {
+			InterferenceGraph<String> ifg = new InterferenceGraph<>();
+
+			//	build a set of all the variables in use in this block
+			Set<String> allBlockVars = new HashSet<>();
+			ArrayList<Set<String>> blockLiveIns = allLiveIns.get(bbIdx);
+			for (Set<String> vars : blockLiveIns) {
+				allBlockVars.addAll(vars);
+			}
+
+			//	add all of these vars to the ifg
+			for (String var : allBlockVars) {
+				ifg.addNode(var);
+			}
+
+			//	add edges between vars that are alive at the same time
+			ArrayList<String> allBlockVarsList = new ArrayList<>(allBlockVars);
+			for (int i = 0; i < allBlockVarsList.size() - 1; i++) {
+				for (int j = i + 1; j < allBlockVarsList.size(); j++) {
+					ifg.addEdge(allBlockVarsList.get(i), allBlockVarsList.get(j));
+				}
+			}
+
+			//	allocate registers
+			Map<String, String> registerAllocations = ifg.color(availableRegisters);
 
 
 
-		//	TODO
+			//	FIXME: spilling
 
 
 
+			BasicBlock bb = cfg.getBasicBlocks().get(bbIdx);
+
+			//	replace occurrences of variables with their respective registers
+			for (int stmtIdx = 0; stmtIdx < bb.getCode().size(); stmtIdx++) {
+				CodeStatement stmt = bb.getCode().get(stmtIdx);
+				stmt.replaceVariableOccurrences(registerAllocations);
+			}
+
+			//	loads and stores for all variables
+			for (Map.Entry<String, String> pair : registerAllocations.entrySet()) {
+				CodeStatement load = new CodeStatement("load", pair.getValue(), pair.getKey());		//	load $reg, var
+				bb.getCode().add(0, load);
+
+				CodeStatement store = new CodeStatement("store", pair.getKey(), pair.getValue());	//	store var, $reg
+				int lastIdx = bb.getCode().size() - 1;
+				if (cfg.statementIsBranch(bb.getCode().get(lastIdx))) {
+					bb.getCode().add(lastIdx, store);	//	add @store right before the branch statement
+				} else {
+					bb.getCode().add(store);			//	add @store to the end
+				}
+			}
+		}
 
 		//	squash the blocks back together into linear code
 		for (BasicBlock bb : cfg.getBasicBlocks()) {

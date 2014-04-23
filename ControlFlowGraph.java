@@ -64,6 +64,16 @@ public class ControlFlowGraph {
 		return conditionalBranchInstructions;
 	}
 
+	//	returns true if it branches or has potential to branch
+	public boolean statementIsBranch(CodeStatement stmt) {
+		if (stmt.isLabel() || stmt.isEmpty()) {
+			return false;
+		}
+
+		return conditionalBranchInstructions().contains(stmt.getOperator()) ||
+				branchInstructions().contains(stmt.getOperator());
+	}
+
 	public ControlFlowGraph(ArrayList<CodeStatement> irCode) {
 		this.basicBlocks = new ArrayList<>();
 		this.basicBlockEdges = new HashSet<>();
