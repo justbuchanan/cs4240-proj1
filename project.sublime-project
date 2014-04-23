@@ -10,32 +10,38 @@
 		{
 			"name": "Parse ex1.tiger",
 			"cmd": ["make", "ex1"],
-			"working_dir": "${project_path}"
+			"working_dir": "${project_path}",
+		    "file_regex": "^(...*?):([0-9]*):?([0-9]*)"
 		},
 		{
 			"name": "Parse ex2.tiger",
 			"cmd": ["make", "ex2"],
-			"working_dir": "${project_path}"
+			"working_dir": "${project_path}",
+		    "file_regex": "^(...*?):([0-9]*):?([0-9]*)"
 		},
 		{
 			"name": "Parse ex3.tiger",
 			"cmd": ["make", "ex3"],
-			"working_dir": "${project_path}"
+			"working_dir": "${project_path}",
+		    "file_regex": "^(...*?):([0-9]*):?([0-9]*)"
 		},
 		{
 			"name": "Parse ex5.tiger",
 			"cmd": ["make", "ex5"],
-			"working_dir": "${project_path}"
+			"working_dir": "${project_path}",
+		    "file_regex": "^(...*?):([0-9]*):?([0-9]*)"
 		},
 		{
 			"name": "Parse ex6.tiger",
 			"cmd": ["make", "ex6"],
-			"working_dir": "${project_path}"
+			"working_dir": "${project_path}",
+		    "file_regex": "^(...*?):([0-9]*):?([0-9]*)"
 		},
 		{
 			"name": "Parse tictactoe.tiger",
 			"cmd": ["make", "tictactoe"],
-			"working_dir": "${project_path}"
+			"working_dir": "${project_path}",
+		    "file_regex": "^(...*?):([0-9]*):?([0-9]*)"
 		}
 	]
 }

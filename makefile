@@ -2,7 +2,7 @@
 DRIVER=Driver
 
 # Replace this with the class that contains all of your tests
-TEST_CLASS=DoublyLinkedListTests
+TEST_CLASS=BasicTests
 
 # Use all .java files in the directory
 SRC=$(wildcard *.java)
@@ -21,8 +21,7 @@ OBJ_DOT=$(patsubst %.dot, %.png, $(SRC_DOT))
 PKG_FILES=$(wildcard *.java) README.md $(wildcard *.png) $(wildcard test-input-ver-2/*) makefile
 
 # class path
-# CLASSPATH="junit-4.11.jar:hamcrest-core-1.3.jar:."
-CLASSPATH="."
+CLASSPATH="junit-4.11.jar:hamcrest-core-1.3.jar:."
 
 all: $(OBJ) $(OBJ_DOT)
 

@@ -11,10 +11,8 @@ public class MIPSGenerator {
 											// TO INCORPORATE REGISTER ALLOCATION
 	private Set<String> variables;
 	private SymbolTable symbolTable;
-	private RegisterAllocator alloc;
-	private ControlFlowGraph cfg;
 
-	public MIPSGenerator(ArrayList<CodeStatement> irCode, SymbolTable symbolTable, RegisterAllocator alloc, ControlFlowGraph cfg) {
+	public MIPSGenerator(ArrayList<CodeStatement> irCode, SymbolTable symbolTable) {
 		this.irCode = irCode;
 		mipsCode = new ArrayList<CodeStatement>();
 
@@ -22,8 +20,6 @@ public class MIPSGenerator {
         variables.addAll(symbolTable.getAllVarNames());
 		
 		this.symbolTable = symbolTable;
-		this.alloc = alloc;
-		this.cfg = cfg;
  	}
 
 	private static boolean isInteger(String string) {
@@ -37,50 +33,52 @@ public class MIPSGenerator {
 	}
 
 	private String unique_var(String prefix) {
-        	String varName = allocate_name(variables, prefix);
-                symbolTable.addVar(varName, "int");
-                return varName;
+		if (prefix.startsWith("$")) {
+			prefix = "tmp";
+		}
+
+    	String varName = allocate_name(variables, prefix);
+        symbolTable.addVar(varName, "int");
+        return varName;
+    }
+ 
+    private String allocate_name(Set<String> names, String prefix) {
+    	//      use just the prefix if possible
+        if (!names.contains(prefix)) {
+        	names.add(prefix);
+         	return prefix;
         }
- 
-        private String allocate_name(Set<String> names, String prefix) {
-        	//      use just the prefix if possible
-                if (!names.contains(prefix)) {
-                	names.add(prefix);
-                        return prefix;
-                }
- 
-                //      append a number to @prefix to make it unique
-                int suffix = 1;
-                while (true) {
-                        String newName = prefix + suffix;
-                        if (!names.contains(newName)) {
-                                names.add(newName);
-                                return newName;
-                        }
-                        suffix++;
-                }
+
+        //      append a number to @prefix to make it unique
+        int suffix = 1;
+        while (true) {
+            String newName = prefix + suffix;
+            if (!names.contains(newName)) {
+                    names.add(newName);
+                    return newName;
+            }
+            suffix++;
+        }
 	}
 
 	private void generateDataSegment() {
-		Set<String> set = new HashSet<String>();
-		for (CodeStatement codeStatement : irCode) {
-			if (!codeStatement.isLabel() && codeStatement.toString().length() > 0 && codeStatement.getOperator().equals("assign") && codeStatement.getRightOperand().length() > 0 && !set.contains(codeStatement.getOutputRegister())) {
-				ArrayList<String> valueList = new ArrayList<>();
-				for (int i = 0; i < (Integer.parseInt(codeStatement.getLeftOperand()) - 1); i++) {
-					valueList.add(codeStatement.getRightOperand());
-				}
-				mipsCode.add(0, new CodeStatement(codeStatement.getOutputRegister() + ":", ".word", codeStatement.getRightOperand(), valueList));
-				set.add(codeStatement.getOutputRegister());
-			} else if (!codeStatement.isLabel() && codeStatement.toString().length() > 0 && codeStatement.getOperator().equals("assign") && !set.contains(codeStatement.getOutputRegister())) {
-				mipsCode.add(0, new CodeStatement(codeStatement.getOutputRegister() + ":", ".word", codeStatement.getLeftOperand()));
-				set.add(codeStatement.getOutputRegister());
-			}		
-		}
+		for (String varName : symbolTable.getAllVarNames()) {
+			VarSymbolEntry var = symbolTable.getVar(varName);
+			TypeSymbolEntry type = var.getType();
 
-		for (String var : symbolTable.getAllVarNames()) {
-			if (!set.contains(var)) {
-				mipsCode.add(0, new CodeStatement(var + ":", ".word", "0"));
+			int numWords = 1;
+			if (type.getArrDims() != null) {
+				for (Integer dim : type.getArrDims()) {
+					numWords *= dim;
+				}
 			}
+
+			String staticData = "0";
+			for (int i = 1; i < numWords; i++) {
+				staticData += ", 0";
+			}
+
+			mipsCode.add(0, new CodeStatement(varName + ":", ".word", staticData));
 		}
 		mipsCode.add(0, new CodeStatement(".data"));
 	}
@@ -241,10 +239,7 @@ public class MIPSGenerator {
 			}
 		}
 		generateDataSegment();
-	}
-	
-	public void allocRegisters(){
-		mipsCode = alloc.allocRegisters(mipsCode, cfg);
+		
 		mipsCode.add(new CodeStatement("jr", "$ra"));
 	}
 	
