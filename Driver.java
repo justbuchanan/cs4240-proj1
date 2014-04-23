@@ -53,7 +53,7 @@ public class Driver {
 
 			//	register allocation
 			System.out.println("\n\nRegister Allocation\n==================================================");
-			RegisterAllocator allocator = new EbbRegisterAllocator();
+			RegisterAllocator allocator = new IntraBbRegisterAllocator();
 			irCode = allocator.allocRegisters(irCode);
 			
 			//	MIPS generation

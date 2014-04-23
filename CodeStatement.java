@@ -1,4 +1,7 @@
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Set;
+import java.util.Iterator;
 
 /**
  * Represents a single line in the intermediate code.
@@ -159,5 +162,85 @@ public class CodeStatement {
 
 	public String getLabelName() {
 		return labelName;
+	}
+
+
+	//	analysis
+
+	/**
+	 * Examines the given code statement and finds the variables defined and used, returning them through the output variables.
+	 */
+	public void getVariableDefsAndUses(Set<String> defOut, Set<String> useOut) {
+		if (defOut == null || useOut == null) {
+			throw new IllegalArgumentException("Parameters should not be null");
+		}
+
+
+		if (!isLabel() && !isEmpty()) {
+
+			ArrayList<String> condBranchOps = new ArrayList<String>(
+				Arrays.asList(new String[]{
+					"breq",
+					"brneq",
+					"brlt",
+					"brgt",
+					"brgeq",
+					"brleq"
+				})
+			);
+
+
+			String operator = getOperator();
+
+			if (operator.equals("assign")) {
+				if (getRightOperand().equals("")) {
+					//	this is an assignment to a regular variable
+					defOut.add(getOutputRegister());
+				} else {
+					//	this is an assignment to set the whole contents of an array
+					//	FIXME: is this a def?  arrays are different...
+				}
+			} else if (operator.equals("return")) {
+				if (getOutputRegister().equals("")) {
+					//	return operation with no ret val
+				} else {
+					//	return a value
+					useOut.add(getOutputRegister());
+				}
+			} else if (operator.equals("call")) {
+				useOut.addAll(getFuncParams());
+			} else if (operator.equals("callr")) {
+				defOut.add(getOutputRegister());
+				useOut.addAll(getFuncParams());
+			} else if (condBranchOps.contains(getOperator())) {
+				//	these are of the form:
+				//	condBranchOp var1, var2, gotoLabel
+				//	we add var1 and var2 to the use set
+
+				//	yes, the method names are wierd - they were named for the general case, which isn't this case
+				useOut.add(getOutputRegister());
+				useOut.add(getLeftOperand());
+			} else {
+				//	general case: "op outVar, inVar1, inVar2"
+				defOut.add(getOutputRegister());
+				useOut.add(getLeftOperand());
+				useOut.add(getRightOperand());
+			}
+
+
+			//	remove any CONST numbers from @useOut
+			Iterator<String> itr = useOut.iterator();
+			while (itr.hasNext()) {
+				String var = itr.next();
+				if (var.length() == 0) {
+					itr.remove();
+				} else {
+					char firstChar = var.charAt(0);
+					if ('0' <= firstChar && firstChar <= '9') {
+						itr.remove();
+					}
+				}
+			}
+		}
 	}
 }
