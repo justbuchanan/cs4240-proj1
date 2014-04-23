@@ -14,7 +14,7 @@ public class ControlFlowGraph {
 	private Set<CFGEdge> basicBlockEdges;
 
 
-	private class CFGEdge {
+	public class CFGEdge {
 		public int from;
 		public int to;
 
@@ -62,6 +62,16 @@ public class ControlFlowGraph {
 		}
 
 		return conditionalBranchInstructions;
+	}
+
+	//	returns true if it branches or has potential to branch
+	public boolean statementIsBranch(CodeStatement stmt) {
+		if (stmt.isLabel() || stmt.isEmpty()) {
+			return false;
+		}
+
+		return conditionalBranchInstructions().contains(stmt.getOperator()) ||
+				branchInstructions().contains(stmt.getOperator());
 	}
 
 	public ControlFlowGraph(ArrayList<CodeStatement> irCode) {
@@ -242,6 +252,18 @@ public class ControlFlowGraph {
 		return basicBlocks.size() - 1;
 	}
 
+	public ArrayList<ExtendedBasicBlock> getExtendedBasicBlocks() {
+		return extendedBasicBlocks;
+	}
+
+	public ArrayList<BasicBlock> getBasicBlocks() {
+		return basicBlocks;
+	}
+
+	public Set<CFGEdge> getEdges() {
+		return basicBlockEdges;
+	}
+
 
 	public String toGraphviz() {
 		String gv = "digraph ControlFlow {\n";
@@ -278,51 +300,8 @@ public class ControlFlowGraph {
 		return gv;
 	}
 
-	/**
-	 * A basic block is a sequence of consecutive statements
-	 * in which flow of control can only enter at the beginning and leave at the end
-	 *
-	 * Only the last statement of a basic block can be a branch statement
-	 * and only the first statement of a basic block can be a target of a branch.
-	 */
-	private class BasicBlock {
-		private List<CodeStatement> code;
-		private int startLineIndex;
 
-		public BasicBlock(int startLineIndex, List<CodeStatement> code) {
-			this.startLineIndex = startLineIndex;
-			this.code = code;
-		}
-
-		public List<CodeStatement> getCode() {
-			return code;
-		}
-
-		public int getStartLineIndex() {
-			return startLineIndex;
-		}
-
-		//	outputs a node (note: doesn't indent at all)
-		public String toGraphviz() {
-			String gv = graphvizNodeName();
-
-			gv += " [shape=record label=\"";
-
-			for (CodeStatement stmt : code) {
-				gv += stmt + "\\n";
-			}
-
-			gv += "\"];";
-
-			return gv;
-		}
-
-		public String graphvizNodeName() {
-			return "block" + getStartLineIndex();
-		}
-	}
-
-	private class ExtendedBasicBlock {
+	public class ExtendedBasicBlock {
 		private List<BasicBlock> basicBlocks;
 
 		ExtendedBasicBlock(List<BasicBlock> basicBlocks) {
