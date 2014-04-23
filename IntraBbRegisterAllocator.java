@@ -85,10 +85,12 @@ public class IntraBbRegisterAllocator implements RegisterAllocator {
 		}
 
 		//	["$r1", "$r2"...]
-		Set<String> availableRegisters = new HashSet<>();
+		ArrayList<String> availableRegisters = new ArrayList<>();
 		for (int i = 1; i <= registerCount; i++) {
 			availableRegisters.add("$r" + i);
 		}
+ 
+		System.out.println("Registers: " + availableRegisters);
 
 
 		//	build an interference graph for each block and assign registers
@@ -133,18 +135,27 @@ public class IntraBbRegisterAllocator implements RegisterAllocator {
 			}
 
 			//	loads and stores for all variables
+			ArrayList<CodeStatement> loads = new ArrayList();
+			ArrayList<CodeStatement> stores = new ArrayList();
 			for (Map.Entry<String, String> pair : registerAllocations.entrySet()) {
 				CodeStatement load = new CodeStatement("load", pair.getValue(), pair.getKey());		//	load $reg, var
-				bb.getCode().add(0, load);
+				loads.add(load);
 
 				CodeStatement store = new CodeStatement("store", pair.getKey(), pair.getValue());	//	store var, $reg
-				int lastIdx = bb.getCode().size() - 1;
-				if (cfg.statementIsBranch(bb.getCode().get(lastIdx))) {
-					bb.getCode().add(lastIdx, store);	//	add @store right before the branch statement
-				} else {
-					bb.getCode().add(store);			//	add @store to the end
-				}
+				stores.add(store);
 			}
+
+			//	merge the loads, old code, and stores into a new array
+			ArrayList<CodeStatement> newCode = new ArrayList();
+			newCode.addAll(loads);
+			newCode.addAll(bb.getCode());
+			int lastIdx = bb.getCode().size() - 1;
+			if (cfg.statementIsBranch(bb.getCode().get(lastIdx))) {
+				newCode.addAll(lastIdx, stores);	//	add @store right before the branch statement
+			} else {
+				newCode.addAll(stores);				//	add @store to the end
+			}
+			bb.setCode(newCode);
 		}
 
 		//	squash the blocks back together into linear code

@@ -47,7 +47,7 @@ public class InterferenceGraph<T> {
 		this.edges = new HashSet<>();
 	}
 
-	public Map<T, String> color(Set<String> colors) {
+	public Map<T, String> color(ArrayList<String> colors) {
 		Stack<T> stack = new Stack<>();
 		Set<T> unhandledNodes = new HashSet<>(nodes);
 		Map<T, String> assignments = new HashMap<>();
@@ -78,7 +78,7 @@ public class InterferenceGraph<T> {
 			Set<T> coloredNeighbors = getNeighbors(nodes.indexOf(n));
 			coloredNeighbors.removeAll(stack);
 
-			Set<String> availableColors = new HashSet<>(colors);
+			ArrayList<String> availableColors = new ArrayList<>(colors);
 			for (T coloredNeighbor : coloredNeighbors) {
 				availableColors.remove(assignments.get(coloredNeighbor));
 			}

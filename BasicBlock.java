@@ -20,6 +20,10 @@ public class BasicBlock {
 		return code;
 	}
 
+	public void setCode(List<CodeStatement> code) {
+		this.code = code;
+	}
+
 	public int getStartLineIndex() {
 		return startLineIndex;
 	}
