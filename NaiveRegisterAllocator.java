@@ -107,7 +107,18 @@ public class NaiveRegisterAllocator implements RegisterAllocator{
 					allocatedIR.add(new CodeStatement(op, "$t0", regs));
 				} else if("return".equals(op)){
 					
-				}else{
+				}else if("array_load".equals(op)){
+					String rightOp = stmt.getRightOperand();
+					String rightReg = "$t1";
+					if(!isNumeric(rightOp)){
+						allocatedIR.add(load(rightReg, rightOp));
+					} else{
+						rightReg = rightOp;
+					}
+					
+					allocatedIR.add(new CodeStatement(op, "$t2", leftOp, rightReg));
+					allocatedIR.add(store("$t2", stmt.getOutputRegister()));
+				} else{
 					allocatedIR.add(stmt);
 				}
 			}
@@ -142,7 +153,6 @@ public class NaiveRegisterAllocator implements RegisterAllocator{
 
 			storesResult = new ArrayList<String>();
 			storesResult.add("add");
-			storesResult.add("array_load");
 			storesResult.add("mult");
 			storesResult.add("assign");
 			storesResult.add("sub");
