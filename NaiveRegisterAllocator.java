@@ -23,7 +23,7 @@ public class NaiveRegisterAllocator implements RegisterAllocator{
 					continue;
 				}
 
-				allocatedIR.add(new CodeStatement("####### " + stmt.toString() + " #######"));
+				//allocatedIR.add(new CodeStatement("####### " + stmt.toString() + " #######"));
 				if(stmt.isLabel()){
 					allocatedIR.add(stmt);
 					continue;
