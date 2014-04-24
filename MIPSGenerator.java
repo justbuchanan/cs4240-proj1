@@ -84,25 +84,25 @@ public class MIPSGenerator {
 						if (isInteger(codeStatement.getRightOperand())) {
 							mipsCode.add(new CodeStatement("addi", "$fp", codeStatement.getRightOperand(), "0"));
 							mipsCode.add(new CodeStatement(codeStatement.getOperator(), codeStatement.getLeftOperand(), "$fp"));
-							mipsCode.add(new CodeStatement("addi", codeStatement.getOutputRegister(), "$LO", "0"));
+							mipsCode.add(new CodeStatement("mflo", codeStatement.getOutputRegister()));
 						} else if (isInteger(codeStatement.getLeftOperand())) {
 							mipsCode.add(new CodeStatement("addi", "$fp", codeStatement.getLeftOperand(), "0"));
 							mipsCode.add(new CodeStatement(codeStatement.getOperator(), "$fp", codeStatement.getRightOperand()));
-							mipsCode.add(new CodeStatement("addi", codeStatement.getOutputRegister(), "$LO", "0"));
+							mipsCode.add(new CodeStatement("mflo", codeStatement.getOutputRegister()));
 						} else {
 							mipsCode.add(new CodeStatement(codeStatement.getOperator(), codeStatement.getLeftOperand(), codeStatement.getRightOperand()));
-							mipsCode.add(new CodeStatement("addi", codeStatement.getOutputRegister(), "$LO", "0"));
+							mipsCode.add(new CodeStatement("mflo", codeStatement.getOutputRegister()));
 						}
 						break;
 					case "div":
 						if (isInteger(codeStatement.getRightOperand())) {
 							mipsCode.add(new CodeStatement("addi", "$fp", codeStatement.getRightOperand(), "0"));
 							mipsCode.add(new CodeStatement(codeStatement.getOperator(), codeStatement.getLeftOperand(), "$fp"));
-							mipsCode.add(new CodeStatement("addi", codeStatement.getOutputRegister(), "$LO", "0"));
+							mipsCode.add(new CodeStatement("mflo", codeStatement.getOutputRegister()));
 						} else if (isInteger(codeStatement.getLeftOperand())) {
 							mipsCode.add(new CodeStatement("addi", "$fp", codeStatement.getLeftOperand(), "0"));
 							mipsCode.add(new CodeStatement(codeStatement.getOperator(), "$fp", codeStatement.getRightOperand()));
-							mipsCode.add(new CodeStatement("addi", codeStatement.getOutputRegister(), "$LO", "0"));
+							mipsCode.add(new CodeStatement("mflo", codeStatement.getOutputRegister()));
 						} else {
 							mipsCode.add(new CodeStatement(codeStatement.getOperator(), codeStatement.getLeftOperand(), codeStatement.getRightOperand()));
 							mipsCode.add(new CodeStatement("addi", codeStatement.getOutputRegister(), "$LO", "0"));
@@ -128,10 +128,10 @@ public class MIPSGenerator {
 						break;
 					case "array_load":
 						mipsCode.add(new CodeStatement("la", "$fp", codeStatement.getLeftOperand()));
-						mipsCode.add(new CodeStatement("addi", "$sp", "$0", "4"));
-						mipsCode.add(new CodeStatement("mult", "$sp", codeStatement.getRightOperand()));
-						mipsCode.add(new CodeStatement("addi", "$sp", "$LO", "0"));
-						mipsCode.add(new CodeStatement("add", "$fp", "$fp", "$sp"));
+						mipsCode.add(new CodeStatement("addi", "$sp", codeStatement.getRightOperand(), "0"));
+						mipsCode.add(new CodeStatement("add", "$sp", "$sp", "$sp"));
+						mipsCode.add(new CodeStatement("add", "$sp", "$sp", "$sp"));
+						mipsCode.add(new CodeStatement("add", "$sp", "$sp", "$fp"));
 						mipsCode.add(new CodeStatement("lw", codeStatement.getOutputRegister(), "0($fp)"));
 						break;
 					case "array_store":
