@@ -6,7 +6,7 @@ public class NaiveRegisterAllocator implements RegisterAllocator{
 
 		private ArrayList<String> storesResult;
 		private ArrayList<CodeStatement> allocatedIR;
-		private ArrayList<CodeStatement> conditionals;
+		private ArrayList<String> conditionals;
 
 		public ArrayList<CodeStatement> allocRegisters(ArrayList<CodeStatement> irCode){
 			allocatedIR = new ArrayList<CodeStatement>();
@@ -130,11 +130,13 @@ public class NaiveRegisterAllocator implements RegisterAllocator{
 
 		private boolean isConditional(String s){
 			if(conditionals != null){
-				return condionals.contains(s);
+				return conditionals.contains(s);
 			}
 
 			conditionals = new ArrayList<String>();
 			conditionals.add("breq");
+			
+			return conditionals.contains(s);
 		}
 
 		private boolean isNumeric(String s){
