@@ -26,6 +26,8 @@ Unfortunately we didn't complete our implementation of the extended basic block 
 
 Each time the compiler runs, it builds a control flow graph of the IR code and writes a `cfg.dot` and `cfg.png` file.  This lets us quickly see what the graph looks like in picture form.
 
+The register allocator to use is set in Driver.java, so they can be swapped out easily to try different strategies.
+
 
 # MIPS Generation
 
