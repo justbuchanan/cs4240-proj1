@@ -88,16 +88,26 @@ public class NaiveRegisterAllocator implements RegisterAllocator{
 				} else if("call".equals(op) || "callr".equals(op)){
 					ArrayList<String> params = stmt.getFuncParams();
 					ArrayList<String> regs = new ArrayList<String>();
-					allocatedIR.add(load("$t0", dest));
-					regs.add("$t0");
+					if(!"callr".equals(op)){
+						allocatedIR.add(load("$t0", dest));
+						regs.add("$t0");
+					}
+
 					for(int reg = 1; reg < params.size(); reg++){
+						if(isNumeric(params.get(reg))){
+							regs.add(params.get(reg));
+							continue;
+						}
+
 						String strReg = "$t" + Integer.toString(reg);
 						allocatedIR.add(load(strReg, params.get(reg)));
 						regs.add(strReg);
 					}
 					
 					allocatedIR.add(new CodeStatement(op, "$t0", regs));
-				} else{
+				} else if("return".equals(op)){
+					
+				}else{
 					allocatedIR.add(stmt);
 				}
 			}

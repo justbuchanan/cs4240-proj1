@@ -170,6 +170,7 @@ public class CodeStatement {
 	}
 
 	public String getRightOperand() {
+		if(components.size() < 4) return "";
 		return components.get(3);
 	}
 
