@@ -143,6 +143,10 @@ public class ControlFlowGraph {
 				this.basicBlocks.add(block);
 
 				blockStartIndex = i + 1;
+			} else if (i == irCode.size() - 1) {
+				List<CodeStatement> code = irCode.subList(blockStartIndex, i + 1);
+				BasicBlock block = new BasicBlock(blockStartIndex, code);
+				this.basicBlocks.add(block);
 			}
 		}
 

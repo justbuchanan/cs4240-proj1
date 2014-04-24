@@ -46,6 +46,9 @@ ex6: all
 tictactoe: all
 	java $(DRIVER) test-input-ver-2/tictactoe.tiger &> tictactoe.log
 
+ex-regalloc: all
+	java $(DRIVER) test-input-ver-2/ex-regalloc.tiger &> ex-regalloc.log
+
 debug: all
 	jdb -cp $(CLASSPATH) $(DRIVER)
 

@@ -6,10 +6,12 @@ import java.util.HashMap;
 
 public class IntraBbRegisterAllocator implements RegisterAllocator {
 	private int registerCount;
+	private int spillRegister;	//	the register used for spilled variables
 	private ArrayList<CodeStatement> finalCode;
 
 	public IntraBbRegisterAllocator() {
-		this.registerCount = 30;
+		this.registerCount = 28;
+		this.spillRegister = 31;
 		this.finalCode = new ArrayList<>();
 	}
 
@@ -91,7 +93,10 @@ public class IntraBbRegisterAllocator implements RegisterAllocator {
 			availableRegisters.add("$r" + i);
 		}
  
-		System.out.println("Registers: " + availableRegisters);
+ 		if (debug) {
+			System.out.println("Registers: " + availableRegisters);
+			System.out.println();
+		}
 
 
 		//	build an interference graph for each block and assign registers
@@ -138,6 +143,11 @@ public class IntraBbRegisterAllocator implements RegisterAllocator {
 				}
 			}
 			
+			if (debug) {
+				System.out.println("Block" + bbIdx);
+				System.out.println("\tspilled vars = " + spilledVars);
+				System.out.println("\tregister allocations = " + registerAllocations);
+			}
 
 			//	FIXME: handle load / store for spilled variables!!!
 
@@ -163,21 +173,35 @@ public class IntraBbRegisterAllocator implements RegisterAllocator {
 
 			//	merge the loads, old code, and stores into a new array
 			ArrayList<CodeStatement> newCode = new ArrayList();
-			newCode.addAll(loads);
 			newCode.addAll(bb.getCode());
+
+			if (newCode.get(0).isLabel()) {
+				newCode.addAll(1, loads);
+			} else {
+				newCode.addAll(0, loads);
+			}
+
 			int lastIdx = bb.getCode().size() - 1;
 			if (cfg.statementIsBranch(bb.getCode().get(lastIdx))) {
-				newCode.addAll(lastIdx, stores);	//	add @store right before the branch statement
+				newCode.addAll(lastIdx, stores);	//	add @stores right before the branch statement
 			} else {
-				newCode.addAll(stores);				//	add @store to the end
+				newCode.addAll(stores);				//	add @stores to the end
 			}
 			bb.setCode(newCode);
+
+			// System.out.println("LOADS: " + loads.size());
 		}
 
 		//	squash the blocks back together into linear code
 		for (BasicBlock bb : cfg.getBasicBlocks()) {
 			finalCode.addAll(bb.getCode());
 		}
+
+
+		// for (CodeStatement stmt : finalCode) {
+		// 	System.out.println("CODE: " + stmt);
+		// }
+
 
 		return finalCode;
 	}

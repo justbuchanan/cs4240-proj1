@@ -37,10 +37,18 @@ public class Driver {
 			ArrayList<CodeStatement> irCode = IRCodeGenerator.generateIRCode(parser.getAST(), parser.getSymbolTable());
 			System.out.println("\nIR Code:");
 
+			ArrayList<CodeStatement> removeStatement = new ArrayList<CodeStatement>();
 			for (CodeStatement stmt : irCode) {
 				System.out.println("> " + stmt);
+				if (stmt.toString().length() == 0) {
+					removeStatement.add(stmt);
+				}
 			}
 
+			for (CodeStatement stmt : removeStatement) {
+				irCode.remove(stmt);
+			}
+			
 			//	create the cfg and save a png of the graph
 			ControlFlowGraph cfg = new ControlFlowGraph(irCode);
 			writeFile("cfg.dot", cfg.toGraphviz());
@@ -66,8 +74,8 @@ public class Driver {
 			
 			//	MIPS generation
 			MIPSGenerator mipsGenerator = new MIPSGenerator(irCode, parser.getSymbolTable());
-			mipsGenerator.generateMips();		
-			System.out.println("\n\nMIPS:\n\n" + mipsGenerator.toString());
+			mipsGenerator.generateMips();
+			System.out.println("\n\nMIPS\n==================================================\n\n" + mipsGenerator.toString());
 			System.out.println(mipsGenerator.toString());
 			
 			// write output file from final code
