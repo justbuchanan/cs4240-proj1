@@ -36,20 +36,33 @@ public class NaiveRegisterAllocator implements RegisterAllocator{
 				String leftReg = "$t0";
 
 				if(storesResult(op)){
+					
 
 					String rightReg = "$t1";
 
 					String rightOp = stmt.getRightOperand();
-					allocatedIR.add(load(leftReg, leftOp));
+					
+					if(!isNumeric(leftOp)){
+						allocatedIR.add(load(leftReg, leftOp));
 					// check if we need to load right operand
-					if(!isNumeric(rightOp)){
-						allocatedIR.add(load(rightReg, rightOp));
-					}else{
-						rightReg = rightOp; // value was immediate
+					} else{
+						leftReg = leftOp;
 					}
 
-					// exec instruction
-					allocatedIR.add(new CodeStatement(op, destReg, leftReg, rightReg));
+					if(stmt.getNumAddr() == 4){
+						if(!isNumeric(rightOp)){
+							allocatedIR.add(load(rightReg, rightOp));
+						}else{
+							rightReg = rightOp; // value was immediate
+						}
+
+						// exec instruction
+						allocatedIR.add(new CodeStatement(op, destReg, leftReg, rightReg));
+					}
+					else{
+						allocatedIR.add(new CodeStatement(op, destReg, leftReg));
+					}
+
 					// store result
 					allocatedIR.add(store(destReg, dest));
 
@@ -72,25 +85,20 @@ public class NaiveRegisterAllocator implements RegisterAllocator{
 				
 
 
-				} else if(op.equals("assign")){
-
-					if(stmt.getNumAddr() == 4){
-						String rightOp = stmt.getRightOperand();
-						// array assignment statement
-						allocatedIR.add(new CodeStatement(op, destReg, leftOp, rightOp));
-						allocatedIR.add(store(destReg, dest));
-						continue;
+				} else if("call".equals(op) || "callr".equals(op)){
+					ArrayList<String> params = stmt.getFuncParams();
+					ArrayList<String> regs = new ArrayList<String>();
+					allocatedIR.add(load("$t0", dest));
+					regs.add("$t0");
+					for(int reg = 1; reg < params.size(); reg++){
+						String strReg = "$t" + Integer.toString(reg);
+						allocatedIR.add(load(strReg, params.get(reg)));
+						regs.add(strReg);
 					}
-
-					// check if we need to load
-					if(!isNumeric(leftOp)){
-						allocatedIR.add(load(leftReg, leftOp));
-					}else{
-						leftReg = leftOp;
-					}
-
-					allocatedIR.add(new CodeStatement(op, destReg, leftReg));
-					allocatedIR.add(store(destReg, dest));
+					
+					allocatedIR.add(new CodeStatement(op, "$t0", regs));
+				} else{
+					allocatedIR.add(stmt);
 				}
 			}
 
@@ -124,6 +132,13 @@ public class NaiveRegisterAllocator implements RegisterAllocator{
 
 			storesResult = new ArrayList<String>();
 			storesResult.add("add");
+			storesResult.add("array_load");
+			storesResult.add("mult");
+			storesResult.add("assign");
+			storesResult.add("sub");
+			storesResult.add("div");
+			storesResult.add("and");
+			storesResult.add("or");
 			return storesResult.contains(op);
 		}
 
@@ -135,6 +150,11 @@ public class NaiveRegisterAllocator implements RegisterAllocator{
 
 			conditionals = new ArrayList<String>();
 			conditionals.add("breq");
+			conditionals.add("brneq");
+			conditionals.add("brlt");
+			conditionals.add("brgt");
+			conditionals.add("brgeq");
+			conditionals.add("brleq");
 			
 			return conditionals.contains(s);
 		}
