@@ -3,154 +3,148 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class NaiveRegisterAllocator implements RegisterAllocator{
-	private ArrayList<CodeStatement> finalCode;
-	Language lang;
-	
-	public NaiveRegisterAllocator(Language lang){
-		this.lang = lang;
-	}
-	public  ArrayList<CodeStatement> allocRegisters(ArrayList<CodeStatement> origMips){
-		finalCode = new ArrayList();
-		
-		for(CodeStatement stmt : origMips){
-			//TODO: REMOVE FOR DEBUGGING
-			finalCode.add(new CodeStatement("######## " + stmt.toString() + " #########"));
-			if(stmt.isLabel()){
-				finalCode.add(stmt);
-				continue;
+
+		private ArrayList<String> storesResult;
+		private ArrayList<CodeStatement> allocatedIR;
+		private ArrayList<CodeStatement> conditionals;
+
+		public ArrayList<CodeStatement> allocRegisters(ArrayList<CodeStatement> irCode){
+			allocatedIR = new ArrayList<CodeStatement>();
+
+			if(irCode == null){
+				System.out.println("GAVE NAIVE REGISTER ALLOCATOR NULL IRCODE INPUT");
+				return null;
 			}
-			
-			if(stmt.getOperator().equals("lw") || stmt.getOperator().equals("sw")){
-				String op = stmt.getLeftOperand();
-				String base = op.substring(0, op.indexOf('('));
-				// check for array indexing i.e. lw array, 0(x)
-				String offset = op.substring(base.length() + 1, op.length() - 1); // don't include last paren
-				// load offset if it's a variable
-				if(offset.charAt(0) != '$'){
-					// load offset
-					finalCode.add(lang.load("$t0", offset));
-					offset = "$t0";
+
+			for(CodeStatement stmt : irCode){
+
+				if((stmt == null) || ((stmt.getNumAddr() == 0) && (!stmt.isLabel()))){
+					System.out.println("EMPTY STATEMENT FROM IR????");
+					continue;
 				}
-				
-				// execute command
-				finalCode.add(new CodeStatement(stmt.getOperator(), "$t1", base + "(" + offset + ")"));
-				
-				// store result
-				finalCode.add(lang.store("$t1", stmt.getOutputRegister()));
-				continue;
-				
-			}
-			
-			
-			int numReg = lang.numRegInstr(stmt.getOperator());
-			switch(numReg){
-				case 3: // i.e. op DR, SR1, SR2
-					allocateThreeRegInstr(stmt);
-					break;
-				case 2: // i.e. op DR, SR1, imm
-					allocateTwoRegInstr(stmt);
-					break;
-				case 1:
-					allocateOneRegInstr(stmt);
-					break;
-				default:
-					finalCode.add(stmt);
-			}
-		}
-		return finalCode;
-	}
-	
-	private void allocateThreeRegInstr(CodeStatement stmt){
-		String operator = stmt.getOperator();
-		String dest = stmt.getOutputRegister();
-		String leftOp = stmt.getLeftOperand();
-		String rightOp = stmt.getRightOperand();
-		
-		
-		// ld operands
-		finalCode.add(lang.load("$t0", leftOp));
-		finalCode.add(lang.load("$t1", rightOp));
-		
-		// exec instruction, output register is now $t2
-		finalCode.add(new CodeStatement(operator, "$t2", "$t0", "$t1"));
 
-		// store result
-		finalCode.add(lang.store("$t2", dest));
-	}
-	
-	private void allocateTwoRegInstr(CodeStatement stmt){
-		// make sure where not looking at 3 instr
-		
-		String operator = stmt.getOperator();
-		String op1 = stmt.getOutputRegister();
-		String op2 = stmt.getLeftOperand();
-		String r1 = "";
-		String r2 = "";
-		
-		
-		// load needed operands
-		if(lang.resultStored(operator) && !lang.storesToLo(operator)){
-			r1 = "$t0";
-		}else if(op1.charAt(0) == '$'){ // it's a hard coded register so use it?
-			if(op1.equals("$LO")){ // need to get value from $lo into useable register
-				finalCode.add(new CodeStatement("mflo", "$t3"));
-				r1 = "$t3";
-			}
-			else{
-				r1 = op1;
-			}
+				allocatedIR.add(new CodeStatement("####### " + stmt.toString() + " #######"));
+				if(stmt.isLabel()){
+					allocatedIR.add(stmt);
+					continue;
+				}
 
-		} else{
-			// must load
-			r1 = "$t0";
-			finalCode.add(lang.load(r1, op1));
-		}
-		
-		if(op2.charAt(0) == '$'){
-			if(op2.equals("$LO")){ // need to get value from $lo into useable register
-				finalCode.add(new CodeStatement("mflo", "$t3"));
-				r2 = "$t3";
-			}
-			else{
-				r2 = op2;
+				String op = stmt.getOperator();
+				String dest  = stmt.getOutputRegister();
+				String leftOp = stmt.getLeftOperand();
+				String destReg = "$t2";
+				String leftReg = "$t0";
+
+				if(storesResult(op)){
+
+					String rightReg = "$t1";
+
+					String rightOp = stmt.getRightOperand();
+					allocatedIR.add(load(leftReg, leftOp));
+					// check if we need to load right operand
+					if(!isNumeric(rightOp)){
+						allocatedIR.add(load(rightReg, rightOp));
+					}else{
+						rightReg = rightOp; // value was immediate
+					}
+
+					// exec instruction
+					allocatedIR.add(new CodeStatement(op, destReg, leftReg, rightReg));
+					// store result
+					allocatedIR.add(store(destReg, dest));
+
+				} else if(isConditional(op)){
+					// just have to check for loads
+					if(!isNumeric(dest)){
+						allocatedIR.add(load(destReg, dest));
+					} else{
+						destReg = dest;
+					}
+
+					if(!isNumeric(leftOp)){
+						allocatedIR.add(load(leftReg, leftOp));
+					} else{
+						leftReg = leftOp;
+					}
+
+
+					allocatedIR.add(new CodeStatement(op, destReg, leftReg, stmt.getRightOperand()));
+				
+
+
+				} else if(op.equals("assign")){
+
+					if(stmt.getNumAddr() == 4){
+						String rightOp = stmt.getRightOperand();
+						// array assignment statement
+						allocatedIR.add(new CodeStatement(op, destReg, leftOp, rightOp));
+						allocatedIR.add(store(destReg, dest));
+						continue;
+					}
+
+					// check if we need to load
+					if(!isNumeric(leftOp)){
+						allocatedIR.add(load(leftReg, leftOp));
+					}else{
+						leftReg = leftOp;
+					}
+
+					allocatedIR.add(new CodeStatement(op, destReg, leftReg));
+					allocatedIR.add(store(destReg, dest));
+				}
 			}
 
-		} else if(op2.charAt(0) == '0'){
-			r2 = "$0";
-		} else{
-			r2 = "$t1";
-			finalCode.add(lang.load(r2, op2));
+			return allocatedIR;
 		}
-		
-		// execute command and store result
-		if(stmt.getNumAddr() > 3){
-			finalCode.add(new CodeStatement(operator, r1, r2, stmt.getRightOperand()));
-		}
-		else{
-			// only three ops
-			finalCode.add(new CodeStatement(operator, r1, r2));
-		}
-		
-		
-		//store results
-		if(lang.resultStored(operator) && !lang.storesToLo(operator)){
-				finalCode.add(lang.store(r1, op1));
+
+		public void printCode(){
+			if(allocatedIR == null){
+				System.out.println("NAIVE REG ALLOC PRODUCED NULL");
+				return;
 			}
-		
-		
-	}
-	
-	private void allocateOneRegInstr(CodeStatement stmt){
-			// load op1 and execute instruction
-			finalCode.add(new CodeStatement(stmt.getOperator(), "$t0", stmt.getLeftOperand()));
-			// store
-			finalCode.add(lang.store("$t0", stmt.getOutputRegister()));			
-	
-	}
-	
-	public void printCode(){
-		for(CodeStatement stmt : finalCode){
-			System.out.println(stmt.toString());
+
+			for(CodeStatement stmt : allocatedIR){
+				System.out.println(stmt.toString());
+			}
 		}
-	}
+		
+
+		private CodeStatement store(String sr, String dest){
+			return new CodeStatement("store", sr, dest);
+		}
+
+		private CodeStatement load(String dr, String src){
+			return new CodeStatement("load", dr, src);
+		}
+
+		private boolean storesResult(String op){
+			if(storesResult != null){
+				return storesResult.contains(op);
+			}
+
+			storesResult = new ArrayList<String>();
+			storesResult.add("add");
+			return storesResult.contains(op);
+		}
+
+
+		private boolean isConditional(String s){
+			if(conditionals != null){
+				return condionals.contains(s);
+			}
+
+			conditionals = new ArrayList<String>();
+			conditionals.add("breq");
+		}
+
+		private boolean isNumeric(String s){
+			try {			
+				Double.parseDouble(s);
+			} catch (NumberFormatException e) {
+				return false;
+			}
+
+			return true;
+		}
 }
+

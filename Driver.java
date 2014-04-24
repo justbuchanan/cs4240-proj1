@@ -52,9 +52,17 @@ public class Driver {
 			}
 
 			//	register allocation
+			// naive
+			System.out.println("\n\n::::NAIVE REGISTER ALLOCATION :::::");
+			RegisterAllocator naiveAlloc = new NaiveRegisterAllocator();
+			naiveAlloc.allocRegisters(irCode);
+			naiveAlloc.printCode();
+
+
 			System.out.println("\n\nRegister Allocation\n==================================================");
 			RegisterAllocator allocator = new IntraBbRegisterAllocator();
 			irCode = allocator.allocRegisters(irCode);
+
 			
 			//	MIPS generation
 			MIPSGenerator mipsGenerator = new MIPSGenerator(irCode, parser.getSymbolTable());

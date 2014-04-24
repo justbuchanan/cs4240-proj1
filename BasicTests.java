@@ -11,7 +11,6 @@ import org.junit.Test;
 public class BasicTests {
 	@Test
 	public void testDefUseExtraction() {
-		EbbRegisterAllocator ebbAlloc = new EbbRegisterAllocator();
 
 		Set<String> def = new HashSet<>();
 		Set<String> use = new HashSet<>();

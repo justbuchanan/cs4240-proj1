@@ -1,0 +1,10 @@
+let
+function testFunction(i : int, i2 : int, i3 : int) begin
+	while i3 < 5 do
+	i := i2 + i3;
+	enddo;
+	return(i2 + i3);
+end;
+in
+	testFunction(3, 2, 1);
+end

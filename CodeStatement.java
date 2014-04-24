@@ -143,6 +143,7 @@ public class CodeStatement {
 	}
 	
 	public int getNumAddr(){
+		if(components == null) return 0;
 		return components.size();
 	}
 
