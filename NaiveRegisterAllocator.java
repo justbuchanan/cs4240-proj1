@@ -34,8 +34,11 @@ public class NaiveRegisterAllocator implements RegisterAllocator{
 				String leftOp = stmt.getLeftOperand();
 				String destReg = "$t2";
 				String leftReg = "$t0";
-
-				if(storesResult(op)){
+				
+				if("assign".equals(op) && stmt.getNumAddr() == 4){
+					allocatedIR.add(new CodeStatement(op, dest, leftOp, stmt.getRightOperand()));
+				}
+				else if(storesResult(op)){
 					
 
 					String rightReg = "$t1";
