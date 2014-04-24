@@ -154,8 +154,8 @@ public class MIPSGenerator {
 						mipsCode.add(new CodeStatement("lw", codeStatement.getOutputRegister(), "0($fp)"));
 						break;
 					case "store":
-						mipsCode.add(new CodeStatement("la", "$fp", codeStatement.getOutputRegister()));
-						mipsCode.add(new CodeStatement("sw", codeStatement.getLeftOperand(), "0($fp)"));
+						mipsCode.add(new CodeStatement("la", "$fp", codeStatement.getLeftOperand()));
+						mipsCode.add(new CodeStatement("sw", codeStatement.getOutputRegister(), "0($fp)"));
 						//store label, register
 						break;
 					case "breq":
